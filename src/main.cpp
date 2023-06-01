@@ -1,27 +1,56 @@
+/*
+    Author: M.D
+    Date: 2023/05/31
+    Description: This program is for automatic light control system.
+    Support 2 modes: 
+        1. RTC clock to determine time of day 
+        2. Light sensor to determine light intensity
+*/
+
+// Include library
 #include <Arduino.h>
 #include <limits.h>
-// Macro pin def
+
+// Macro pin definition
 #define PHOTORESISTOR_ADC_PIN 0
 #define REF_ADC_PIN 2
 #define SELECT_MODE_PIN 27
 #define ON_BOARD_LED_PIN 32
 #define LIGHT_OUT_PIN 17
+
 // Const value
 const uint32_t TICK_TO_MINUTE = 60;
-const uint32_t MINUTES_TO_TURN_OFF_LIGHT = 120;   //Default value 2h = 120min
+const uint32_t MINUTES_TO_TURN_OFF_LIGHT = 120; //Default value 2h = 120min
 const uint32_t MINUTES_TO_BLANKING_LIGHT = 10;  //Default value 10min
 const uint32_t COUNT_OF_SAMPLES = 5;
 const float MIN_DUTY_CYCLE = 0.5f;
-//Enum
-enum State
-{
-    Off,
-    Blanking,
-    On
-};
-State current_state = State::Off; // Default state
 
-//Variable
+// Enum class for light mode machine state 
+enum class LightState
+{
+    Off,        // Default state
+    Blanking,   // Light is slowly blanking
+    On          // Light is on
+};
+LightState light_state = LightState::Off; // Default state
+
+enum class ProgramMode
+{
+    RTC,            // Recomended mode  
+    LightSensor,    // Unrecomended mode in dark place
+    None   
+};
+ProgramMode program_state = ProgramMode::RTC; // Default state
+
+enum class RtcSource
+{
+    Internal,
+    DS1302,
+    None
+};
+RtcSource rtc_source = RtcSource::Internal; // Default state
+
+// Local variable
 uint16_t photoresistor_adc_val;
 uint16_t reference_adc_val;
 float median_photoresistor_adc_val;
@@ -41,7 +70,7 @@ void turn_on_light();
 void turn_blanking_light();
 void dynamic_light_blanking();
 
-// Setup
+// Setup program 
 void setup()
 {   
     //Initialize serial 
@@ -62,6 +91,7 @@ void setup()
     tick_count = TICK_TO_MINUTE; // Set max value to tick count
 }
 
+// Main program loop
 void loop()
 {
     //Decrease tick count 
@@ -72,16 +102,16 @@ void loop()
     if (tick_count == 0)
     {
         tick_count = TICK_TO_MINUTE;
-        if (current_state != State::Off)    //When system is active
+        if (light_state != LightState::Off)    //When system is active
         {
             minutes_count -= 1; //Decrease minutes count 
             if (minutes_count == 0)
-                switch (current_state)
+                switch (light_state)
                 {
-                case State::On: 
+                case LightState::On: 
                     turn_blanking_light();
                     break;
-                case State::Blanking: 
+                case LightState::Blanking: 
                     turn_off_light();
                     break;               
                 default:
@@ -95,19 +125,19 @@ void loop()
     {
         is_dark =  compare_values();   //Return false when is dark
         //Switch between diffrent programs
-        switch (current_state)
+        switch (light_state)
         {
-            case State::Off :
+            case LightState::Off :
                     if (is_dark == true && was_active == false)
                         turn_on_light();
                     if (is_dark == false)
                         was_active = false;
                 break;
-            case State::On :
+            case LightState::On :
                     if (is_dark == false)
                         turn_off_light();   
                 break;
-            case State::Blanking :
+            case LightState::Blanking :
                     if (is_dark == false)
                         turn_off_light();
                     else
@@ -123,7 +153,7 @@ void loop()
         Serial.println(median_reference_adc_val);
     }
 
-    //Delay for 1s
+    // Delay for 1s
     delay(1000);
 }
 
@@ -142,7 +172,7 @@ bool compare_values(){
 }
 void turn_off_light(){
     minutes_count = 0;
-    current_state = State::Off;
+    light_state = LightState::Off;
     was_active = true;
     pinMode(LIGHT_OUT_PIN, OUTPUT);
     digitalWrite(LIGHT_OUT_PIN, LOW);
@@ -150,7 +180,7 @@ void turn_off_light(){
 }
 void turn_on_light(){
     minutes_count = MINUTES_TO_TURN_OFF_LIGHT;
-    current_state = State::On;
+    light_state = LightState::On;
     pinMode(LIGHT_OUT_PIN, OUTPUT);
     digitalWrite(LIGHT_OUT_PIN, HIGH);  
     digitalWrite(ON_BOARD_LED_PIN, LOW);
@@ -158,7 +188,7 @@ void turn_on_light(){
 void turn_blanking_light(){
     pinMode(LIGHT_OUT_PIN, PWM);
     minutes_count = MINUTES_TO_BLANKING_LIGHT;
-    current_state = State::Blanking;
+    light_state = LightState::Blanking;
     dynamic_light_blanking();
 }
 
