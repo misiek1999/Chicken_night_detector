@@ -1,0 +1,14 @@
+#ifndef PROJECT_PIN_DEFINITION_H
+#define PROJECT_PIN_DEFINITION_H
+//TODO: change this defines to contexpr
+#define PHOTORESISTOR_ADC_PIN 0
+#define REF_ADC_PIN 2
+#define SELECT_MODE_PIN 27
+#define ON_BOARD_LED_PIN 32
+#define LIGHT_OUT_PIN 17
+#define DS1302_CLK_PIN PA8
+#define DS1302_DAT_PIN PA9
+#define DS1302_EN_PIN PB12
+#define DS1302_RST_PIN PA10
+
+#endif // PROJECT_PIN_DEFINITION_H
