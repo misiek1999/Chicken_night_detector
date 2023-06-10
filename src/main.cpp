@@ -68,7 +68,7 @@ void setup()
     initRtc();
     setRtcSource(RtcSource::External);
 
-    // setTimeToRtc(time_curr);   // TODO: delete this function after debug test
+    setTimeToRtc(time_curr);   // TODO: delete this function after debug test
 }
 
 // Main program loop
@@ -93,16 +93,17 @@ void loop()
     // Update light control
     perdiocUpdateLightControl(is_dark);
 
-    char buf[50];
-    // Get the time from the RTC
-    snprintf(buf, sizeof(buf), "test: %04d-%02d-%02d %02d:%02d:%02d",
-        time_curr.yr, time_curr.mon, time_curr.date,
-        time_curr.hr, time_curr.min, time_curr.sec);
+    // char buf[50];
+    // // Get the time from the RTC
+    // snprintf(buf, sizeof(buf), "test: %04d-%02d-%02d %02d:%02d:%02d",
+    //     time_curr.yr, time_curr.mon, time_curr.date,
+    //     time_curr.hr, time_curr.min, time_curr.sec);
 
-    // Print the formatted string to serial so we can see the time.
-     Serial.println(buf);
+    // // Print the formatted string to serial so we can see the time.
+    //  Serial.println(buf);
     // Delay for 1s
-    getCurrentTimeRtc(time_curr);
+    // getCurrentTimeRtc(time_curr);
+    setTimeToRtc(time_curr); 
     delay(1000);
 }
 
