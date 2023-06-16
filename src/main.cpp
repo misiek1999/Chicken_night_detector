@@ -7,6 +7,11 @@
         2. Light sensor to determine light intensity
 */
 
+// macro to disable HAL library
+// #define HAL_SPI_MODULE_DISABLED
+// #define HAL_I2C_MODULE_DISABLED
+// TODO: check this method
+
 // Include library
 #include <Arduino.h>
 #include <limits.h>
@@ -19,18 +24,15 @@
 #include "cli_interface.h"
 #include "calculate_night_time.h"
 
-// Const value
-const uint32_t COUNT_OF_SAMPLES = 5;
-
 enum class ProgramMode
 {
-    RTC,            // Recomended mode
-    LightSensor,    // Unrecomended mode in dark place
+    RTC,            // Recommenced mode
+    LightSensor,    // Unrecommended mode in dark place
     None
 };
 ProgramMode program_state = ProgramMode::RTC; // Default state
 
-Time time_curr(2013, 9, 22, 1, 38, 50, Time::Day::kFriday);
+static Time time_curr(0, 0, 0, 0, 0, 0, (Time::Day)0);
 
 // Local variable
 uint16_t photoresistor_adc_val;
@@ -41,9 +43,11 @@ float median_reference_adc_val;
 bool setup_ref_val_mode;
 bool is_dark;
 
-// Local dunctions declaration
+uint32_t mainLoopCounterLightProcess = 0;
+
+// Local functions declaration
 bool compare_values();
-Time calculateSunsetTime(const Time current_time);
+void periodicProcessLightControl();
 
 // Setup program
 void setup()
@@ -64,19 +68,60 @@ void setup()
 
     // Initialize light control
     initLightControl();
+
     // Initialize RTC
     initRtc();
     setRtcSource(RtcSource::External);
+    delay(200); // delay for RTC to sync time
+    // read time from RTC and check if it is valid
+    if  (getRtcStatus() != RtcStatus::Ok) { // if RTC is not valid
+        // change program mode to light sensor
+        program_state = ProgramMode::LightSensor;
+        Serial.println("RTC is not valid, change to light sensor mode");
+    } else {
+        // change program mode to RTC
+        program_state = ProgramMode::RTC;
+        Serial.println("RTC is valid, change to RTC mode");
+    }
 
-    setTimeToRtc(time_curr);   // TODO: delete this function after debug test
+    // Initialize CLI
+    CLI::init_CLI();
 }
 
 // Main program loop
 void loop()
 {
+    // process light control every 1s
+    if (mainLoopCounterLightProcess++ >= ProjectConst::kMainLoopCountToProcessLightDetect) {
+        mainLoopCounterLightProcess = 0;
+        periodicProcessLightControl();
+    }
+
+    // process CLI
+    CLI::periodicCProcessCLI();
+
+    // Delay for 1s
+    delay(ProjectConst::kMainLoopDelayMs);    // TODO: fix this delay to more accurate
+}
+
+// Return true when reference voltage is lower than photoresistor voltage
+bool compare_values() {
+    median_photoresistor_adc_val = 0;
+    median_reference_adc_val = 0;
+    for (size_t i =0; i < ProjectConst::kPhotoresistorSensorCount; ++i) {
+        median_photoresistor_adc_val += 1.0f/ProjectConst::kPhotoresistorSensorCount * analogRead(PHOTORESISTOR_ADC_PIN);
+        median_reference_adc_val += 1.0f/ProjectConst::kPhotoresistorSensorCount * analogRead(REF_ADC_PIN);
+    }
+    if (median_photoresistor_adc_val < median_reference_adc_val )
+        return true;
+    else
+        return false;
+}
+
+void periodicProcessLightControl() {
     // Read select pin mode
     setup_ref_val_mode = ! digitalRead(SELECT_MODE_PIN);
-    // Selcect mode of detection dark
+    // Select mode of detection dark
     switch (program_state)
     {
     case ProgramMode::RTC:          // Detect night using RTC
@@ -91,43 +136,5 @@ void loop()
         break;
     }
     // Update light control
-    perdiocUpdateLightControl(is_dark);
-
-    // char buf[50];
-    // // Get the time from the RTC
-    // snprintf(buf, sizeof(buf), "test: %04d-%02d-%02d %02d:%02d:%02d",
-    //     time_curr.yr, time_curr.mon, time_curr.date,
-    //     time_curr.hr, time_curr.min, time_curr.sec);
-
-    // // Print the formatted string to serial so we can see the time.
-    //  Serial.println(buf);
-    // Delay for 1s
-    // getCurrentTimeRtc(time_curr);
-    setTimeToRtc(time_curr); 
-    delay(1000);
-}
-
-// Return true when reference voltage is lower than photoresistor voltage
-bool compare_values() {
-    median_photoresistor_adc_val = 0;
-    median_reference_adc_val = 0;
-    for (int i =0; i < COUNT_OF_SAMPLES; ++i) {
-        median_photoresistor_adc_val += 1.0f/COUNT_OF_SAMPLES * analogRead(PHOTORESISTOR_ADC_PIN);
-        median_reference_adc_val += 1.0f/COUNT_OF_SAMPLES * analogRead(REF_ADC_PIN);
-    }
-    if (median_photoresistor_adc_val < median_reference_adc_val )
-        return true;
-    else
-        return false;
-}
-
-Time calculateSunsetTime(const Time current_time) {
-    Time sunset_time = current_time;
-    float year =  current_time.yr;
-    float month = current_time.mon;
-    float day = current_time.day;
-    // equation of sunset time
-
-
-    return sunset_time;
+    periodicUpdateLightControl(is_dark);
 }

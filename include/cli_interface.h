@@ -2,14 +2,26 @@
 #define CLI_INTERFACE_H
 
 #include <Arduino.h>
-#include <cli_interface.h>
+#include <embedded_cli.h>
+#include <rtc_controler.h>
 
 namespace CLI {
-// macro used to define CLI parameters
+// const values used in cli interface
+constexpr uint16_t kBufferSize = 512;
+constexpr uint16_t kMaxBindingCount = 8;
+constexpr uint16_t kHistorySize = 32;
+constexpr uint16_t kCmdBuffersize = 64;
+constexpr uint16_t kRxBufferSize = 32;
 
+/*
+    @details function to initialize CLI
+*/
 void init_CLI(void);
 
-void perdiodCProcessCLI(void);
+/*
+    @details function to process CLI in main loop
+*/
+void periodicCProcessCLI(void);
 
 } // namespace CLI
 

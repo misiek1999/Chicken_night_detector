@@ -5,12 +5,23 @@
 #include <DS1302.h>
 #include "project_pin_definition.h"
 
+constexpr unsigned int minYearWhenYearValueIsSmallerRtcIsUninitialized = 2020;
+constexpr unsigned int maxYearWhenYearValueIsHigherRtcIsDisconnected = 2100;
+
 enum class RtcSource
 {
     Internal,
     External,
     None
 };
+
+enum class RtcStatus
+{
+    Ok,
+    Uninitialized,
+    Disconnected
+};
+
 
 /*
     @details get current time from rtc
@@ -31,5 +42,23 @@ void setRtcSource(RtcSource rtc_source_to_set);
     @details init rtc
 */
 void initRtc(void);
+
+/*
+    @details get rtc status
+    @return RtcStatus enum with current status of rtc
+*/
+RtcStatus getRtcStatus(void);
+
+/*
+    @details check input value is in range
+    index 0 - year
+    index 1 - month
+    index 2 - day
+    index 3 - hour
+    index 4 - minute
+    index 5 - second
+    @return true if value is in range, false otherwise
+*/
+bool checkRtcValueIsInRange(uint32_t value, size_t index);
 
 #endif // RTC_CONTROLER_H

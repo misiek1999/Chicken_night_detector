@@ -5,12 +5,15 @@
 #define  PROJECT_CONST_H
 
 #include <cinttypes>
+#include "DS1302.h"
 #include "project_types.h"
 
 namespace ProjectConst
 {
     // main program const
-    constexpr ProjectTypes::time_ms_t kPeriodicUpdateTimeMs = 1000;
+    constexpr ProjectTypes::time_ms_t kMainLoopCountToProcessLightDetect = 100;
+    constexpr ProjectTypes::time_ms_t kMainLoopDelayMs = 10;
+    constexpr uint32_t kPhotoresistorSensorCount = 5;
     constexpr float kLightControlMinimumDutyCycle = 0.5f;
     constexpr int kMinutesToTurnOnLightBeforeSunset = 60;
     // light control const

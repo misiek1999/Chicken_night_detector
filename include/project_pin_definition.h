@@ -9,6 +9,5 @@
 #define DS1302_CLK_PIN PA8
 #define DS1302_DAT_PIN PA9
 #define DS1302_EN_PIN PA10
-// #define DS1302_RST_PIN 
 
 #endif // PROJECT_PIN_DEFINITION_H

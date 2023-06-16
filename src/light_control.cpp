@@ -39,7 +39,7 @@ void initLightControl(void) {
     light_state = LightState::Off;
 }
 
-void perdiocUpdateLightControl(bool turn_on_light) {
+void periodicUpdateLightControl(bool turn_on_light) {
     // decrement tick count to change light state
     second_count_to_change_light_state -= 1;
     // when tick count to change state is equal to 0, update light state

@@ -26,7 +26,7 @@ void initLightControl(void);
     call this function in constant period of time (1s)
     @param turn_on_light true if light should be turn on
 */
-void perdiocUpdateLightControl(bool turn_on_light);
+void periodicUpdateLightControl(bool turn_on_light);
 
 /*
     @details function to get current state of light controller
