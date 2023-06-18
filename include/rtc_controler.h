@@ -36,7 +36,12 @@ void setTimeToRtc(Time &time_to_set);
 /*
     @details set rtc source
 */
-void setRtcSource(RtcSource rtc_source_to_set);
+void setRtcSource(const RtcSource rtc_source_to_set);
+
+/*
+    @details get rtc source
+*/
+RtcSource getRtcSource();
 
 /*
     @details init rtc

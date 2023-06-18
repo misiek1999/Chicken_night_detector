@@ -13,6 +13,8 @@ void setRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void setProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context);
+void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
+
 
 // cli buffer
 CLI_UINT cliBuffer[BYTES_TO_CLI_UINTS(CLI::kBufferSize)];
@@ -42,18 +44,53 @@ void CLI::init_CLI(void) {
     cli->writeChar = sendCharOverSerial;
     // add bindings function cli
     embeddedCliAddBinding(cli, {// set rtc time
-            "rtc",                      // command name (spaces are not allowed)
-            "set rtc time: yyyy-mm-dd-hh-mm-ss [space separated]",   // Optional help for a command (NULL for no help)
+            "set_rtc",                      // command name (spaces are not allowed)
+            "set rtc time: yyyy-mm-dd-hh-mm-ss [space separated] PROVIDE TIME IN WINTER TIME!!!",   // Optional help for a command (NULL for no help)
             true,                       // flag whether to tokenize arguments (see below)
             nullptr,                    // optional pointer to any application context
             setRtcTimeCli               // binding function
     });
-    embeddedCliAddBinding(cli, {// set rtc time
+    embeddedCliAddBinding(cli, {// get rtc time
             "get_rtc",                  // command name (spaces are not allowed)
             "get current rtc time: yyyy-mm-dd-hh-mm-ss",   // Optional help for a command (NULL for no help)
             false,                      // flag whether to tokenize arguments (see below)
             nullptr,                    // optional pointer to any application context
             getRtcTimeCli               // binding function
+    });
+    embeddedCliAddBinding(cli, {// set rtc source
+            "rtc_source",                  // command name (spaces are not allowed)
+            "set rtc source: 1 -Internal, 2 - external",   // Optional help for a command (NULL for no help)
+            false,                      // flag whether to tokenize arguments (see below)
+            nullptr,                    // optional pointer to any application context
+            setRtcSourceCli               // binding function
+    });
+    embeddedCliAddBinding(cli, {// get rtc source
+            "get_rtc_source",                  // command name (spaces are not allowed)
+            "get rtc source",   // Optional help for a command (NULL for no help)
+            false,                      // flag whether to tokenize arguments (see below)
+            nullptr,                    // optional pointer to any application context
+            getRtcSourceCli               // binding function
+    });
+    embeddedCliAddBinding(cli, {// set program mode
+            "set_program_mode",                  // command name (spaces are not allowed)
+            "set program mode: 1 -RTC, 2 - Light sensor",   // Optional help for a command (NULL for no help)
+            false,                      // flag whether to tokenize arguments (see below)
+            nullptr,                    // optional pointer to any application context
+            setProgramModeCli               // binding function
+    });
+    embeddedCliAddBinding(cli, {// get program mode
+            "get_program_mode",                  // command name (spaces are not allowed)
+            "get program mode",   // Optional help for a command (NULL for no help)
+            false,                      // flag whether to tokenize arguments (see below)
+            nullptr,                    // optional pointer to any application context
+            getProgramModeCli           // binding function
+    });
+    embeddedCliAddBinding(cli, {// get light status
+            "get_light_status",                  // command name (spaces are not allowed)
+            "get light status",   // Optional help for a command (NULL for no help)
+            false,                      // flag whether to tokenize arguments (see below)
+            nullptr,                    // optional pointer to any application context
+            getLightStatusCli           // binding function
     });
 }
 
@@ -150,7 +187,7 @@ void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     // print current time
     char buf[50];
     // Get the time from the RTC
-    snprintf(buf, sizeof(buf), "test: %04d-%02d-%02d %02d:%02d:%02d",
+    snprintf(buf, sizeof(buf), "Time: %04d-%02d-%02d %02d:%02d:%02d",
         currentTime.yr, currentTime.mon, currentTime.date,
         currentTime.hr, currentTime.min, currentTime.sec);
     // Print the formatted string to serial so we can see the time.
@@ -162,6 +199,42 @@ void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
         Serial.println("Sensor is uninitialized!");
 }
 
+void setRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+
+}
+
+void getRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+    RtcSource source = getRtcSource();
+    if (source == RtcSource::External) {
+        Serial.println("External rtc source");
+        return;
+    }
+    if (source == RtcSource::Internal) {
+        Serial.println("Internal rtc source");
+        return;
+    }
+}
+
 void setProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 
+}
+
+void getProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+
+}
+
+void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+    LightState status = getLightState();
+    if (status == LightState::On) {
+        Serial.println("Light is on");
+        return;
+    }
+    if (status == LightState::Off) {
+        Serial.println("Light is off");
+        return;
+    }
+    if (status == LightState::Blanking) {
+        Serial.println("Light is Blanking");
+        return;
+    }
 }

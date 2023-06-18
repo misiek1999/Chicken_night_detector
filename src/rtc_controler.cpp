@@ -58,9 +58,14 @@ void setTimeToRtc(Time &time_to_set) {
     }
 }
 
-void setRtcSource(RtcSource rtc_source_to_set) {
+void setRtcSource(const RtcSource rtc_source_to_set) {
     //TODO: add verification of rtc_source_to_set
     rtc_source = rtc_source_to_set;
+}
+
+RtcSource getRtcSource()
+{
+    return rtc_source;
 }
 
 void initRtc(void) {

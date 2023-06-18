@@ -12,7 +12,7 @@ namespace ProjectConst
 {
     // main program const
     constexpr ProjectTypes::time_ms_t kMainLoopCountToProcessLightDetect = 100;
-    constexpr ProjectTypes::time_ms_t kMainLoopDelayMs = 10;
+    constexpr ProjectTypes::time_ms_t kMainLoopDelayUs = 10000; // 10 ms
     constexpr uint32_t kPhotoresistorSensorCount = 5;
     constexpr float kLightControlMinimumDutyCycle = 0.5f;
     constexpr int kMinutesToTurnOnLightBeforeSunset = 60;
@@ -22,8 +22,9 @@ namespace ProjectConst
     constexpr uint32_t kLightControlNightMaximumSecondDuration = 24 * 60 * 60;   // if control stuck in night mode, reset mcu after 24 hours
     constexpr uint32_t kLightControlSecondsBetweenChangeLightMode = 60;   // threshold for change light mode [s]
     // sunset and sunrise const
-    constexpr float kInstlationLatitude = 50.08027485662493f;
-    constexpr float kInstlationLongitude = 21.341718388675318f;
-    constexpr float kInstlationReq = -0.833f;
+    constexpr float kInstallationLatitude = 50.08027485662493f;
+    constexpr float kInstallationLongitude = 21.341718388675318f;
+    constexpr int8_t kInstallationTimeZone = 1;
+    constexpr float kInstallationReq = -0.833f;
 } // namespace ProjectConst
 #endif // PROJECT_CONST_H

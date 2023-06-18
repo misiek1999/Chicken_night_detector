@@ -17,6 +17,8 @@
 #include <limits.h>
 #include <math.h>
 
+#include <IWatchdog.h>
+
 #include "project_const.h"
 #include "project_pin_definition.h"
 #include "light_control.h"
@@ -44,6 +46,8 @@ bool setup_ref_val_mode;
 bool is_dark;
 
 uint32_t mainLoopCounterLightProcess = 0;
+uint32_t delayMainLoopUs = 0;
+uint32_t loopEntryTimeUs = 0;
 
 // Local functions declaration
 bool compare_values();
@@ -91,6 +95,7 @@ void setup()
 // Main program loop
 void loop()
 {
+    loopEntryTimeUs = micros();
     // process light control every 1s
     if (mainLoopCounterLightProcess++ >= ProjectConst::kMainLoopCountToProcessLightDetect) {
         mainLoopCounterLightProcess = 0;
@@ -100,8 +105,15 @@ void loop()
     // process CLI
     CLI::periodicCProcessCLI();
 
-    // Delay for 1s
-    delay(ProjectConst::kMainLoopDelayMs);    // TODO: fix this delay to more accurate
+    // calculate delay for main loop
+    delayMainLoopUs = (loopEntryTimeUs + ProjectConst::kMainLoopDelayUs) - micros();
+    // check calculated delay is correct
+    if (delayMainLoopUs < ProjectConst::kMainLoopDelayUs) {
+        delay_us(delayMainLoopUs);  //TODO: change this function to more accurate
+    }
+    else { //this case mean probably overrun
+        // TODO: add overrun support
+    }
 }
 
 // Return true when reference voltage is lower than photoresistor voltage

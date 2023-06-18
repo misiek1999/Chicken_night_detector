@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <embedded_cli.h>
 #include <rtc_controler.h>
+#include <light_control.h>
 
 namespace CLI {
 // const values used in cli interface

@@ -1,7 +1,7 @@
 #include "light_control.h"
 
 static LightState light_state = LightState::Off; // Default state
-static uint32_t second_count_to_change_light_state = 0;   // Count of seconds to change light state
+static uint8_t second_count_to_change_light_state = 0;   // Count of seconds to change light state
 static uint32_t count_of_second_in_night = 0;   // Count of seconds when light signal is on
 /*
     @details change light state to turn off
@@ -26,7 +26,7 @@ void turn_blanking_light();
 /*
     @details update light control state
 */
-void update_light_control_state(bool light_is_on);
+void update_light_control_state(bool night_is_detected);
 
 void dynamic_light_blanking();
 
@@ -96,9 +96,9 @@ void dynamic_light_blanking() {
     pwmWrite(LIGHT_OUT_PIN, duty_cycle);
 }
 
-void update_light_control_state(bool light_is_on) {
+void update_light_control_state(bool night_is_detected) {
     // when flag to turn on light is false, turn off light and reset counter of seconds in night
-    if (light_is_on == false) {
+    if (night_is_detected == false) {
         count_of_second_in_night = 0;
         if (light_state != LightState::Off) {
             turn_off_light();
@@ -110,7 +110,7 @@ void update_light_control_state(bool light_is_on) {
         turn_on_light();
         return;
     }
-    if (light_state == LightState::On && count_of_second_in_night < ProjectConst::kLightControlSecondsToTurnOffLights + ProjectConst::kLightControlSecondsToBlankingLight) {
+    if (light_state == LightState::On && count_of_second_in_night < ProjectConst::kLightControlSecondsToTurnOffLights + ProjectConst::kLightControlSecondsToBlankingLight && count_of_second_in_night >= ProjectConst::kLightControlSecondsToTurnOffLights) {
         turn_blanking_light();
         return;
     }
