@@ -3,7 +3,7 @@
 #include "project_pin_definition.h"
 
 // Global object of GpioDriver
-GPIO::GpioDriver gpio_driver;
+GPIO::GpioDriver GPIO::gpio_driver;
 
 GPIO::GpioDriver::GpioDriver()
 {
