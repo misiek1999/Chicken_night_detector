@@ -1,37 +1,30 @@
-#include "rtc_controler.h"
+#include "rtc_driver.h"
 
-static RtcSource rtc_source = RtcSource::Internal; // Default state
+RtcDriver rtc_driver;
 
-// Class with DS1302 RTC clock
-DS1302 external_rtc(DS1302_EN_PIN, DS1302_DAT_PIN, DS1302_CLK_PIN);
-
-void setExternalRtcTime(Time &time_to_set) {
-    external_rtc.time(time_to_set);
+void RtcDriver::setExternalRtcTime(ProjectTypes::RTC_Time &time_to_set) {
+    ModuleAdapter::set_external_rtc_time(time_to_set);
 }
 
-void getExternalRtcTime(Time &current_time) {
-    // read time from external rtc
-    Time time_from_sensor = external_rtc.time();
-    // copy values to input argument
-    current_time.yr = time_from_sensor.yr;
-    current_time.mon = time_from_sensor.mon;
-    current_time.day = time_from_sensor.day;
-    current_time.hr = time_from_sensor.hr;
-    current_time.min = time_from_sensor.min;
-    current_time.sec = time_from_sensor.sec;
-    current_time.date = time_from_sensor.date;
+void RtcDriver::getExternalRtcTime(ProjectTypes::RTC_Time &current_time) {
+    ModuleAdapter::get_external_rtc_time(current_time);
 }
 
-void setInternalRtcTime(Time &time_to_set) {
+void RtcDriver::setInternalRtcTime(ProjectTypes::RTC_Time &time_to_set) {
     //TODO: Implement function
 }
 
-void getInternalRtcTime(Time &current_time) {
+void RtcDriver::getInternalRtcTime(ProjectTypes::RTC_Time &current_time) {
     //TODO: Implement function
+    
 }
 
-void getCurrentTimeRtc(Time &current_time) {
-    switch (rtc_source)
+RtcDriver::RtcDriver()
+{
+}
+
+void RtcDriver::getCurrentTimeRtc(ProjectTypes::RTC_Time &current_time) {
+    switch (rtc_source_)
     {
     case RtcSource::Internal:
         getInternalRtcTime(current_time);
@@ -44,8 +37,8 @@ void getCurrentTimeRtc(Time &current_time) {
     }
 }
 
-void setTimeToRtc(Time &time_to_set) {
-    switch (rtc_source)
+void RtcDriver::setTimeToRtc(ProjectTypes::RTC_Time &time_to_set) {
+    switch (rtc_source_)
     {
     case RtcSource::Internal:
         setInternalRtcTime(time_to_set);
@@ -58,25 +51,20 @@ void setTimeToRtc(Time &time_to_set) {
     }
 }
 
-void setRtcSource(const RtcSource rtc_source_to_set) {
+void RtcDriver::setRtcSource(const RtcSource rtc_source_to_set) {
     //TODO: add verification of rtc_source_to_set
-    rtc_source = rtc_source_to_set;
+    rtc_source_ = rtc_source_to_set;
 }
 
-RtcSource getRtcSource()
+RtcSource RtcDriver::getRtcSource()
 {
-    return rtc_source;
+    return rtc_source_;
 }
 
-void initRtc(void) {
-    // TODO: Debug purpose only
-    external_rtc.writeProtect(false);
-    external_rtc.halt(false);
-}
 
-RtcStatus getRtcStatus(void) {
+RtcStatus RtcDriver::getRtcStatus(void) {
     // read current time from rtc
-    Time time_from_sensor(0, 0, 0, 0, 0, 0, (Time::Day)0);
+    ProjectTypes::RTC_Time time_from_sensor;
     getCurrentTimeRtc(time_from_sensor);
     // check if time is valid
     if (time_from_sensor.yr < minYearWhenYearValueIsSmallerRtcIsUninitialized) {
@@ -88,7 +76,7 @@ RtcStatus getRtcStatus(void) {
     return RtcStatus::Ok;
 }
 
-bool checkRtcValueIsInRange(uint32_t value, size_t index) {
+bool RtcDriver::checkRtcValueIsInRange(uint32_t value, size_t index) {
     bool status = false;    // default value
     switch (index) {
     case 0: // year
@@ -118,3 +106,4 @@ bool checkRtcValueIsInRange(uint32_t value, size_t index) {
 
     return status;
 }
+

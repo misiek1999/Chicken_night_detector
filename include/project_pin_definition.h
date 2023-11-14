@@ -1,6 +1,6 @@
 #ifndef PROJECT_PIN_DEFINITION_H
 #define PROJECT_PIN_DEFINITION_H
-//TODO: change this defines to contexpr
+// TODO: change this defines to constexpr
 #define PHOTORESISTOR_ADC_PIN 0
 #define REF_ADC_PIN 2
 #define SELECT_MODE_PIN 27

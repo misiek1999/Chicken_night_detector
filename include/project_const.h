@@ -5,26 +5,27 @@
 #define  PROJECT_CONST_H
 
 #include <cinttypes>
-#include "DS1302.h"
 #include "project_types.h"
 
 namespace ProjectConst
 {
     // main program const
+    constexpr unsigned kSerialBaudRate = 115200U;
     constexpr ProjectTypes::time_ms_t kMainLoopCountToProcessLightDetect = 100;
     constexpr ProjectTypes::time_ms_t kMainLoopDelayUs = 10000; // 10 ms
     constexpr uint32_t kPhotoresistorSensorCount = 5;
-    constexpr float kLightControlMinimumDutyCycle = 0.5f;
-    constexpr int kMinutesToTurnOnLightBeforeSunset = 60;
+    constexpr float kLightControlMinimumDutyCycle = 0.5F;
+
     // light control const
-    constexpr uint32_t kLightControlSecondsToTurnOffLights = 120 * 60; // Default value 2h = 120min
+    constexpr uint32_t kLightControlSecondsToTurnOnLights = 60 * 60; // Default value 1h
+    constexpr uint32_t kLightControlSecondsToTurnOffLights = 60 * 60; // Default value 1h
     constexpr uint32_t kLightControlSecondsToBlankingLight = 10 * 60;   // Default value 10min
-    constexpr uint32_t kLightControlNightMaximumSecondDuration = 24 * 60 * 60;   // if control stuck in night mode, reset mcu after 24 hours
-    constexpr uint32_t kLightControlSecondsBetweenChangeLightMode = 60;   // threshold for change light mode [s]
+    constexpr uint32_t kLightControlNightMaximumSecondDuration = 24 * 60 * 60;   // if control stuck in ON or blanking mode, reset mcu after 24 hours
+
     // sunset and sunrise const
-    constexpr float kInstallationLatitude = 50.08027485662493f;
-    constexpr float kInstallationLongitude = 21.341718388675318f;
-    constexpr int8_t kInstallationTimeZone = 1;
-    constexpr float kInstallationReq = -0.833f;
+    constexpr ProjectTypes::latitude_t kInstallationLatitude = 50.08027485662493F;
+    constexpr ProjectTypes::longitude_t kInstallationLongitude = 21.341718388675318F;
+    constexpr ProjectTypes::time_zone_t kInstallationTimeZone = 1;
+    constexpr ProjectTypes::req_t kInstallationReq = -0.833F;
 } // namespace ProjectConst
 #endif // PROJECT_CONST_H

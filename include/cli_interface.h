@@ -1,12 +1,13 @@
-#ifndef CLI_INTERFACE_H
-#define CLI_INTERFACE_H
+#pragma once
 
+#include <functional>
 #include <Arduino.h>
 #include <embedded_cli.h>
-#include <rtc_controler.h>
-#include <light_control.h>
+#include <etl/vector.h>
 
-namespace CLI {
+namespace CLI 
+{
+
 // const values used in cli interface
 constexpr uint16_t kBufferSize = 512;
 constexpr uint16_t kMaxBindingCount = 8;
@@ -14,16 +15,34 @@ constexpr uint16_t kHistorySize = 32;
 constexpr uint16_t kCmdBuffersize = 64;
 constexpr uint16_t kRxBufferSize = 32;
 
-/*
-    @details function to initialize CLI
-*/
-void init_CLI(void);
+typedef char (*serial_read_char_fun_t)(void);
+typedef void (*serial_write_char_fun_t)(EmbeddedCli *, char);
+typedef int (*serial_rest_bytes_in_rx_buffer_fun_t)(void);
 
-/*
-    @details function to process CLI in main loop
-*/
-void periodicCProcessCLI(void);
+class CLIInterface 
+{
+public:
+    CLIInterface(etl::vector<CliCommandBinding, kMaxBindingCount> &cli_callbacks,
+                serial_read_char_fun_t getCharFromSerial,
+                serial_write_char_fun_t sendCharOverSerial,
+                serial_rest_bytes_in_rx_buffer_fun_t restBytesInRxBuffer);
 
-} // namespace CLI
+    // Update CLI interfaces periodically
+    bool periodicCProcessCLI();
 
-#endif // CLI_INTERFACE_H
+private:
+    // buffer for cli
+    CLI_UINT cliBuffer[BYTES_TO_CLI_UINTS(CLI::kBufferSize)];
+
+    // cli instance
+    EmbeddedCli *cli_;
+
+    // callback functions to send char over serial
+    serial_write_char_fun_t sendCharOverSerial_;
+    // callback functions to get char from serial
+    serial_read_char_fun_t getCharFromSerial_;
+    // callback functions to get rest bytes is in rx buffer
+    serial_rest_bytes_in_rx_buffer_fun_t restBytesInRxBuffer_;
+};
+
+}   // namespace CLI

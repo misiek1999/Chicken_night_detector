@@ -1,121 +1,102 @@
 #include "light_control.h"
+#include <functional>
+#include "gpio_driver.h"
+#include "project_const.h"
+#include "rtc_driver.h"
 
-static LightState light_state = LightState::Off; // Default state
-static uint8_t second_count_to_change_light_state = 0;   // Count of seconds to change light state
-static uint32_t count_of_second_in_night = 0;   // Count of seconds when light signal is on
-/*
-    @details change light state to turn off
-*/
-void turn_off_light();
-
-/*
-    @details change light state to turn on
-*/
-void turn_on_light();
-
-/*
-    @details change light state to blanking
-*/
-void turn_blanking_light();
-
-/*
-    @details change pwm light output in blanking mode
-*/
-void turn_blanking_light();
-
-/*
-    @details update light control state
-*/
-void update_light_control_state(bool night_is_detected);
-
-void dynamic_light_blanking();
-
-void initLightControl(void) {
-    // init gpio for light control
-    pinMode(LIGHT_OUT_PIN, OUTPUT);
-    // init static variables
-    second_count_to_change_light_state = ProjectConst::kLightControlSecondsBetweenChangeLightMode;
-    count_of_second_in_night = 0;
-    light_state = LightState::Off;
+ProjectTypes::abs_min_past_midnight_t ger_rtc_time_abs()
+{
+    ProjectTypes::RTC_Time rtc_time;
+    rtc_driver.getCurrentTimeRtc(rtc_time);
+    return rtc_time.getAbsTimePostMidnight();
 }
 
-void periodicUpdateLightControl(bool turn_on_light) {
-    // decrement tick count to change light state
-    second_count_to_change_light_state -= 1;
-    // when tick count to change state is equal to 0, update light state
-    if (second_count_to_change_light_state == 0) {
-        // reset tick count to change light state
-        second_count_to_change_light_state = ProjectConst::kLightControlSecondsBetweenChangeLightMode;
-        // function to update light state
-        update_light_control_state(turn_on_light);
-    }
-    // update counter of seconds in night
-    if(turn_on_light == true) {
-        count_of_second_in_night += 1;
-        // if counter of seconds in night is higher than max value, reset board
-        if (count_of_second_in_night > ProjectConst::kLightControlNightMaximumSecondDuration) {
-            // TODO: reset board
-        }
-    }
-    // when light state is blanking, update light output
-    if (light_state == LightState::Blanking) {
-        dynamic_light_blanking();
+LightControl::LightController::LightController():
+    daytime_calculator_(ProjectConst::kInstallationLatitude,
+                                    ProjectConst::kInstallationLongitude,
+                                    ProjectConst::kInstallationTimeZone,
+                                    ProjectConst::kInstallationReq),
+    light_control_mode_(LightControlMode::RTC)
+{
+    // Calculate current sunset and sunrise time to rtc light controller
+    ProjectTypes::RTC_Time rtc_time;
+    rtc_driver.getCurrentTimeRtc(rtc_time);
+    ProjectTypes::abs_min_past_midnight_t event_time = daytime_calculator_.getSunsetTime(rtc_time);
+    light_controller_rtc_.addEvent((LightEventAndUpdateCallback)
+                 {LightEvent(event_time,
+                ProjectConst::kLightControlSecondsToTurnOnLights,
+                ProjectConst::kLightControlSecondsToTurnOffLights,
+                ProjectConst::kLightControlSecondsToBlankingLight,
+                ProjectConst::kLightControlSecondsToBlankingLight),
+             std::bind(&DaytimeCalculator::getSunsetTime,
+                daytime_calculator_, std::placeholders::_1)});
+}
+
+bool LightControl::LightController::periodicUpdateLightState()
+{
+    bool status = true;
+    // get current rtc time
+    ProjectTypes::RTC_Time rtc_time;
+    rtc_driver.getCurrentTimeRtc(rtc_time);
+    // update selected light controller
+    this->light_controller_rtc_.updateEvents(rtc_time);
+    // read light state
+
+
+    return status;
+}
+
+bool LightControl::LightController::changeBlankingTime(const ProjectTypes::abs_min_past_midnight_t & new_blanking_time,  const size_t &event_id)
+{
+    return light_controller_rtc_.updateBlankingTime(new_blanking_time, event_id);
+}
+
+void LightControl::LightController::changeLightControlMode(const LightControlMode & new_mode)
+{
+    if (new_mode < LightControlMode::NumOfLightControlModes) {
+        light_control_mode_ = new_mode;
     }
 }
 
-LightState getLightState(void) {
-    return light_state;
+bool LightControl::LightController::updateEvents(const ProjectTypes::RTC_Time & time_now)
+{
+    // TODO: add support to outdoor light detection method
+    light_controller_rtc_.updateEvents(time_now);
+
+    return true;
 }
 
-void turn_off_light() {
-    light_state = LightState::Off;
-    pinMode(LIGHT_OUT_PIN, OUTPUT);
-    digitalWrite(LIGHT_OUT_PIN, LOW);
-    digitalWrite(ON_BOARD_LED_PIN, HIGH);
-}
-
-void turn_on_light() {
-    light_state = LightState::On;
-    pinMode(LIGHT_OUT_PIN, OUTPUT);
-    digitalWrite(LIGHT_OUT_PIN, HIGH);
-    digitalWrite(ON_BOARD_LED_PIN, LOW);
-}
-
-void turn_blanking_light() {
-    pinMode(LIGHT_OUT_PIN, PWM);
-    light_state = LightState::Blanking;
-    dynamic_light_blanking();
-}
-
-void dynamic_light_blanking() {
-    uint16_t max_duty_cycle_value = numeric_limits<uint16_t>::max();
-    uint16_t diff = (uint16_t)max_duty_cycle_value *float(1 - ProjectConst::kLightControlMinimumDutyCycle);
-    float fill_factor = 1 - float(count_of_second_in_night - ProjectConst::kLightControlSecondsToTurnOffLights)
-                        /ProjectConst::kLightControlSecondsToBlankingLight;
-    uint16_t duty_cycle  = max_duty_cycle_value - fill_factor * diff;
-    pwmWrite(LIGHT_OUT_PIN, duty_cycle);
-}
-
-void update_light_control_state(bool night_is_detected) {
-    // when flag to turn on light is false, turn off light and reset counter of seconds in night
-    if (night_is_detected == false) {
-        count_of_second_in_night = 0;
-        if (light_state != LightState::Off) {
-            turn_off_light();
-        }
-        return;
+LightControl::LightState LightControl::LightController::updateLightState(const ProjectTypes::RTC_Time & time_now)
+{
+    // Select mode of detection dark
+    switch (light_control_mode_)
+    {
+    case LightControl::LightControlMode::RTC:          // Detect night using RTC
+        light_state_ = light_controller_rtc_.getLightState(time_now);
+        break;
+    case LightControl::LightControlMode::LightSensor:  // Detect night using outdoor light sensor
+        light_state_ = light_sensor_driver_.getLightState(time_now);
+        break;
+    case LightControl::LightControlMode::None:         // Do nothing
+        light_state_ = LightState::Off;
+        break;
+    default:
+        light_state_ = LightState::Error;
+        break;
     }
-    // when flag to turn on light is true, select light state
-    if (light_state == LightState::Off && count_of_second_in_night < ProjectConst::kLightControlSecondsToTurnOffLights) {
-        turn_on_light();
-        return;
-    }
-    if (light_state == LightState::On && count_of_second_in_night < ProjectConst::kLightControlSecondsToTurnOffLights + ProjectConst::kLightControlSecondsToBlankingLight && count_of_second_in_night >= ProjectConst::kLightControlSecondsToTurnOffLights) {
-        turn_blanking_light();
-        return;
-    }
-    if (count_of_second_in_night > ProjectConst::kLightControlSecondsToTurnOffLights + ProjectConst::kLightControlSecondsToBlankingLight) {
-        turn_off_light();
-        return;
-    }
+}
+
+void LightControl::LightController::turnOffLight()
+{
+    GPIO::gpio_driver.toggleLight(false);
+}
+
+void LightControl::LightController::turnOnLight()
+{
+    GPIO::gpio_driver.toggleLight(false);
+}
+
+void LightControl::LightController::lightBlanking(const float &percent_blanking)
+{
+    GPIO::gpio_driver.setPWMLightPercentage(percent_blanking);
 }
