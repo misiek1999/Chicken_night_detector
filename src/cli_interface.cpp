@@ -1,5 +1,11 @@
 #include "cli_interface.h"
 
+// enable embedded CLI 
+#ifndef EMBEDDED_CLI_IMPL
+#define EMBEDDED_CLI_IMPL
+#include "embedded_cli.h"
+#endif
+
 CLI::CLIInterface::CLIInterface(etl::vector<CliCommandBinding, kMaxBindingCount> &cli_callbacks,
                                 serial_read_char_fun_t getCharFromSerial,
                                 serial_write_char_fun_t sendCharOverSerial,

@@ -243,8 +243,6 @@ LightControl::LightState LightControl::LightControllerRTC::getLightState(const P
     LightControl::LightState light_state = LightControl::LightState::Undefined;
     // get abs min time past midnight from rtc time
     ProjectTypes::abs_min_past_midnight_t rtc_abs_min = getAbsMinPastMidnightFromRtc(rtc_time);
-    int a = event_containers_.size();
-    Serial.println(a);
     // check if light should start blinking
     // for (auto& event_container : event_containers_)
     for (auto event_container= event_containers_.begin(); event_container != event_containers_.end(); ++event_container)
@@ -283,7 +281,7 @@ bool LightControl::LightControllerRTC::updateBlankingTime(const ProjectTypes::ab
 bool LightControl::LightControllerRTC::addEvent(const LightEventAndUpdateCallback & new_event)
 {
     bool status = false;
-    if (event_containers_.full())
+    if (event_containers_.full() == false)
     {
         status = true;
         event_containers_.push_back(new_event);
