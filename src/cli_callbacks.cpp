@@ -14,7 +14,7 @@ void setProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 
-etl::vector<CliCommandBinding, CLI::kMaxBindingCount> cli_callbacks = {{
+etl::vector<CliCommandBinding, CLI::kMaxBindingCount> CLI::cli_callbacks = {{
         "set_rtc",                      // command name (spaces are not allowed)
         "set rtc time: yyyy-mm-dd-hh-mm-ss [space separated] PROVIDE TIME IN WINTER TIME!!!",   // Optional help for a command (NULL for no help)
         true,                       // flag whether to tokenize arguments (see below)

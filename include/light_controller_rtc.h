@@ -130,8 +130,8 @@ private:
     DaytimeEvent turn_on_event_;
     DaytimeEvent start_blanking_event_;
     LightState light_state_;
-    ProjectTypes::time_minute_diff_t time_to_turn_on_before_event_;
     ProjectTypes::time_minute_diff_t time_to_turn_off_after_event_;
+    ProjectTypes::time_minute_diff_t time_to_turn_on_before_event_;
     ProjectTypes::time_minute_diff_t time_to_start_blanking_before_turn_on_;
     ProjectTypes::time_minute_diff_t time_to_end_blanking_after_turn_off_;
 

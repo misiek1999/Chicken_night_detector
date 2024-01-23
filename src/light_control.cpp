@@ -84,6 +84,7 @@ LightControl::LightState LightControl::LightController::updateLightState(const P
         light_state_ = LightState::Error;
         break;
     }
+    return light_state_;
 }
 
 void LightControl::LightController::turnOffLight()

@@ -17,7 +17,7 @@ ProjectTypes::time_minute_diff_t format_time_to_24h(ProjectTypes::time_minute_di
     {
         time_24h += kMinPerDay;
     }
-    else if (time > kMinPerDay)
+    else if (time > ProjectTypes::time_minute_diff_t(kMinPerDay))
     {
         time_24h -= kMinPerDay;
     }
@@ -102,7 +102,9 @@ ProjectTypes::time_minute_diff_t LightControl::DaytimeEvent::getTimePastEvent(co
 bool LightControl::DaytimeEvent::checkTimeIsInRange(const ProjectTypes::time_minute_diff_t & relative_time) const
 {
     bool is_in_range = false;
-    if (relative_time + time_to_turn_on_before_event_ > event_time_ && relative_time < event_time_ + time_to_turn_off_after_event_ )
+    ProjectTypes::time_minute_diff_t event_time_relative = static_cast<ProjectTypes::time_minute_diff_t>(event_time_);
+    if (relative_time + time_to_turn_on_before_event_ > event_time_relative &&
+        relative_time < event_time_relative + time_to_turn_off_after_event_ )
     {
         is_in_range = true;
     }

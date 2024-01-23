@@ -17,10 +17,14 @@
 #include "light_control.h"
 #include "rtc_driver.h"
 #include "gpio_driver.h"
-#include "cli_interface.h"
+#include "cli_process.h"
 
+// Object of light controller
 LightControl::LightController light_controller;
+// Object of CLI interface controller
+CLI::CLIProcess cli_process;
 
+//TODO: remove below local variables from main.cpp
 // Local variable
 uint16_t photoresistor_adc_val;
 uint16_t reference_adc_val;
@@ -58,7 +62,7 @@ void loop()
     }
 
     // process CLI
-
+    cli_process.periodicCProcessCLI();
 
     // calculate delay for main loop
     delayMainLoopUs = (loopEntryTimeUs + ProjectConst::kMainLoopDelayUs) - micros();
