@@ -34,7 +34,7 @@ LightControl::LightController::LightController():
 
 bool LightControl::LightController::periodicUpdateLightState()
 {
-    //TODO: rebuild this code 
+    //TODO: rebuild this code
     bool status = true;
     // get current rtc time
     ProjectTypes::RTC_Time rtc_time;
@@ -42,7 +42,7 @@ bool LightControl::LightController::periodicUpdateLightState()
     // update selected light controller
     this->light_controller_rtc_.updateEvents(rtc_time);
     // read light state
-    
+
 
     return status;
 }
@@ -52,11 +52,21 @@ bool LightControl::LightController::changeBlankingTime(const ProjectTypes::abs_m
     return light_controller_rtc_.updateBlankingTime(new_blanking_time, event_id);
 }
 
-void LightControl::LightController::changeLightControlMode(const LightControlMode & new_mode)
+void LightControl::LightController::setLightControlMode(const LightControlMode & new_mode)
 {
     if (new_mode < LightControlMode::NumOfLightControlModes) {
         light_control_mode_ = new_mode;
     }
+}
+
+LightControl::LightControlMode LightControl::LightController::getLightControlMode() const
+{
+    return light_control_mode_;
+}
+
+LightControl::LightState LightControl::LightController::getLightState() const
+{
+    return light_state_;
 }
 
 bool LightControl::LightController::updateEvents(const ProjectTypes::RTC_Time & time_now)
@@ -69,7 +79,7 @@ bool LightControl::LightController::updateEvents(const ProjectTypes::RTC_Time & 
 
 LightControl::LightState LightControl::LightController::updateLightState(const ProjectTypes::RTC_Time & time_now)
 {
-    // Select mode of detection dark
+    // update and read state of light for current mode
     switch (light_control_mode_)
     {
     case LightControl::LightControlMode::RTC:          // Detect night using RTC

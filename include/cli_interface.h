@@ -5,10 +5,10 @@
 #include <embedded_cli.h>
 #include <etl/vector.h>
 
-// enable embedded CLI 
+// enable embedded CLI
 #define EMBEDDED_CLI_IMPL
 
-namespace CLI 
+namespace CLI
 {
 
 // const values used in cli interface

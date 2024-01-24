@@ -31,7 +31,9 @@ public:
 
     bool periodicUpdateLightState();
     bool changeBlankingTime(const ProjectTypes::abs_min_past_midnight_t &new_blanking_time, const size_t &event_id);
-    void changeLightControlMode(const LightControlMode &new_mode);
+    void setLightControlMode(const LightControlMode &new_mode);
+    LightControlMode getLightControlMode() const;
+    LightState getLightState() const;
 
 private:
     LightSensorDriver light_sensor_driver_;

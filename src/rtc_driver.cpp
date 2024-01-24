@@ -73,8 +73,9 @@ void RtcDriver::setTimeToRtc(ProjectTypes::RTC_Time &time_to_set) {
 }
 
 void RtcDriver::setRtcSource(const RtcSource rtc_source_to_set) {
-    //TODO: add verification of rtc_source_to_set
-    rtc_source_ = rtc_source_to_set;
+    if ((int)rtc_source_to_set >= 0 && rtc_source_to_set < RtcSource::NumberOfRtcSources) {
+        rtc_source_ = rtc_source_to_set;
+    }
 }
 
 RtcSource RtcDriver::getRtcSource()

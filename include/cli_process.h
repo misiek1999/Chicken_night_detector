@@ -5,7 +5,7 @@
 
 namespace CLI
 {
-    
+
 class CLIProcess
 {
 public:

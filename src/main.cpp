@@ -14,13 +14,11 @@
 #include <libmaple/iwdg.h>
 #include "project_const.h"
 #include "project_pin_definition.h"
-#include "light_control.h"
+#include "light_controller_process.h"
 #include "rtc_driver.h"
 #include "gpio_driver.h"
 #include "cli_process.h"
 
-// Object of light controller
-LightControl::LightController light_controller;
 // Object of CLI interface controller
 CLI::CLIProcess cli_process;
 

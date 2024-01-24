@@ -1,7 +1,8 @@
 #include "cli_callbacks.h"
 
 #include <Arduino.h>
-#include "light_control.h"
+#include "light_state.h"
+#include "light_controller_process.h"
 #include "rtc_driver.h"
 
 
@@ -17,51 +18,51 @@ void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 etl::vector<CliCommandBinding, CLI::kMaxBindingCount> CLI::cli_callbacks = {{
         "set_rtc",                      // command name (spaces are not allowed)
         "set rtc time: yyyy-mm-dd-hh-mm-ss [space separated] PROVIDE TIME IN WINTER TIME!!!",   // Optional help for a command (NULL for no help)
-        true,                       // flag whether to tokenize arguments (see below)
-        nullptr,                    // optional pointer to any application context
-        setRtcTimeCli               // binding function
+        true,                           // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        setRtcTimeCli                   // binding function
     },
     {
-        "get_rtc",                  // command name (spaces are not allowed)
+        "get_rtc",                      // command name (spaces are not allowed)
         "get current rtc time: yyyy-mm-dd-hh-mm-ss",   // Optional help for a command (NULL for no help)
-        false,                      // flag whether to tokenize arguments (see below)
-        nullptr,                    // optional pointer to any application context
-        getRtcTimeCli               // binding function
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getRtcTimeCli                   // binding function
     },
     {
-        "rtc_source",                  // command name (spaces are not allowed)
-        "set rtc source: 1 -Internal, 2 - external",   // Optional help for a command (NULL for no help)
-        false,                      // flag whether to tokenize arguments (see below)
-        nullptr,                    // optional pointer to any application context
-        setRtcSourceCli               // binding function
+        "rtc_source",                   // command name (spaces are not allowed)
+        "set rtc source: 1 - Internal, 2 - external, 3 - syncInternalWithExternal, 4 - DCF77",    // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        setRtcSourceCli                 // binding function
     },
     {
-        "get_rtc_source",                  // command name (spaces are not allowed)
-        "get rtc source",   // Optional help for a command (NULL for no help)
-        false,                      // flag whether to tokenize arguments (see below)
-        nullptr,                    // optional pointer to any application context
-        getRtcSourceCli               // binding function
+        "get_rtc_source",               // command name (spaces are not allowed)
+        "get rtc source",               // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getRtcSourceCli                 // binding function
     },
     {
-        "set_program_mode",                  // command name (spaces are not allowed)
-        "set program mode: 1 -RTC, 2 - Light sensor",   // Optional help for a command (NULL for no help)
-        false,                      // flag whether to tokenize arguments (see below)
-        nullptr,                    // optional pointer to any application context
+        "set_program_mode",             // command name (spaces are not allowed)
+        "set program mode: 1 -RTC, 2 - Light sensor", // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
         setProgramModeCli               // binding function
     },
     {
-        "get_program_mode",                  // command name (spaces are not allowed)
-        "get program mode",   // Optional help for a command (NULL for no help)
-        false,                      // flag whether to tokenize arguments (see below)
-        nullptr,                    // optional pointer to any application context
-        getProgramModeCli           // binding function
+        "get_program_mode",             // command name (spaces are not allowed)
+        "get program mode",             // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getProgramModeCli               // binding function
     },
     {
-        "get_light_status",                  // command name (spaces are not allowed)
-        "get light status",   // Optional help for a command (NULL for no help)
-        false,                      // flag whether to tokenize arguments (see below)
-        nullptr,                    // optional pointer to any application context
-        getLightStatusCli           // binding function
+        "get_light_status",             // command name (spaces are not allowed)
+        "get light status",             // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getLightStatusCli               // binding function
     }
 };
 
@@ -70,7 +71,7 @@ void sendCharOverSerial(EmbeddedCli *embeddedCli, char c) {
     Serial.write(c);
 }
 
-bool checkCstringIsNumber(const char *str) {
+bool checkCStringIsNumber(const char *str) {
     for (size_t i = 0; i < strlen(str); ++i) {
         if (!isdigit(str[i])) {
             return false;
@@ -117,7 +118,7 @@ void setRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     for (size_t i = 1; i <= token_count; ++i) {
         // check if token is number
           const char *token = embeddedCliGetToken(args, i);
-        if (!checkCstringIsNumber(token)) {
+        if (!checkCStringIsNumber(token)) {
             Serial.println(F("Argument is not number!"));
             Serial.print(F("arg "));
             Serial.print((char) ('0' + i));
@@ -163,7 +164,17 @@ void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 }
 
 void setRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
-
+    //  check only first token
+    constexpr size_t kTokenToCheck = 1;
+    const char *token = embeddedCliGetToken(args, kTokenToCheck);
+    if (!checkCStringIsNumber(token)) {
+        Serial.println(F("Argument is not number!"));
+        Serial.print(F("arg : "));
+        Serial.println(token);
+        return;
+    }
+    // set new rtc source
+    rtc_driver.setRtcSource((RtcSource) atoi(token));
 }
 
 void getRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
@@ -179,25 +190,58 @@ void getRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 }
 
 void setProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
-
+    //  check only first token
+    constexpr size_t kTokenToCheck = 1;
+    const char *token = embeddedCliGetToken(args, kTokenToCheck);
+    if (!checkCStringIsNumber(token)) {
+        Serial.println(F("Argument is not number!"));
+        Serial.print(F("arg : "));
+        Serial.println(token);
+        return;
+    }
+    // set new program mode
+    LightControl::LightControlMode mode = (LightControl::LightControlMode) atoi(token);
+    light_controller.setLightControlMode(mode);
 }
 
 void getProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
-
+    LightControl::LightControlMode mode = light_controller.getLightControlMode();
+    switch (mode)
+    {
+    case LightControl::LightControlMode::RTC:
+        Serial.println("RTC mode");
+        break;
+    case LightControl::LightControlMode::LightSensor:
+        Serial.println("Light sensor mode");
+        break;
+    case LightControl::LightControlMode::None:
+        Serial.println("None mode");
+        break;
+    default:
+        Serial.println("Error mode");
+        break;
+    }
 }
 
 void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
-    // LightControl::LightState status = getLightState();
-    // if (status == LightControl::LightState::On) {
-    //     Serial.println("Light is on");
-    //     return;
-    // }
-    // if (status == LightControl::LightState::Off) {
-    //     Serial.println("Light is off");
-    //     return;
-    // }
-    // if (status == LightControl::LightState::Blanking) {
-    //     Serial.println("Light is Blanking");
-    //     return;
-    // }
+    LightControl::LightState light_status = light_controller.getLightState();
+    switch (light_status)
+    {
+    case LightControl::LightState::On:
+        Serial.println("Light is on");
+        break;
+    case LightControl::LightState::Off:
+        Serial.println("Light is off");
+        break;
+    case LightControl::LightState::Blanking:
+        Serial.println("Light is blanking");
+        break;
+    case LightControl::LightState::Error:
+        Serial.println("Light is in error state");
+        break;
+    case LightControl::LightState::Undefined:
+    default:
+        Serial.println("Light is in undefined state");
+        break;
+    }
 }
