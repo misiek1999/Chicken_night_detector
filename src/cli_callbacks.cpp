@@ -28,35 +28,35 @@ etl::vector<CliCommandBinding, CLI::kMaxBindingCount> CLI::cli_callbacks = {{
         nullptr,                    // optional pointer to any application context
         getRtcTimeCli               // binding function
     },
-    {            
+    {
         "rtc_source",                  // command name (spaces are not allowed)
         "set rtc source: 1 -Internal, 2 - external",   // Optional help for a command (NULL for no help)
         false,                      // flag whether to tokenize arguments (see below)
         nullptr,                    // optional pointer to any application context
         setRtcSourceCli               // binding function
     },
-    {            
+    {
         "get_rtc_source",                  // command name (spaces are not allowed)
-            "get rtc source",   // Optional help for a command (NULL for no help)
-            false,                      // flag whether to tokenize arguments (see below)
-            nullptr,                    // optional pointer to any application context
-            getRtcSourceCli               // binding function
+        "get rtc source",   // Optional help for a command (NULL for no help)
+        false,                      // flag whether to tokenize arguments (see below)
+        nullptr,                    // optional pointer to any application context
+        getRtcSourceCli               // binding function
     },
-    {            
+    {
         "set_program_mode",                  // command name (spaces are not allowed)
-            "set program mode: 1 -RTC, 2 - Light sensor",   // Optional help for a command (NULL for no help)
-            false,                      // flag whether to tokenize arguments (see below)
-            nullptr,                    // optional pointer to any application context
-            setProgramModeCli               // binding function
+        "set program mode: 1 -RTC, 2 - Light sensor",   // Optional help for a command (NULL for no help)
+        false,                      // flag whether to tokenize arguments (see below)
+        nullptr,                    // optional pointer to any application context
+        setProgramModeCli               // binding function
     },
-    {            
+    {
         "get_program_mode",                  // command name (spaces are not allowed)
         "get program mode",   // Optional help for a command (NULL for no help)
         false,                      // flag whether to tokenize arguments (see below)
         nullptr,                    // optional pointer to any application context
         getProgramModeCli           // binding function
     },
-    {            
+    {
         "get_light_status",                  // command name (spaces are not allowed)
         "get light status",   // Optional help for a command (NULL for no help)
         false,                      // flag whether to tokenize arguments (see below)

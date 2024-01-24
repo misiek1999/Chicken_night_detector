@@ -4,16 +4,17 @@
 #include <RTClock.h>
 #include "project_pin_definition.h"
 #include "project_types.h"
+#include "rtc_adapter.h"
 #include "external_rtc_adapter.h"
-
-constexpr unsigned int minYearWhenYearValueIsSmallerRtcIsUninitialized = 2020;
-constexpr unsigned int maxYearWhenYearValueIsHigherRtcIsDisconnected = 2100;
+#include "internal_rtc_adapter.h"
+#include "internal_and_external_sync_adapter.h"
 
 enum class RtcSource
 {
     Internal,   // use only internal RTC clock
     External,   // use external RTC clock
     SyncExternalWithInternal,   // when power is supplied use internal RTC, however when power is not supplied use external RTC
+    DCF77,      // use DCF77 module
     None,
     NumberOfRtcSources  // number of rtc sources
 };
@@ -75,6 +76,8 @@ private:
     void getExternalRtcTime(ProjectTypes::RTC_Time &current_time);
     void setInternalRtcTime(ProjectTypes::RTC_Time &time_to_set);
     void getInternalRtcTime(ProjectTypes::RTC_Time &current_time);
+    void setIntWithExtSyncRtcTime(ProjectTypes::RTC_Time &time_to_set);
+    void getIntWithExtSyncRtcTime(ProjectTypes::RTC_Time &current_time);
 
 };
 

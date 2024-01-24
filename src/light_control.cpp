@@ -34,6 +34,7 @@ LightControl::LightController::LightController():
 
 bool LightControl::LightController::periodicUpdateLightState()
 {
+    //TODO: rebuild this code 
     bool status = true;
     // get current rtc time
     ProjectTypes::RTC_Time rtc_time;
@@ -41,7 +42,7 @@ bool LightControl::LightController::periodicUpdateLightState()
     // update selected light controller
     this->light_controller_rtc_.updateEvents(rtc_time);
     // read light state
-
+    
 
     return status;
 }

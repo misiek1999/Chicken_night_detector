@@ -2,6 +2,31 @@
 #include <cstdint>
 #include "project_types.h"
 
+// Constants for RTC container
+constexpr unsigned int minYearWhenYearValueIsSmallerRtcIsUninitialized = 2020;
+constexpr unsigned int maxYearWhenYearValueIsHigherRtcIsInvalid = 2100;
+constexpr unsigned int minMonth = 1;
+constexpr unsigned int maxMonth = 12;
+constexpr unsigned int minDate = 1;
+constexpr unsigned int maxDate = 31;
+constexpr unsigned int minHour = 0;
+constexpr unsigned int maxHour = 23;
+constexpr unsigned int minMinute = 0;
+constexpr unsigned int maxMinute = 59;
+constexpr unsigned int minSecond = 0;
+constexpr unsigned int maxSecond = 59;
+constexpr unsigned int minDay = 1;
+constexpr unsigned int maxDay = 7;
+
+enum class RtcTimeContainerError
+{
+    Ok,
+    InvalidDate,
+    UnitializedContainer,
+    UndefinedError,
+    NumberOfErrors
+};
+
 // Copy of class from library DS1302.h
 class RtcTimeContainer {
 public:
@@ -40,6 +65,37 @@ public:
 
     ProjectTypes::abs_min_past_midnight_t getAbsTimePostMidnight() const {
         return (ProjectTypes::abs_min_past_midnight_t)(min + hr * 60);
+    }
+    RtcTimeContainerError getContainerStatus() const{
+        if (yr < minYearWhenYearValueIsSmallerRtcIsUninitialized) {
+            return RtcTimeContainerError::UnitializedContainer;
+        }
+        if (yr > maxYearWhenYearValueIsHigherRtcIsInvalid) {
+            return RtcTimeContainerError::InvalidDate;
+        }
+        if (mon < minMonth || mon > maxMonth) {
+            return RtcTimeContainerError::InvalidDate;
+        }
+        if (date < minDate || date > maxDate) {
+            return RtcTimeContainerError::InvalidDate;
+        }
+        if (hr < minHour || hr > maxHour) {
+            return RtcTimeContainerError::InvalidDate;
+        }
+        if (min < minMinute || min > maxMinute) {
+            return RtcTimeContainerError::InvalidDate;
+        }
+        if (sec < minSecond || sec > maxSecond) {
+            return RtcTimeContainerError::InvalidDate;
+        }
+        if (day < minDay || day > maxDay) {
+            return RtcTimeContainerError::InvalidDate;
+        }
+        return RtcTimeContainerError::Ok;
+    }
+
+    bool isTimeValid() const{
+        return getContainerStatus() == RtcTimeContainerError::Ok;
     }
 };
 

@@ -19,7 +19,7 @@ namespace LightControl
 enum class LightControlMode
 {
     RTC,            // Recommenced mode
-    LightSensor,    // Unrecommended mode in dark place
+    LightSensor,    // Unrecommended mode when sensor is mounted in dark place
     None,
     NumOfLightControlModes
 };

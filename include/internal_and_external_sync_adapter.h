@@ -1,27 +1,25 @@
 #pragma once
 
 #include <Arduino.h>
-#include "rtc_adapter.h"
-#include "project_pin_definition.h"
-#include "project_types.h"
-#include "rtc_time_container.h"
+#include "internal_rtc_adapter.h"
+#include "external_rtc_adapter.h"
 
 namespace ModuleAdapter
 {
     /*
         @details function to initialize module
     */
-    void init_external_rtc_module(void);
+    void init_inter_and_exter_sync_rtc_module(void);
 
     /*
-        @details get current time from external rtc
+        @details get current time from sync rtc
     */
-    void get_external_rtc_time(ProjectTypes::RTC_Time &time_from_external_rtc);
+    void get_inter_and_exter_sync_rtc_time(ProjectTypes::RTC_Time &time_from_external_rtc);
 
     /*
-        @details set current time to external rtc
+        @details set current time to sync rtc
     */
-   void set_external_rtc_time(const ProjectTypes::RTC_Time &time_to_set);
+   void set_inter_and_exter_sync_rtc_time(const ProjectTypes::RTC_Time &time_to_set);
 // class ExternalRtcModuleAdapter : public RtcModuleAdapter {
 // public:
 //     /*
@@ -41,3 +39,4 @@ namespace ModuleAdapter
 // };
 
 } // namespace ModuleAdapter
+

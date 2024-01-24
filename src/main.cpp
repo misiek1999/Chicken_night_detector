@@ -24,15 +24,7 @@ LightControl::LightController light_controller;
 // Object of CLI interface controller
 CLI::CLIProcess cli_process;
 
-//TODO: remove below local variables from main.cpp
-// Local variable
-uint16_t photoresistor_adc_val;
-uint16_t reference_adc_val;
-float median_photoresistor_adc_val;
-float median_reference_adc_val;
-
-bool setup_ref_val_mode;
-
+// TODO: add watchdog and loop execution controller
 uint32_t mainLoopCounterLightProcess = 0;
 uint32_t delayMainLoopUs = 0;
 uint32_t loopEntryTimeUs = 0;
@@ -44,11 +36,8 @@ void setup()
     Serial.begin(ProjectConst::kSerialBaudRate);
 
     // Initialize variable
-    setup_ref_val_mode = GPIO::gpio_driver.getControlSelectSignal();
+    bool setup_ref_val_mode = GPIO::gpio_driver.getControlSelectSignal();
     delay(200); // delay for RTC to sync time
-
-    // Initialize CLI
-    // CLI::init_CLI();
 }
 
 // Main program loop
@@ -70,7 +59,7 @@ void loop()
     if (delayMainLoopUs < ProjectConst::kMainLoopDelayUs) {
         delay_us(delayMainLoopUs);  //TODO: change this function to more accurate
     }
-    else { 
+    else {
         // TODO: add overrun support
     }
 }

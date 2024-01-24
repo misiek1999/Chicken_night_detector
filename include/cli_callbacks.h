@@ -4,8 +4,6 @@
 #include <etl/vector.h>
 #include <cli_interface.h>
 
-
-
 namespace CLI
 {
 

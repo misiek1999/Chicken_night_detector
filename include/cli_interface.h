@@ -22,7 +22,7 @@ typedef char (*serial_read_char_fun_t)(void);
 typedef void (*serial_write_char_fun_t)(EmbeddedCli *, char);
 typedef int (*serial_rest_bytes_in_rx_buffer_fun_t)(void);
 
-class CLIInterface 
+class CLIInterface
 {
 public:
     CLIInterface(etl::vector<CliCommandBinding, kMaxBindingCount> &cli_callbacks,
