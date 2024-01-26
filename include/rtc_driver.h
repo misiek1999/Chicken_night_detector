@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include <RTClock.h>
 #include "project_pin_definition.h"
 #include "project_types.h"
 #include "rtc_adapter.h"

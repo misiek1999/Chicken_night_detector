@@ -47,8 +47,8 @@ void GPIO::GpioDriver::setPWMLightPercentage(const float percent_light)
 
 void GPIO::GpioDriver::setPWMLight(const uint16_t pwm)
 {
-    pinMode(LIGHT_OUT_PIN, PWM);
-    pwmWrite(LIGHT_OUT_PIN, pwm);
+    pinMode(LIGHT_OUT_PIN, OUTPUT);
+    analogWrite(LIGHT_OUT_PIN, pwm);
 }
 
 // TODO: implement this function

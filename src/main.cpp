@@ -11,7 +11,6 @@
 #include <Arduino.h>
 #include <limits.h>
 #include <math.h>
-#include <libmaple/iwdg.h>
 #include "project_const.h"
 #include "project_pin_definition.h"
 #include "light_controller_process.h"
@@ -68,6 +67,6 @@ void loop()
     }
     else {
         // delay for main loop
-        delay_us(next_main_loop_process_time_us - main_loop_current_time_us);
+        delayMicroseconds(next_main_loop_process_time_us - main_loop_current_time_us);
     }
 }

@@ -13,6 +13,11 @@
 #include "calculate_sunset_and_sunrise_time.h"
 #include "light_sensor_driver.h"
 
+// undef macro from system library
+#ifdef RTC
+#undef RTC
+#endif
+
 namespace LightControl
 {
 
