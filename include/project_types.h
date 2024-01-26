@@ -6,6 +6,7 @@ namespace ProjectTypes {
     // internal project type aliases
     using GPIO_t = uint16_t;
     using time_ms_t = uint32_t;
+    using time_us_t = uint32_t;
     using time_minute_t = uint16_t;
     using time_minute_diff_t = int32_t;
     using abs_min_past_midnight_t = uint32_t;

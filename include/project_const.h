@@ -11,8 +11,8 @@ namespace ProjectConst
 {
     // main program const
     constexpr unsigned kSerialBaudRate = 115200U;
-    constexpr ProjectTypes::time_ms_t kMainLoopCountToProcessLightDetect = 100;
-    constexpr ProjectTypes::time_ms_t kMainLoopDelayUs = 10000; // 10 ms
+    constexpr ProjectTypes::time_ms_t kMainLoopDelayBetweenLightControlProcess = 1000;  // 1000ms
+    constexpr ProjectTypes::time_us_t kMainLoopDelayUs = 10000; // 10 ms
     constexpr uint32_t kPhotoresistorSensorCount = 5;
     constexpr float kLightControlMinimumDutyCycle = 0.5F;
 
@@ -20,8 +20,7 @@ namespace ProjectConst
     constexpr uint32_t kLightControlSecondsToTurnOnLights = 60 * 60; // Default value 1h
     constexpr uint32_t kLightControlSecondsToTurnOffLights = 60 * 60; // Default value 1h
     constexpr uint32_t kLightControlSecondsToBlankingLight = 10 * 60;   // Default value 10min
-    constexpr uint32_t kLightControlNightMaximumSecondDuration = 24 * 60 * 60;   // if control stuck in ON or blanking mode, reset mcu after 24 hours
-
+    constexpr uint32_t kLightControlNightMaximumSecondDuration = 24 * 60 * 60;   //Maximum duration of ON or Blanking mode in light control logic
     // sunset and sunrise const
     constexpr ProjectTypes::latitude_t kInstallationLatitude = 50.08027485662493F;
     constexpr ProjectTypes::longitude_t kInstallationLongitude = 21.341718388675318F;

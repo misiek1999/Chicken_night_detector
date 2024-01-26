@@ -1,6 +1,17 @@
 #include "system_functions.h"
+#include <Arduino.h>
 
 void System::resetSystem(void)
 {
-    // TODO: modify this in future to use watchdog
+
+}
+
+void System::delayMs(const unsigned int &delay_time_ms)
+{
+    delayMs(delay_time_ms);
+}
+
+unsigned int System::readCurrentSystemTimeMs(void)
+{
+    return millis();
 }

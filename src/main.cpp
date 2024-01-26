@@ -22,10 +22,11 @@
 // Object of CLI interface controller
 CLI::CLIProcess cli_process;
 
-// TODO: add watchdog and loop execution controller
-uint32_t mainLoopCounterLightProcess = 0;
-uint32_t delayMainLoopUs = 0;
-uint32_t loopEntryTimeUs = 0;
+ProjectTypes::time_ms_t light_process_last_time_ms = 0;
+ProjectTypes::time_ms_t main_loop_loop_entry_time_ms = 0;
+ProjectTypes::time_us_t main_loop_calculated_delay_us = 0;
+ProjectTypes::time_us_t next_main_loop_process_time_us = 0;
+ProjectTypes::time_us_t main_loop_current_time_us = 0;
 
 // Setup program
 void setup()
@@ -36,15 +37,19 @@ void setup()
     // Initialize variable
     bool setup_ref_val_mode = GPIO::gpio_driver.getControlSelectSignal();
     delay(200); // delay for RTC to sync time
+
+    // set first entry time for main loop
+    main_loop_loop_entry_time_ms = micros();
 }
 
 // Main program loop
 void loop()
 {
-    loopEntryTimeUs = micros();
+    // get current time
+    main_loop_loop_entry_time_ms = millis();
     // process light control every 1s
-    if (mainLoopCounterLightProcess++ >= ProjectConst::kMainLoopCountToProcessLightDetect) {
-        mainLoopCounterLightProcess = 0;
+    if ( main_loop_loop_entry_time_ms - light_process_last_time_ms >= ProjectConst::kMainLoopDelayBetweenLightControlProcess) {
+        light_process_last_time_ms = main_loop_loop_entry_time_ms;
         light_controller.periodicUpdateLightState();
     }
 
@@ -52,12 +57,17 @@ void loop()
     cli_process.periodicCProcessCLI();
 
     // calculate delay for main loop
-    delayMainLoopUs = (loopEntryTimeUs + ProjectConst::kMainLoopDelayUs) - micros();
-    // check calculated delay is correct
-    if (delayMainLoopUs < ProjectConst::kMainLoopDelayUs) {
-        delay_us(delayMainLoopUs);  //TODO: change this function to more accurate
+    next_main_loop_process_time_us += ProjectConst::kMainLoopDelayUs;
+    // get current time in us
+    main_loop_current_time_us = micros();
+    if (next_main_loop_process_time_us - main_loop_current_time_us > ProjectConst::kMainLoopDelayUs) {
+        //overrurn detected
+        Serial.println("Overrun main loop detected!!!");
+        // set new time for next main loop process
+        next_main_loop_process_time_us = main_loop_current_time_us;
     }
     else {
-        // TODO: add overrun support
+        // delay for main loop
+        delay_us(next_main_loop_process_time_us - main_loop_current_time_us);
     }
 }
