@@ -11,21 +11,21 @@ void RtcDriver::getExternalRtcTime(ProjectTypes::RTC_Time &current_time) {
 }
 
 void RtcDriver::setInternalRtcTime(ProjectTypes::RTC_Time &time_to_set) {
-    setInternalRtcTime(time_to_set);
+    ModuleAdapter::set_internal_rtc_time(time_to_set);
 }
 
 void RtcDriver::getInternalRtcTime(ProjectTypes::RTC_Time &current_time) {
-    getInternalRtcTime(current_time);
+    ModuleAdapter::get_internal_rtc_time(current_time);
 }
 
 void RtcDriver::setIntWithExtSyncRtcTime(ProjectTypes::RTC_Time &time_to_set)
 {
-    setIntWithExtSyncRtcTime(time_to_set);
+    ModuleAdapter::set_inter_and_exter_sync_rtc_time(time_to_set);
 }
 
 void RtcDriver::getIntWithExtSyncRtcTime(ProjectTypes::RTC_Time &current_time)
 {
-    getIntWithExtSyncRtcTime(current_time);
+    ModuleAdapter::get_inter_and_exter_sync_rtc_time(current_time);
 }
 
 RtcDriver::RtcDriver()
