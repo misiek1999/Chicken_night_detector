@@ -42,8 +42,31 @@ bool LightControl::LightController::periodicUpdateLightState()
     // update selected light controller
     this->light_controller_rtc_.updateEvents(rtc_time);
     // read light state
-
-
+    this->light_state_ = this->light_controller_rtc_.getLightState(rtc_time);
+    // update light state
+    switch (this->light_state_)
+    {
+    case LightState::On:
+        GPIO::gpio_driver.toggleLight(true);
+        break;
+    case LightState::Off:
+        GPIO::gpio_driver.toggleLight(false);
+        break;
+    case LightState::Blanking:
+        GPIO::gpio_driver.setPWMLightPercentage(this->light_controller_rtc_.getRestOfBlankingTimePercent(rtc_time));
+        break;
+    case LightState::Undefined:
+        Serial.println("LightControl::LightController::periodicUpdateLightState() - LightState::Undefined");
+        GPIO::gpio_driver.toggleLight(false);
+        status = false;
+        break;
+    case LightState::Error:
+    default:
+        Serial.println("LightControl::LightController::periodicUpdateLightState() - LightState::Error");
+        GPIO::gpio_driver.toggleLight(false);
+        status = false;
+        break;
+    }
     return status;
 }
 

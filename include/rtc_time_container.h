@@ -66,7 +66,8 @@ public:
     ProjectTypes::abs_min_past_midnight_t getAbsTimePostMidnight() const {
         return (ProjectTypes::abs_min_past_midnight_t)(min + hr * 60);
     }
-    RtcTimeContainerError getContainerStatus() const{
+
+    RtcTimeContainerError getContainerStatusWithoutDayVerification() const{
         if (yr < minYearWhenYearValueIsSmallerRtcIsUninitialized) {
             return RtcTimeContainerError::UnitializedContainer;
         }
@@ -88,13 +89,25 @@ public:
         if (sec < minSecond || sec > maxSecond) {
             return RtcTimeContainerError::InvalidDate;
         }
+        return RtcTimeContainerError::Ok;
+    }
+
+    RtcTimeContainerError getContainerStatus() const{
+        RtcTimeContainerError status_without_day_verification = getContainerStatusWithoutDayVerification();
+        if (status_without_day_verification != RtcTimeContainerError::Ok) {
+            return status_without_day_verification;
+        }
         if (day < minDay || day > maxDay) {
             return RtcTimeContainerError::InvalidDate;
         }
         return RtcTimeContainerError::Ok;
     }
 
-    bool isTimeValid() const{
+    bool isTimeDateValid() const{
+        return getContainerStatusWithoutDayVerification() == RtcTimeContainerError::Ok;
+    }
+
+    bool isTimeDateDayValid() const{
         return getContainerStatus() == RtcTimeContainerError::Ok;
     }
 };

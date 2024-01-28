@@ -4,7 +4,7 @@ void sync_both_rtc_source() {
     RtcTimeContainer int_time;
     ModuleAdapter::get_internal_rtc_time(int_time);
     // check if internal rtc is valid, if not synchronize internal RTC with external RTC
-    if (int_time.isTimeValid() == false) {
+    if (int_time.isTimeDateDayValid() == false) {
         RtcTimeContainer ext_time;
         ModuleAdapter::get_external_rtc_time(ext_time);
         ModuleAdapter::set_internal_rtc_time(ext_time);

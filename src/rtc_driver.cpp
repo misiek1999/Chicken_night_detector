@@ -1,6 +1,6 @@
 #include "rtc_driver.h"
 
-RtcDriver rtc_driver;
+RtcDriver rtc_driver(RtcSource::Internal);
 
 void RtcDriver::setExternalRtcTime(ProjectTypes::RTC_Time &time_to_set) {
     ModuleAdapter::set_external_rtc_time(time_to_set);
@@ -32,6 +32,11 @@ RtcDriver::RtcDriver()
 {
 }
 
+RtcDriver::RtcDriver(RtcSource rtc_source_to_set):
+    rtc_source_(rtc_source_to_set)
+{
+}
+
 // TODO: redesign c function to ModuleAdapter class inheritance
 void RtcDriver::getCurrentTimeRtc(ProjectTypes::RTC_Time &current_time) {
     switch (rtc_source_)
@@ -50,10 +55,10 @@ void RtcDriver::getCurrentTimeRtc(ProjectTypes::RTC_Time &current_time) {
     }
 }
 
-void RtcDriver::setTimeToRtc(ProjectTypes::RTC_Time &time_to_set) {
+bool RtcDriver::setTimeToRtc(ProjectTypes::RTC_Time &time_to_set) {
     // check time is valid
-    if (time_to_set.isTimeValid() == false) {
-        return;
+    if (time_to_set.isTimeDateValid() == false) {
+        return false;
     }
     // set time to selected rtc
     switch (rtc_source_)
@@ -70,6 +75,7 @@ void RtcDriver::setTimeToRtc(ProjectTypes::RTC_Time &time_to_set) {
     default:
         break;
     }
+    return true;
 }
 
 void RtcDriver::setRtcSource(const RtcSource rtc_source_to_set) {
@@ -88,7 +94,7 @@ RtcStatus RtcDriver::getRtcStatus(void) {
     ProjectTypes::RTC_Time time_from_sensor;
     getCurrentTimeRtc(time_from_sensor);
     // check if time is valid
-    RtcTimeContainerError rtc_time_container_error = time_from_sensor.getContainerStatus();
+    RtcTimeContainerError rtc_time_container_error = time_from_sensor.getContainerStatusWithoutDayVerification();
     if (rtc_time_container_error == RtcTimeContainerError::Ok) {
         return RtcStatus::Ok;
     }

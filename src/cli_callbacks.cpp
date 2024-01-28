@@ -140,8 +140,16 @@ void setRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
         saveValueToTimeVariable(time_to_set, value, i - 1);
     }
     // set rtc time
-    rtc_driver.setTimeToRtc(time_to_set);
-    Serial.println(F("New time is set!"));
+    if (rtc_driver.setTimeToRtc(time_to_set))
+    {
+        Serial.println(F("New time is set!"));
+        // update light state
+        light_controller.periodicUpdateLightState();
+    }
+    else
+    {
+        Serial.println(F("Failed to set new time!"));
+    }
 }
 
 void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
@@ -179,13 +187,26 @@ void setRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 
 void getRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     RtcSource source = rtc_driver.getRtcSource();
-    if (source == RtcSource::External) {
+    switch (source)
+    {
+    case RtcSource::External:
         Serial.println("External rtc source");
-        return;
-    }
-    if (source == RtcSource::Internal) {
+        break;
+    case RtcSource::Internal:
         Serial.println("Internal rtc source");
-        return;
+        break;
+    case RtcSource::SyncExternalWithInternal:
+        Serial.println("Sync internal with external rtc source");
+        break;
+    case RtcSource::DCF77:
+        Serial.println("DCF77 rtc source");
+        break;
+    case RtcSource::None:
+        Serial.println("Non selected rtc source");
+        break;
+    default:
+        Serial.println("Error rtc source");
+        break;
     }
 }
 

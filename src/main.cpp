@@ -35,6 +35,9 @@ void setup()
 
     // Initialize variable
     bool setup_ref_val_mode = GPIO::gpio_driver.getControlSelectSignal();
+
+    // Set rtc source to external module
+    rtc_driver.setRtcSource(RtcSource::External);
     delay(200); // delay for RTC to sync time
 
     // set first entry time for main loop

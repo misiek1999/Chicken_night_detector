@@ -30,6 +30,7 @@ class RtcDriver
 {
 public:
     RtcDriver();
+    RtcDriver(RtcSource rtc_source_to_set);
     /*
         @details get current time from rtc
     */
@@ -37,8 +38,10 @@ public:
 
     /*
         @details set current time to rtc
+        @param time_to_set time to set to rtc
+        @return true if time is set successful, false otherwise
     */
-    void setTimeToRtc(ProjectTypes::RTC_Time &time_to_set);
+    bool setTimeToRtc(ProjectTypes::RTC_Time &time_to_set);
 
     /*
         @details set rtc source
