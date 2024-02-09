@@ -22,12 +22,17 @@ LightControl::LightController::LightController():
     ProjectTypes::RTC_Time rtc_time;
     rtc_driver.getCurrentTimeRtc(rtc_time);
     ProjectTypes::abs_min_past_midnight_t event_time = daytime_calculator_.getSunsetTime(rtc_time);
+    const ProjectTypes::time_minute_diff_t time_to_turn_on_before_event = ProjectConst::kLightControlSecondsToTurnOnLights/60;
+    const ProjectTypes::time_minute_diff_t time_to_turn_off_after_event = ProjectConst::kLightControlSecondsToTurnOffLights/60;
+    const ProjectTypes::time_minute_diff_t time_to_blink_before_event = 0;
+    const ProjectTypes::time_minute_diff_t time_to_blink_after_event = ProjectConst::kLightControlSecondsToBlankingLight/60;
+
     light_controller_rtc_.addEvent((LightEventAndUpdateCallback)
                  {LightEvent(event_time,
-                ProjectConst::kLightControlSecondsToTurnOnLights,
-                ProjectConst::kLightControlSecondsToTurnOffLights,
-                ProjectConst::kLightControlSecondsToBlankingLight,
-                ProjectConst::kLightControlSecondsToBlankingLight),
+                time_to_turn_on_before_event,
+                time_to_turn_off_after_event,
+                time_to_blink_before_event,
+                time_to_blink_after_event),
              std::bind(&DaytimeCalculator::getSunsetTime,
                 daytime_calculator_, std::placeholders::_1)});
 }
@@ -40,30 +45,30 @@ bool LightControl::LightController::periodicUpdateLightState()
     ProjectTypes::RTC_Time rtc_time;
     rtc_driver.getCurrentTimeRtc(rtc_time);
     // update selected light controller
-    this->light_controller_rtc_.updateEvents(rtc_time);
+    this->updateLightState(rtc_time);
     // read light state
     this->light_state_ = this->light_controller_rtc_.getLightState(rtc_time);
     // update light state
-    switch (this->light_state_)
+    switch (light_state_)
     {
     case LightState::On:
-        GPIO::gpio_driver.toggleLight(true);
+        turnOnLight();
         break;
     case LightState::Off:
-        GPIO::gpio_driver.toggleLight(false);
+        turnOffLight();
         break;
     case LightState::Blanking:
-        GPIO::gpio_driver.setPWMLightPercentage(this->light_controller_rtc_.getRestOfBlankingTimePercent(rtc_time));
+        lightBlanking(this->light_controller_rtc_.getRestOfBlankingTimePercent(rtc_time));
         break;
     case LightState::Undefined:
         Serial.println("LightControl::LightController::periodicUpdateLightState() - LightState::Undefined");
-        GPIO::gpio_driver.toggleLight(false);
+        turnOffLight();
         status = false;
         break;
     case LightState::Error:
     default:
         Serial.println("LightControl::LightController::periodicUpdateLightState() - LightState::Error");
-        GPIO::gpio_driver.toggleLight(false);
+        turnOffLight();
         status = false;
         break;
     }
@@ -128,7 +133,7 @@ void LightControl::LightController::turnOffLight()
 
 void LightControl::LightController::turnOnLight()
 {
-    GPIO::gpio_driver.toggleLight(false);
+    GPIO::gpio_driver.toggleLight(true);
 }
 
 void LightControl::LightController::lightBlanking(const float &percent_blanking)

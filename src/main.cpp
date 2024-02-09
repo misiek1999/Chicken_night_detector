@@ -32,7 +32,8 @@ void setup()
 {
     //Initialize serial
     Serial.begin(ProjectConst::kSerialBaudRate);
-
+    // Initialize GPIO
+    GPIO::gpio_driver.init();
     // Initialize variable
     bool setup_ref_val_mode = GPIO::gpio_driver.getControlSelectSignal();
 

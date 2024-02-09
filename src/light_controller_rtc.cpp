@@ -169,15 +169,15 @@ ProjectTypes::abs_min_past_midnight_t LightControl::LightEvent::getRestBlankingT
     if (light_state_ == LightState::Blanking)
     {
         ProjectTypes::time_minute_diff_t time_past_event = start_blanking_event_.getTimePastEvent(abs_rtc_time);
-        ProjectTypes::time_minute_diff_t time_before_event = start_blanking_event_.getTimeToTurnOnBeforeEvent();
+        ProjectTypes::time_minute_diff_t time_before_event = start_blanking_event_.getTimeToEvent(abs_rtc_time);
         // check event was happen
         if (time_past_event < time_before_event)
         {
             // case when event was happen and we should start blanking after turn off
-            ProjectTypes::time_minute_diff_t time_diff = get_time_difference_minute( start_blanking_event_.getEventTime()+ start_blanking_event_.getTimeToTurnOnBeforeEvent(), abs_rtc_time);
+            ProjectTypes::time_minute_diff_t time_diff = get_time_difference_minute( start_blanking_event_.getEventTime() + start_blanking_event_.getTimeToTurnOffAfterEvent(), abs_rtc_time);
             time_diff = format_time_to_24h(time_diff);
             rest_blanking_time = static_cast<ProjectTypes::abs_min_past_midnight_t>(time_diff);
-            total_blanking_time = static_cast<ProjectTypes::abs_min_past_midnight_t>(get_time_difference_minute(start_blanking_event_.getTimeToTurnOnBeforeEvent() - turn_on_event_.getTimeToTurnOnBeforeEvent(), abs_rtc_time));
+            total_blanking_time = static_cast<ProjectTypes::abs_min_past_midnight_t>(get_time_difference_minute(start_blanking_event_.getTimeToTurnOffAfterEvent(), turn_on_event_.getTimeToTurnOffAfterEvent()));
         }
         else
         {
@@ -205,16 +205,17 @@ float LightControl::LightEvent::getRestBlankingTimePercent(const ProjectTypes::a
 
 void LightControl::LightEvent::updateLightState(const ProjectTypes::abs_min_past_midnight_t & abs_rtc_time)
 {
-    if (start_blanking_event_.checkEventIsActive(abs_rtc_time))
+    if (turn_on_event_.checkEventIsActive(abs_rtc_time))
     {
-        light_state_ = LightControl::LightState::On;
+        light_state_ = LightState::On;
     }
-    else if (turn_on_event_.checkEventIsActive(abs_rtc_time))
+    else if (start_blanking_event_.checkEventIsActive(abs_rtc_time))
     {
-        light_state_ = LightControl::LightState::Blanking;
-    } else
+        light_state_ = LightState::Blanking;
+    }
+    else
     {
-        light_state_ = LightControl::LightState::Off;
+        light_state_ = LightState::Off;
     }
 }
 
@@ -243,10 +244,9 @@ LightControl::LightState LightControl::LightControllerRTC::getLightState(const P
     LightControl::LightState light_state = LightControl::LightState::Undefined;
     // get abs min time past midnight from rtc time
     ProjectTypes::abs_min_past_midnight_t rtc_abs_min = getAbsMinPastMidnightFromRtc(rtc_time);
-    int a = event_containers_.size();
-    Serial.println(a);
+    // update events
+    updateEvents(rtc_time);
     // check if light should start blinking
-    // for (auto& event_container : event_containers_)
     for (auto event_container= event_containers_.begin(); event_container != event_containers_.end(); ++event_container)
     {
         light_state = event_container->event_.checkLightState(rtc_abs_min);
@@ -283,7 +283,7 @@ bool LightControl::LightControllerRTC::updateBlankingTime(const ProjectTypes::ab
 bool LightControl::LightControllerRTC::addEvent(const LightEventAndUpdateCallback & new_event)
 {
     bool status = false;
-    if (event_containers_.full())
+    if (!event_containers_.full())
     {
         status = true;
         event_containers_.push_back(new_event);
@@ -312,11 +312,11 @@ float LightControl::LightControllerRTC::getRestOfBlankingTimePercent(const Proje
     float rest_of_blanking_time_percent = 0.0F;
     // get abs min time past midnight from rtc time
     ProjectTypes::abs_min_past_midnight_t rtc_abs_min = getAbsMinPastMidnightFromRtc(rtc_time);
-    for (auto& event_container : event_containers_)
+    for (auto event_container= event_containers_.begin(); event_container != event_containers_.end(); ++event_container)
     {
-        if (event_container.event_.checkLightState(rtc_abs_min) == LightControl::LightState::Blanking)
+        if (event_container->event_.checkLightState(rtc_abs_min) == LightControl::LightState::Blanking)
         {
-            rest_of_blanking_time_percent = event_container.event_.getRestBlankingTimePercent(rtc_abs_min);
+            rest_of_blanking_time_percent = event_container->event_.getRestBlankingTimePercent(rtc_abs_min);
             break;
         }
     }
@@ -325,12 +325,12 @@ float LightControl::LightControllerRTC::getRestOfBlankingTimePercent(const Proje
 
 void LightControl::LightControllerRTC::updateEvents(const ProjectTypes::RTC_Time & rtc_time)
 {
-    for (auto & event_container : event_containers_)
+    for (auto event_container= event_containers_.begin(); event_container != event_containers_.end(); ++event_container)
     {
-        if (event_container.callback_ != nullptr)
+        if (event_container->callback_ != nullptr)
         {
-            ProjectTypes::abs_min_past_midnight_t event_time = event_container.callback_(rtc_time);
-            event_container.event_.setEventTime(event_time);
+            ProjectTypes::abs_min_past_midnight_t event_time = event_container->callback_(rtc_time);
+            event_container->event_.setEventTime(event_time);
         }
     }
 }

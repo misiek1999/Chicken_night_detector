@@ -9,8 +9,9 @@ namespace GPIO
 class GpioDriver
 {
 public:
-    GpioDriver();
+    GpioDriver() noexcept;
 
+    void init();
     void toggleLight(const bool state);
     void setPWMLightPercentage(const float percent_light);
     void setPWMLight(const uint16_t pwm);
