@@ -5,8 +5,11 @@
 // Global object of GpioDriver
 GPIO::GpioDriver GPIO::gpio_driver;
 
-GPIO::GpioDriver::GpioDriver()
-{
+constexpr uint16_t kPwmFrequency = 500;
+constexpr uint16_t kPwmMaxValue = 255;
+constexpr uint16_t kPwmMinValue = 0;
+
+GPIO::GpioDriver::GpioDriver() {
 }
 
 void GPIO::GpioDriver::init() {
@@ -16,7 +19,7 @@ void GPIO::GpioDriver::init() {
     pinMode(ON_BOARD_LED_PIN, OUTPUT);
     pinMode(LIGHT_OUT_PIN, OUTPUT);
     pinMode(SELECT_MODE_PIN, INPUT_PULLDOWN);
-    analogWriteFrequency(500);
+    analogWriteFrequency(kPwmFrequency);
     // lights are off by default
     digitalWrite(LIGHT_OUT_PIN, LOW);
     digitalWrite(ON_BOARD_LED_PIN, HIGH);
@@ -24,14 +27,11 @@ void GPIO::GpioDriver::init() {
 
 void GPIO::GpioDriver::toggleLight(const bool state)
 {
-    if(state)
-    {
-        digitalWrite(LIGHT_OUT_PIN, HIGH);
+    if (state) {
+        analogWrite(LIGHT_OUT_PIN, kPwmMaxValue);
         digitalWrite(ON_BOARD_LED_PIN, LOW);
-    }
-    else
-    {
-        digitalWrite(LIGHT_OUT_PIN, LOW);
+    } else {
+        analogWrite(LIGHT_OUT_PIN, kPwmMinValue);
         digitalWrite(ON_BOARD_LED_PIN, HIGH);
     }
 }
