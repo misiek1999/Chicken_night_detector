@@ -4,7 +4,7 @@
 namespace ModuleAdapter
 {
 // Class with DS1302 RTC clock
-DS1302 external_rtc(DS1302_EN_PIN, DS1302_DAT_PIN, DS1302_CLK_PIN);
+DS1302 external_rtc(kPinDS1302En, kPinDS1302Data, kPinDS1302Clk);
 
 // Local function declaration
 void convert_internal_rtc_format_to_external_rtc_format(const ProjectTypes::RTC_Time &time_to_convert, Time &converted_time) {
@@ -32,7 +32,6 @@ void convert_external_rtc_format_to_internal_rtc_format(const Time &time_to_conv
 // Global function definitions
 
 void init_external_rtc_module(void) {
-    // TODO: Debug purpose only
     external_rtc.writeProtect(false);
     external_rtc.halt(false);
 }

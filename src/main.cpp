@@ -34,8 +34,6 @@ void setup()
     Serial.begin(ProjectConst::kSerialBaudRate);
     // Initialize GPIO
     GPIO::gpio_driver.init();
-    // Initialize variable
-    bool setup_ref_val_mode = GPIO::gpio_driver.getControlSelectSignal();
 
     // Set rtc source to external module
     rtc_driver.setRtcSource(RtcSource::External);

@@ -14,25 +14,25 @@ GPIO::GpioDriver::GpioDriver() {
 
 void GPIO::GpioDriver::init() {
     // initialize all gpio
-    pinMode(PHOTORESISTOR_ADC_PIN, INPUT_ANALOG);
-    pinMode(REF_ADC_PIN, INPUT_ANALOG);
-    pinMode(ON_BOARD_LED_PIN, OUTPUT);
-    pinMode(LIGHT_OUT_PIN, OUTPUT);
-    pinMode(SELECT_MODE_PIN, INPUT_PULLDOWN);
+    pinMode(kPinPhotoresistorAdc, INPUT_ANALOG);
+    pinMode(kPinRefAdc, INPUT_ANALOG);
+    pinMode(kPinOnboardLed, OUTPUT);
+    pinMode(kPinLigthOutput, OUTPUT);
+    pinMode(kPinModeSelect, INPUT_PULLDOWN);
     analogWriteFrequency(kPwmFrequency);
     // lights are off by default
-    digitalWrite(LIGHT_OUT_PIN, LOW);
-    digitalWrite(ON_BOARD_LED_PIN, HIGH);
+    digitalWrite(kPinLigthOutput, LOW);
+    digitalWrite(kPinOnboardLed, HIGH);
 }
 
 void GPIO::GpioDriver::toggleLight(const bool state)
 {
     if (state) {
-        analogWrite(LIGHT_OUT_PIN, kPwmMaxValue);
-        digitalWrite(ON_BOARD_LED_PIN, LOW);
+        analogWrite(kPinLigthOutput, kPwmMaxValue);
+        digitalWrite(kPinOnboardLed, LOW);
     } else {
-        analogWrite(LIGHT_OUT_PIN, kPwmMinValue);
-        digitalWrite(ON_BOARD_LED_PIN, HIGH);
+        analogWrite(kPinLigthOutput, kPwmMinValue);
+        digitalWrite(kPinOnboardLed, HIGH);
     }
 }
 
@@ -49,21 +49,21 @@ void GPIO::GpioDriver::setPWMLightPercentage(const float percent_light)
 
 void GPIO::GpioDriver::setPWMLight(const uint16_t pwm)
 {
-    analogWrite(LIGHT_OUT_PIN, pwm);
-    digitalWrite(ON_BOARD_LED_PIN, LOW);
+    analogWrite(kPinLigthOutput, pwm);
+    digitalWrite(kPinOnboardLed, LOW);
 }
 
 bool GPIO::GpioDriver::getControlSelectSignal()
 {
-    return static_cast<bool>(digitalRead(SELECT_MODE_PIN));
+    return static_cast<bool>(digitalRead(kPinModeSelect));
 }
 
 ProjectTypes::analog_signal_t GPIO::GpioDriver::getLightAnalogSensorValue()
 {
-    return analogRead(PHOTORESISTOR_ADC_PIN);
+    return analogRead(kPinPhotoresistorAdc);
 }
 
 ProjectTypes::analog_signal_t GPIO::GpioDriver::getControlAnalogSensorValue()
 {
-    return analogRead(REF_ADC_PIN);
+    return analogRead(kPinRefAdc);
 }

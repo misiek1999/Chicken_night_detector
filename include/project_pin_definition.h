@@ -1,13 +1,10 @@
-#ifndef PROJECT_PIN_DEFINITION_H
-#define PROJECT_PIN_DEFINITION_H
-// TODO: change this defines to constexpr
-#define PHOTORESISTOR_ADC_PIN 0
-#define REF_ADC_PIN 2
-#define SELECT_MODE_PIN 27
-#define ON_BOARD_LED_PIN PC13
-#define LIGHT_OUT_PIN PB1
-#define DS1302_CLK_PIN PA8
-#define DS1302_DAT_PIN PA9
-#define DS1302_EN_PIN PA10
+#pragma once
 
-#endif // PROJECT_PIN_DEFINITION_H
+constexpr auto kPinPhotoresistorAdc = 0;
+constexpr auto kPinRefAdc = 2;
+constexpr auto kPinModeSelect = 27;
+constexpr auto kPinOnboardLed = PC13;
+constexpr auto kPinLigthOutput = PB1;
+constexpr auto kPinDS1302Clk = PA8;
+constexpr auto kPinDS1302Data = PA9;
+constexpr auto kPinDS1302En = PA10;

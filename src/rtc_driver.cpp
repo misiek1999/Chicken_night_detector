@@ -39,8 +39,7 @@ RtcDriver::RtcDriver(RtcSource rtc_source_to_set):
 
 // TODO: redesign c function to ModuleAdapter class inheritance
 void RtcDriver::getCurrentTimeRtc(ProjectTypes::RTC_Time &current_time) {
-    switch (rtc_source_)
-    {
+    switch (rtc_source_) {
     case RtcSource::Internal:
         getInternalRtcTime(current_time);
         break;
