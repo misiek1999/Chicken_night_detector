@@ -11,23 +11,9 @@
 #include "light_controller_rtc.h"
 #include "gpio_driver.h"
 #include "calculate_sunset_and_sunrise_time.h"
-#include "light_sensor_driver.h"
-
-// undef macro from system library
-#ifdef RTC
-#undef RTC
-#endif
 
 namespace LightControl
 {
-
-enum class LightControlMode
-{
-    RTC,            // Recommenced mode
-    LightSensor,    // Unrecommended mode when sensor is mounted in dark place
-    None,
-    NumOfLightControlModes
-};
 
 class LightController
 {
@@ -36,15 +22,11 @@ public:
 
     bool periodicUpdateLightState();
     bool changeBlankingTime(const ProjectTypes::abs_min_past_midnight_t &new_blanking_time, const size_t &event_id);
-    void setLightControlMode(const LightControlMode &new_mode);
-    LightControlMode getLightControlMode() const;
     LightState getLightState() const;
 
 private:
-    LightSensorDriver light_sensor_driver_;
     LightControllerRTC light_controller_rtc_;
     DaytimeCalculator daytime_calculator_;
-    LightControlMode light_control_mode_;
     LightState light_state_;
 
     // Update events in light control

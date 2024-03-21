@@ -14,8 +14,7 @@ LightControl::LightController::LightController():
     daytime_calculator_(ProjectConst::kInstallationLatitude,
                                     ProjectConst::kInstallationLongitude,
                                     ProjectConst::kInstallationTimeZone,
-                                    ProjectConst::kInstallationReq),
-    light_control_mode_(LightControlMode::RTC) {
+                                    ProjectConst::kInstallationReq) {
     // Calculate current sunset and sunrise time to rtc light controller
     ProjectTypes::RTC_Time rtc_time;
     rtc_driver.getCurrentTimeRtc(rtc_time);
@@ -76,18 +75,6 @@ bool LightControl::LightController::changeBlankingTime(const ProjectTypes::abs_m
     return light_controller_rtc_.updateBlankingTime(new_blanking_time, event_id);
 }
 
-void LightControl::LightController::setLightControlMode(const LightControlMode & new_mode)
-{
-    if (new_mode < LightControlMode::NumOfLightControlModes) {
-        light_control_mode_ = new_mode;
-    }
-}
-
-LightControl::LightControlMode LightControl::LightController::getLightControlMode() const
-{
-    return light_control_mode_;
-}
-
 LightControl::LightState LightControl::LightController::getLightState() const
 {
     return light_state_;
@@ -100,21 +87,8 @@ bool LightControl::LightController::updateEvents(const ProjectTypes::RTC_Time & 
 }
 
 LightControl::LightState LightControl::LightController::updateLightState(const ProjectTypes::RTC_Time & time_now) {
-    // update and read state of light for current mode
-    switch (light_control_mode_) {
-    case LightControl::LightControlMode::RTC:          // Detect night using RTC
-        light_state_ = light_controller_rtc_.getLightState(time_now);
-        break;
-    case LightControl::LightControlMode::LightSensor:  // Detect night using outdoor light sensor
-        light_state_ = light_sensor_driver_.getLightState(time_now);
-        break;
-    case LightControl::LightControlMode::None:         // Do nothing
-        light_state_ = LightState::Off;
-        break;
-    default:
-        light_state_ = LightState::Error;
-        break;
-    }
+    // Detect night using RTC
+    light_state_ = light_controller_rtc_.getLightState(time_now);
     return light_state_;
 }
 

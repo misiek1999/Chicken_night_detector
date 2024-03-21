@@ -4,10 +4,9 @@ CLI::CLIInterface::CLIInterface(etl::array<CliCommandBinding, kMaxBindingCount> 
                                 serial_read_char_fun_t getCharFromSerial,
                                 serial_write_char_fun_t sendCharOverSerial,
                                 serial_rest_bytes_in_rx_buffer_fun_t restBytesInRxBuffer):
-    sendCharOverSerial_(sendCharOverSerial),
-    getCharFromSerial_(getCharFromSerial),
-    restBytesInRxBuffer_(restBytesInRxBuffer)
-{
+        sendCharOverSerial_(sendCharOverSerial),
+        getCharFromSerial_(getCharFromSerial),
+        restBytesInRxBuffer_(restBytesInRxBuffer) {
     // create new instance of CLI config
     EmbeddedCliConfig *config = embeddedCliDefaultConfig();
     config->cliBuffer = cliBuffer;
