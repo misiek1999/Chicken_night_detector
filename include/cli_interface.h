@@ -13,7 +13,7 @@ namespace CLI
 
 // const values used in cli interface
 constexpr uint16_t kBufferSize = 512;
-constexpr uint16_t kMaxBindingCount = 8;
+constexpr uint16_t kMaxBindingCount = 7;
 constexpr uint16_t kHistorySize = 32;
 constexpr uint16_t kCmdBuffersize = 64;
 constexpr uint16_t kRxBufferSize = 32;
@@ -25,7 +25,7 @@ typedef int (*serial_rest_bytes_in_rx_buffer_fun_t)(void);
 class CLIInterface
 {
 public:
-    CLIInterface(etl::vector<CliCommandBinding, kMaxBindingCount> &cli_callbacks,
+    CLIInterface(etl::array<CliCommandBinding, kMaxBindingCount> &cli_callbacks,
                 serial_read_char_fun_t getCharFromSerial,
                 serial_write_char_fun_t sendCharOverSerial,
                 serial_rest_bytes_in_rx_buffer_fun_t restBytesInRxBuffer);

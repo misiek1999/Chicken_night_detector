@@ -232,7 +232,7 @@ LightControl::LightControllerRTC::LightControllerRTC()
 {
 }
 
-LightControl::LightControllerRTC::LightControllerRTC(const etl::vector<LightEventAndUpdateCallback,kMaxEventsCount>& events_containers):
+LightControl::LightControllerRTC::LightControllerRTC(const etl::vector<LightEventAndUpdateCallback, kMaxEventsCount>& events_containers):
     event_containers_(events_containers)
 {
 }

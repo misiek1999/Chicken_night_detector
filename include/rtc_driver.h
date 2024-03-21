@@ -59,18 +59,6 @@ public:
     */
     RtcStatus getRtcStatus(void);
 
-    /*
-        @details check input value is in range
-        index 0 - year
-        index 1 - month
-        index 2 - day
-        index 3 - hour
-        index 4 - minute
-        index 5 - second
-        @return true if value is in range, false otherwise
-    */
-    static bool checkRtcValueIsInRange(uint32_t value, size_t index);
-
 private:
     RtcSource rtc_source_ = RtcSource::None;
 

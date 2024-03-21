@@ -1,10 +1,13 @@
 #include "cli_callbacks.h"
 
 #include <Arduino.h>
+#include <cstdlib>
 #include "light_state.h"
 #include "light_controller_process.h"
 #include "rtc_driver.h"
 
+// declaration of helper function
+bool checkInputRtcArgumentValueIsInRange(uint32_t value, size_t index);
 
 // declaration of function to process command
 void setRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context);
@@ -15,7 +18,7 @@ void setProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 
-etl::vector<CliCommandBinding, CLI::kMaxBindingCount> CLI::cli_callbacks = {{
+etl::array<CliCommandBinding, CLI::kMaxBindingCount> CLI::cli_callbacks = {{{
         "set_rtc",                      // command name (spaces are not allowed)
         "set rtc time: yyyy-mm-dd-hh-mm-ss [space separated] PROVIDE TIME IN WINTER TIME!!!",   // Optional help for a command (NULL for no help)
         true,                           // flag whether to tokenize arguments (see below)
@@ -64,7 +67,7 @@ etl::vector<CliCommandBinding, CLI::kMaxBindingCount> CLI::cli_callbacks = {{
         nullptr,                        // optional pointer to any application context
         getLightStatusCli               // binding function
     }
-};
+}};
 
 
 void sendCharOverSerial(EmbeddedCli *embeddedCli, char c) {
@@ -73,14 +76,14 @@ void sendCharOverSerial(EmbeddedCli *embeddedCli, char c) {
 
 bool checkCStringIsNumber(const char *str) {
     for (size_t i = 0; i < strlen(str); ++i) {
-        if (!isdigit(str[i])) {
+        if (isdigit(str[i]) == 0) {
             return false;
         }
     }
     return true;
 }
 
-void saveValueToTimeVariable(ProjectTypes::RTC_Time& time_to_set, uint32_t value, size_t index) {
+void saveValueToTimeVariable(ProjectTypes::RTC_Time& time_to_set, const uint32_t value, const size_t index) {
     switch (index) {
         case 0:
             time_to_set.yr = value;
@@ -128,7 +131,7 @@ void setRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
         }
         // check if token is in range
         int32_t value = atoi(token);
-        if (RtcDriver::checkRtcValueIsInRange(value, i - 1) == false) {
+        if (checkInputRtcArgumentValueIsInRange(value, i - 1) == false) {
             Serial.println(F("Argument is not in range!"));
             Serial.print(F("arg "));
             Serial.print((char) ('0' + i));
@@ -227,8 +230,7 @@ void setProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 
 void getProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     LightControl::LightControlMode mode = light_controller.getLightControlMode();
-    switch (mode)
-    {
+    switch (mode) {
     case LightControl::LightControlMode::RTC:
         Serial.println("RTC mode");
         break;
@@ -246,8 +248,7 @@ void getProgramModeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 
 void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     LightControl::LightState light_status = light_controller.getLightState();
-    switch (light_status)
-    {
+    switch (light_status) {
     case LightControl::LightState::On:
         Serial.println("Light is on");
         break;
@@ -265,4 +266,45 @@ void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
         Serial.println("Light is in undefined state");
         break;
     }
+}
+
+/*
+    @details check input value is in range
+    index 0 - year
+    index 1 - month
+    index 2 - day
+    index 3 - hour
+    index 4 - minute
+    index 5 - second
+    @return true if value is in range, false otherwise
+*/
+bool checkInputRtcArgumentValueIsInRange(uint32_t value, size_t index) {
+    bool status = false;    // default value
+    switch (index) {
+    case 0: // year
+        if(value > 2000 && value < 2100)
+            status = true;
+        break;
+    case 1: // month
+        if(value > 0 && value < 13)
+            status = true;
+        break;
+    case 2: // day
+        if(value > 0 && value < 32)
+            status = true;
+        break;
+    case 3: // hour
+        if(value < 24)
+            status = true;
+        break;
+    case 4: // minute
+    case 5: // second
+        if(value < 60)
+            status = true;
+        break;
+    default:
+        break;
+    }
+
+    return status;
 }

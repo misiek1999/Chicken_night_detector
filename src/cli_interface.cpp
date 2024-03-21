@@ -1,6 +1,6 @@
 #include "cli_interface.h"
 
-CLI::CLIInterface::CLIInterface(etl::vector<CliCommandBinding, kMaxBindingCount> &cli_callbacks,
+CLI::CLIInterface::CLIInterface(etl::array<CliCommandBinding, kMaxBindingCount> &cli_callbacks,
                                 serial_read_char_fun_t getCharFromSerial,
                                 serial_write_char_fun_t sendCharOverSerial,
                                 serial_rest_bytes_in_rx_buffer_fun_t restBytesInRxBuffer):

@@ -6,7 +6,8 @@ LightSensorDriver::LightSensorDriver() {
 }
 
 LightControl::LightState LightSensorDriver::getLightState(const ProjectTypes::RTC_Time & time_now) {
-    //TODO: Implement this method
+    (void)time_now;  //  Unused argument
+    //  This method is obsolete
     return LightControl::LightState::Off;
 }
 

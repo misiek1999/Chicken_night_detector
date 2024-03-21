@@ -4,8 +4,7 @@
 #include "project_const.h"
 #include "rtc_driver.h"
 
-ProjectTypes::abs_min_past_midnight_t ger_rtc_time_abs()
-{
+ProjectTypes::abs_min_past_midnight_t ger_rtc_time_abs() {
     ProjectTypes::RTC_Time rtc_time;
     rtc_driver.getCurrentTimeRtc(rtc_time);
     return rtc_time.getAbsTimePostMidnight();
@@ -16,8 +15,7 @@ LightControl::LightController::LightController():
                                     ProjectConst::kInstallationLongitude,
                                     ProjectConst::kInstallationTimeZone,
                                     ProjectConst::kInstallationReq),
-    light_control_mode_(LightControlMode::RTC)
-{
+    light_control_mode_(LightControlMode::RTC) {
     // Calculate current sunset and sunrise time to rtc light controller
     ProjectTypes::RTC_Time rtc_time;
     rtc_driver.getCurrentTimeRtc(rtc_time);
@@ -37,10 +35,9 @@ LightControl::LightController::LightController():
                 daytime_calculator_, std::placeholders::_1)});
 }
 
-bool LightControl::LightController::periodicUpdateLightState()
-{
+bool LightControl::LightController::periodicUpdateLightState() {
     //TODO: rebuild this code
-    bool status = true;
+    bool result = true;
     // get current rtc time
     ProjectTypes::RTC_Time rtc_time;
     rtc_driver.getCurrentTimeRtc(rtc_time);
@@ -49,8 +46,7 @@ bool LightControl::LightController::periodicUpdateLightState()
     // read light state
     this->light_state_ = this->light_controller_rtc_.getLightState(rtc_time);
     // update light state
-    switch (light_state_)
-    {
+    switch (light_state_) {
     case LightState::On:
         turnOnLight();
         break;
@@ -63,16 +59,16 @@ bool LightControl::LightController::periodicUpdateLightState()
     case LightState::Undefined:
         Serial.println("LightControl::LightController::periodicUpdateLightState() - LightState::Undefined");
         turnOffLight();
-        status = false;
+        result = false;
         break;
     case LightState::Error:
     default:
         Serial.println("LightControl::LightController::periodicUpdateLightState() - LightState::Error");
         turnOffLight();
-        status = false;
+        result = false;
         break;
     }
-    return status;
+    return result;
 }
 
 bool LightControl::LightController::changeBlankingTime(const ProjectTypes::abs_min_past_midnight_t & new_blanking_time,  const size_t &event_id)
@@ -99,17 +95,13 @@ LightControl::LightState LightControl::LightController::getLightState() const
 
 bool LightControl::LightController::updateEvents(const ProjectTypes::RTC_Time & time_now)
 {
-    // TODO: add support to outdoor light detection method
     light_controller_rtc_.updateEvents(time_now);
-
     return true;
 }
 
-LightControl::LightState LightControl::LightController::updateLightState(const ProjectTypes::RTC_Time & time_now)
-{
+LightControl::LightState LightControl::LightController::updateLightState(const ProjectTypes::RTC_Time & time_now) {
     // update and read state of light for current mode
-    switch (light_control_mode_)
-    {
+    switch (light_control_mode_) {
     case LightControl::LightControlMode::RTC:          // Detect night using RTC
         light_state_ = light_controller_rtc_.getLightState(time_now);
         break;
@@ -126,17 +118,14 @@ LightControl::LightState LightControl::LightController::updateLightState(const P
     return light_state_;
 }
 
-void LightControl::LightController::turnOffLight()
-{
+void LightControl::LightController::turnOffLight() {
     GPIO::gpio_driver.toggleLight(false);
 }
 
-void LightControl::LightController::turnOnLight()
-{
+void LightControl::LightController::turnOnLight() {
     GPIO::gpio_driver.toggleLight(true);
 }
 
-void LightControl::LightController::lightBlanking(const float &percent_blanking)
-{
+void LightControl::LightController::lightBlanking(const float &percent_blanking) {
     GPIO::gpio_driver.setPWMLightPercentage(percent_blanking);
 }
