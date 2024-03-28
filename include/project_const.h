@@ -19,8 +19,8 @@ namespace ProjectConst
     // light control const
     constexpr uint32_t kLightControlSecondsToTurnOnLights = 60 * 60; // Default value 1h
     constexpr uint32_t kLightControlSecondsToTurnOffLights = 60 * 60; // Default value 1h
-    constexpr uint32_t kLightControlSecondsToBlankingLight = 10 * 60;   // Default value 10min
-    constexpr uint32_t kLightControlNightMaximumSecondDuration = 24 * 60 * 60;   //Maximum duration of ON or Blanking mode in light control logic
+    constexpr uint32_t kLightControlSecondsToDimmingLight = 10 * 60;   // Default value 10min
+    constexpr uint32_t kLightControlNightMaximumSecondDuration = 24 * 60 * 60;   //Maximum duration of ON or Dimming mode in light control logic
     // sunset and sunrise const
     constexpr ProjectTypes::latitude_t kInstallationLatitude = 50.08027485662493F;
     constexpr ProjectTypes::longitude_t kInstallationLongitude = 21.341718388675318F;

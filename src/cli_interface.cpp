@@ -18,13 +18,12 @@ CLI::CLIInterface::CLIInterface(etl::array<CliCommandBinding, kMaxBindingCount> 
     // create new instance of CLI
     cli_ = embeddedCliNew(config);
     // check cli creation status
-    if (cli_ == NULL) {
+    if (cli_ == nullptr) {
         Serial.println(F("Cli was not created. Check sizes!"));
-        uint16_t size = embeddedCliRequiredSize(config);
+        const uint16_t size = embeddedCliRequiredSize(config);
         Serial.print(F("Required size: "));
         Serial.println(size);
-    }
-    else{
+    } else {
         // add cli function to send char over serial
         cli_->writeChar = sendCharOverSerial_;
         // add cli function callbacks
@@ -36,7 +35,7 @@ CLI::CLIInterface::CLIInterface(etl::array<CliCommandBinding, kMaxBindingCount> 
 
 bool CLI::CLIInterface::periodicCProcessCLI()
 {
-    if (cli_ == NULL) {
+    if (cli_ == nullptr) {
         return false;
     }
     // read received bytes from buffer

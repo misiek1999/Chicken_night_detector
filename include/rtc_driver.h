@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <ctime>
 #include "project_pin_definition.h"
 #include "project_types.h"
 #include "rtc_adapter.h"
@@ -8,8 +9,7 @@
 #include "internal_rtc_adapter.h"
 #include "internal_and_external_sync_adapter.h"
 
-enum class RtcSource
-{
+enum class RtcSource {
     Internal,   // use only internal RTC clock
     External,   // use external RTC clock
     SyncExternalWithInternal,   // when power is supplied use internal RTC, however when power is not supplied use external RTC
@@ -18,30 +18,37 @@ enum class RtcSource
     NumberOfRtcSources  // number of rtc sources
 };
 
-enum class RtcStatus
-{
+enum class RtcStatus {
     Ok,
     Uninitialized,
     Disconnected,
     UndefinedError
 };
 
-class RtcDriver
-{
-public:
-    RtcDriver();
-    RtcDriver(RtcSource rtc_source_to_set);
+class RtcDriver {
+private:
+    RtcDriver() = default;
+    RtcDriver(const RtcDriver &) = delete;
+    explicit RtcDriver(RtcSource rtc_source_to_set);
+ public:
+    /*
+        @details get instance of RtcDriver
+    */
+    static RtcDriver& getInstance() {
+        static RtcDriver rtc_driver_inst(RtcSource::External);
+        return rtc_driver_inst;
+    }
     /*
         @details get current time from rtc
     */
-    void getCurrentTimeRtc(ProjectTypes::RTC_Time &current_time);
+    std::time_t getCurrentTimeRtc();
 
     /*
         @details set current time to rtc
         @param time_to_set time to set to rtc
         @return true if time is set successful, false otherwise
     */
-    bool setTimeToRtc(ProjectTypes::RTC_Time &time_to_set);
+    bool setTimeToRtc(const std::time_t &time);
 
     /*
         @details set rtc source
@@ -57,18 +64,17 @@ public:
         @details get rtc status
         @return RtcStatus enum with current status of rtc
     */
-    RtcStatus getRtcStatus(void);
+    RtcStatus getRtcStatus();
 
-private:
+ private:
     RtcSource rtc_source_ = RtcSource::None;
 
-    void setExternalRtcTime(ProjectTypes::RTC_Time &time_to_set);
-    void getExternalRtcTime(ProjectTypes::RTC_Time &current_time);
-    void setInternalRtcTime(ProjectTypes::RTC_Time &time_to_set);
-    void getInternalRtcTime(ProjectTypes::RTC_Time &current_time);
-    void setIntWithExtSyncRtcTime(ProjectTypes::RTC_Time &time_to_set);
-    void getIntWithExtSyncRtcTime(ProjectTypes::RTC_Time &current_time);
+    void setExternalRtcTime(const std::time_t &time);
+    void getExternalRtcTime(std::time_t &time);
+    void setInternalRtcTime(const std::time_t &time);
+    void getInternalRtcTime(std::time_t &time);
+    void setIntWithExtSyncRtcTime(const std::time_t &time);
+    void getIntWithExtSyncRtcTime(std::time_t &time);
 
 };
 
-extern RtcDriver rtc_driver;

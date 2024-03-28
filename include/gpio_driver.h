@@ -1,28 +1,102 @@
 #pragma once
 
 #include <Arduino.h>
-#include "project_types.h"
+#include <door_control_config.h>
 
-namespace GPIO
-{
+namespace GPIO {
 
-class GpioDriver
-{
-public:
-    GpioDriver() noexcept;
+class GpioDriver {
+ private:
+    GpioDriver();
 
-    void init();
-    void toggleLight(const bool state);
-    void setPWMLightPercentage(const float percent_light);
-    void setPWMLight(const uint16_t pwm);
-    bool getControlSelectSignal();
-    ProjectTypes::analog_signal_t getLightAnalogSensorValue();
-    ProjectTypes::analog_signal_t getControlAnalogSensorValue();
+ public:
+    /*
+        * Get instance of GpioDriver
+        * @brief This is a singleton class
+        * @return instance of GpioDriver
+    */
+    static GpioDriver *getInstance() noexcept {
+        static GpioDriver gpio_driver;
+        return &gpio_driver;
+    }
 
-private:
+    /*
+        * Toggle light in main building
+        * @param state - state to set
+    */
+    void toggleLightMainBuilding(const bool state);
 
+    /*
+        * Set PWM light percentage in main building
+        * @param percent_light - percentage of light to set
+    */
+    void setPWMLightPercentageMainBuilding(const float percent_light);
+
+    /*
+        * Toggle light in external building
+        * @param state - state to set
+    */
+    void toggleLightExternalBuilding(const bool state);
+
+    /*
+        * Set PWM light percentage in external building
+        * @param percent_light - percentage of light to set
+    */
+    void setPWMLightPercentageExternalBuilding(const float percent_light);
+
+    /*
+        * Set light state to selected pin
+        * @param state - state to set
+        * @param pin - pin number to set
+    */
+    void setNormalLightState(const bool state, const uint16_t pin);
+
+    /*
+        * Set PWM light
+        * @param percent_light - number of PWM to set [0 - 1.0]
+        * @param pin - pin number to set
+    */
+    void setPWMLight(const float percent_light, const uint16_t pin);
+
+    /*
+        * Check that light in main building should enabled
+        * @return true if control select signal is high, false otherwise
+    */
+    bool getMainBuildingEnableControl();
+
+    /*
+        * Check that light in external building should enabled
+        * @return true if control select signal is high, false otherwise
+    */
+    bool getExternalBuildingEnableControl();
+
+    /*
+        * Check selected mode of door control in main building
+        * @return state of door control select signal
+    */
+    DoorControl::DoorControlMode getMainBuildingDoorControlMode();
+
+    /*
+        * Check door open signal in main building is active
+        * @return true if door open signal is active, false otherwise
+    */
+    bool checkDoorOpenSignalIsActive();
+
+    /*
+        * Check door close signal in main building is active
+        * @return true if door close signal is active, false otherwise
+    */
+    bool checkDoorCloseSignalIsActive();
+
+    /*
+        * Set door control action
+        * @brief Set door control action
+        *       Disable - dont perform any action
+        *       Open - open door
+        *       Close - close door
+        * @param action - action to set
+    */
+    void setDoorControlAction(const DoorControl::DoorControlAction action);
 };
 
-extern GpioDriver gpio_driver;
-
-}   // GPIO
+}  //  namespace GPIO

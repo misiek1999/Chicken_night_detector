@@ -2,8 +2,10 @@
 
 #include <Arduino.h>
 #include <cstdlib>
+#include <ctime>
 #include "light_state.h"
-#include "light_controller_process.h"
+#include "chicken_coop_controller.h"
+#include "chicken_coop_controller_impl.h"
 #include "rtc_driver.h"
 
 // declaration of helper function
@@ -16,7 +18,7 @@ void setRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 
-etl::array<CliCommandBinding, CLI::kMaxBindingCount> CLI::cli_callbacks = {{{
+CLI::CliCommandContainer CLI::cli_callbacks = {{{
         "set_rtc",                      // command name (spaces are not allowed)
         "set rtc time: yyyy-mm-dd-hh-mm-ss [space separated] PROVIDE TIME IN WINTER TIME!!!",   // Optional help for a command (NULL for no help)
         true,                           // flag whether to tokenize arguments (see below)
@@ -67,25 +69,25 @@ bool checkCStringIsNumber(const char *str) {
     return true;
 }
 
-void saveValueToTimeVariable(ProjectTypes::RTC_Time& time_to_set, const uint32_t value, const size_t index) {
+void saveValueToTimeVariable(std::tm& time_to_set, const int value, const size_t index) {
     switch (index) {
         case 0:
-            time_to_set.yr = value;
+            time_to_set.tm_year = value;
             break;
         case 1:
-            time_to_set.mon = value;
+            time_to_set.tm_mon = value;
             break;
         case 2:
-            time_to_set.date = value;
+            time_to_set.tm_mday = value;
             break;
         case 3:
-            time_to_set.hr = value;
+            time_to_set.tm_hour = value;
             break;
         case 4:
-            time_to_set.min = value;
+            time_to_set.tm_min = value;
             break;
         case 5:
-            time_to_set.sec = value;
+            time_to_set.tm_sec = value;
             break;
         default:
             break;
@@ -93,8 +95,10 @@ void saveValueToTimeVariable(ProjectTypes::RTC_Time& time_to_set, const uint32_t
 }
 
 void setRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+    auto* chicken_coop_controller_ptr = ControlLogic::getChickenCoopControllerInstance();
+    auto* rtc_driver_ptr = &RtcDriver::getInstance();
     // Time value
-    ProjectTypes::RTC_Time time_to_set;
+    std::tm time_to_set = {};
     // get number of tokens
     size_t token_count = embeddedCliGetTokenCount(args);
     if (token_count != 6) {
@@ -126,32 +130,33 @@ void setRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
         // save value to time
         saveValueToTimeVariable(time_to_set, value, i - 1);
     }
+    // convert tm to time_t
+    const auto time_to_set_time_t = std::mktime(&time_to_set);
     // set rtc time
-    if (rtc_driver.setTimeToRtc(time_to_set))
-    {
+    if (rtc_driver_ptr->setTimeToRtc(time_to_set_time_t)) {
         Serial.println(F("New time is set!"));
         // update light state
-        light_controller.periodicUpdateLightState();
-    }
-    else
-    {
+        chicken_coop_controller_ptr->periodicUpdateController();
+    } else {
         Serial.println(F("Failed to set new time!"));
     }
 }
 
 void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+    auto* rtc_driver_ptr = &RtcDriver::getInstance();
     // read current time
-    ProjectTypes::RTC_Time currentTime;
-    rtc_driver.getCurrentTimeRtc(currentTime);
+    std::time_t currentTime = rtc_driver_ptr->getCurrentTimeRtc();
+    // convert time_t to tm
+    auto currentTimeTm = *std::localtime(&currentTime);
     // print current time
     char buf[50];
     // Get the time from the RTC
     snprintf(buf, sizeof(buf), "Time: %04d-%02d-%02d %02d:%02d:%02d",
-        currentTime.yr, currentTime.mon, currentTime.date,
-        currentTime.hr, currentTime.min, currentTime.sec);
+        currentTimeTm.tm_year, currentTimeTm.tm_mon, currentTimeTm.tm_mday,
+        currentTimeTm.tm_hour, currentTimeTm.tm_min, currentTimeTm.tm_sec);
     // Print the formatted string to serial so we can see the time.
     Serial.println(buf);
-    RtcStatus rtc_status = rtc_driver.getRtcStatus();
+    const RtcStatus rtc_status = rtc_driver_ptr->getRtcStatus();
     if (rtc_status == RtcStatus::Disconnected)
         Serial.println("Sensor is disconnected!");
     else if (rtc_status == RtcStatus::Uninitialized)
@@ -159,6 +164,7 @@ void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 }
 
 void setRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+    auto* rtc_driver_ptr = &RtcDriver::getInstance();
     //  check only first token
     constexpr size_t kTokenToCheck = 1;
     const char *token = embeddedCliGetToken(args, kTokenToCheck);
@@ -169,13 +175,13 @@ void setRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
         return;
     }
     // set new rtc source
-    rtc_driver.setRtcSource((RtcSource) atoi(token));
+    rtc_driver_ptr->setRtcSource((RtcSource) atoi(token));
 }
 
 void getRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
-    RtcSource source = rtc_driver.getRtcSource();
-    switch (source)
-    {
+    auto* rtc_driver_ptr = &RtcDriver::getInstance();
+    RtcSource source = rtc_driver_ptr->getRtcSource();
+    switch (source) {
     case RtcSource::External:
         Serial.println("External rtc source");
         break;
@@ -198,24 +204,31 @@ void getRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 }
 
 void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
-    LightControl::LightState light_status = light_controller.getLightState();
-    switch (light_status) {
-    case LightControl::LightState::On:
-        Serial.println("Light is on");
-        break;
-    case LightControl::LightState::Off:
-        Serial.println("Light is off");
-        break;
-    case LightControl::LightState::Blanking:
-        Serial.println("Light is blanking");
-        break;
-    case LightControl::LightState::Error:
-        Serial.println("Light is in error state");
-        break;
-    case LightControl::LightState::Undefined:
-    default:
-        Serial.println("Light is in undefined state");
-        break;
+    auto* chicken_coop_controller_ptr = ControlLogic::getChickenCoopControllerInstance();
+    auto light_status = chicken_coop_controller_ptr->getLightStates();
+    for (auto light_status_it : light_status) {
+        // TODO: Add ID translation to string
+        Serial.print("Building ID: ");
+        Serial.print((int)light_status_it.first);
+         Serial.print(" -> ");
+        switch (light_status_it.second) {
+        case ControlLogic::LightState::On:
+            Serial.println("Light is on");
+            break;
+        case ControlLogic::LightState::Off:
+            Serial.println("Light is off");
+            break;
+        case ControlLogic::LightState::Dimming:
+            Serial.println("Light is dimming");
+            break;
+        case ControlLogic::LightState::Error:
+            Serial.println("Light is in error state");
+            break;
+        case ControlLogic::LightState::Undefined:
+        default:
+            Serial.println("Light is in undefined state");
+            break;
+        }
     }
 }
 

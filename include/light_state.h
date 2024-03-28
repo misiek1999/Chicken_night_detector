@@ -1,17 +1,15 @@
 #pragma once
 
-namespace LightControl
-{
+namespace ControlLogic {
 
 // Enum class for light mode machine state
-enum class LightState
-{
-    Off,        // Default state
-    Blanking,   // Light is slowly blanking
-    On,         // Light is on
-    Error,      // Error state
-    Undefined,  // Undefined state
-    NumOfStates // Number of states
+enum class LightState {
+    Off,         // Default state
+    Dimming,     // Light is slowly dimming
+    On,          // Light is on
+    Error,       // Error state
+    Undefined,   // Undefined state
+    NumOfStates  // Number of states
 };
 
-} // namespace LightControl
+}  //  namespace ControlLogic

@@ -1,74 +1,63 @@
 #include "rtc_driver.h"
 
-RtcDriver rtc_driver(RtcSource::Internal);
-
-void RtcDriver::setExternalRtcTime(ProjectTypes::RTC_Time &time_to_set) {
-    ModuleAdapter::set_external_rtc_time(time_to_set);
+// TODO: implement this functions
+void RtcDriver::setExternalRtcTime(const std::time_t &time) {
+    ModuleAdapter::set_external_rtc_time(time);
 }
 
-void RtcDriver::getExternalRtcTime(ProjectTypes::RTC_Time &current_time) {
-    ModuleAdapter::get_external_rtc_time(current_time);
+void RtcDriver::getExternalRtcTime(std::time_t &time) {
+    ModuleAdapter::get_external_rtc_time(time);
 }
 
-void RtcDriver::setInternalRtcTime(ProjectTypes::RTC_Time &time_to_set) {
-    ModuleAdapter::set_internal_rtc_time(time_to_set);
+void RtcDriver::setInternalRtcTime(const std::time_t &time) {
+    ModuleAdapter::set_internal_rtc_time(time);
 }
 
-void RtcDriver::getInternalRtcTime(ProjectTypes::RTC_Time &current_time) {
-    ModuleAdapter::get_internal_rtc_time(current_time);
+void RtcDriver::getInternalRtcTime(std::time_t &time) {
+    ModuleAdapter::get_internal_rtc_time(time);
 }
 
-void RtcDriver::setIntWithExtSyncRtcTime(ProjectTypes::RTC_Time &time_to_set)
-{
-    ModuleAdapter::set_inter_and_exter_sync_rtc_time(time_to_set);
+void RtcDriver::setIntWithExtSyncRtcTime(const std::time_t &time) {
+    ModuleAdapter::set_inter_and_exter_sync_rtc_time(time);
 }
 
-void RtcDriver::getIntWithExtSyncRtcTime(ProjectTypes::RTC_Time &current_time)
-{
-    ModuleAdapter::get_inter_and_exter_sync_rtc_time(current_time);
-}
-
-RtcDriver::RtcDriver()
-{
+void RtcDriver::getIntWithExtSyncRtcTime(std::time_t &time) {
+    ModuleAdapter::get_inter_and_exter_sync_rtc_time(time);
 }
 
 RtcDriver::RtcDriver(RtcSource rtc_source_to_set):
-    rtc_source_(rtc_source_to_set)
-{
+    rtc_source_(rtc_source_to_set) {
 }
 
-
-void RtcDriver::getCurrentTimeRtc(ProjectTypes::RTC_Time &current_time) {
+std::time_t RtcDriver::getCurrentTimeRtc() {
+    std::time_t time = {};
     switch (rtc_source_) {
     case RtcSource::Internal:
-        getInternalRtcTime(current_time);
+        getInternalRtcTime(time);
         break;
     case RtcSource::External:
-        getExternalRtcTime(current_time);
+        getExternalRtcTime(time);
         break;
     case RtcSource::SyncExternalWithInternal:
-        getIntWithExtSyncRtcTime(current_time);
+        getIntWithExtSyncRtcTime(time);
         break;
     default:
         break;
     }
+    return time;
 }
 
-bool RtcDriver::setTimeToRtc(ProjectTypes::RTC_Time &time_to_set) {
-    // check time is valid
-    if (time_to_set.isTimeDateValid() == false) {
-        return false;
-    }
+bool RtcDriver::setTimeToRtc(const std::time_t &time) {
     // set time to selected rtc
     switch (rtc_source_) {
     case RtcSource::Internal:
-        setInternalRtcTime(time_to_set);
+        setInternalRtcTime(time);
         break;
     case RtcSource::External:
-        setExternalRtcTime(time_to_set);
+        setExternalRtcTime(time);
         break;
     case RtcSource::SyncExternalWithInternal:
-        setIntWithExtSyncRtcTime(time_to_set);
+        setIntWithExtSyncRtcTime(time);
         break;
     default:
         break;
@@ -88,18 +77,14 @@ RtcSource RtcDriver::getRtcSource() {
 
 RtcStatus RtcDriver::getRtcStatus() {
     // read current time from rtc
-    ProjectTypes::RTC_Time time_from_sensor;
-    getCurrentTimeRtc(time_from_sensor);
+    std::time_t time_from_sensor = getCurrentTimeRtc();
+    std::tm date = *std::localtime(&time_from_sensor);
     // check if time is valid
-    RtcTimeContainerError rtc_time_container_error = time_from_sensor.getContainerStatusWithoutDayVerification();
-    if (rtc_time_container_error == RtcTimeContainerError::Ok) {
-        return RtcStatus::Ok;
-    }
-    if (rtc_time_container_error == RtcTimeContainerError::UnitializedContainer) {
+    if (time_from_sensor == 0) {
         return RtcStatus::Uninitialized;
     }
-    if (rtc_time_container_error == RtcTimeContainerError::InvalidDate) {
-        return RtcStatus::Disconnected;
+    if (date.tm_year < 2020 || date.tm_year > 2100) {
+        return RtcStatus::Uninitialized;
     }
-    return RtcStatus::UndefinedError;
+    return RtcStatus::Ok;
 }

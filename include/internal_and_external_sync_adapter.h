@@ -1,25 +1,25 @@
 #pragma once
 
 #include <Arduino.h>
+#
 #include "internal_rtc_adapter.h"
 #include "external_rtc_adapter.h"
-
-namespace ModuleAdapter
-{
+#include <ctime>
+namespace ModuleAdapter {
     /*
         @details function to initialize module
     */
-    void init_inter_and_exter_sync_rtc_module(void);
+    void init_inter_and_exter_sync_rtc_module();
 
     /*
         @details get current time from sync rtc
     */
-    void get_inter_and_exter_sync_rtc_time(ProjectTypes::RTC_Time &time_from_external_rtc);
+    void get_inter_and_exter_sync_rtc_time(std::time_t &time);
 
     /*
         @details set current time to sync rtc
     */
-   void set_inter_and_exter_sync_rtc_time(const ProjectTypes::RTC_Time &time_to_set);
+    void set_inter_and_exter_sync_rtc_time(const std::time_t &time);
 // class ExternalRtcModuleAdapter : public RtcModuleAdapter {
 // public:
 //     /*
@@ -38,5 +38,4 @@ namespace ModuleAdapter
 //    virtual void setRtcTime(const ProjectTypes::RTC_Time &time_to_set) override;
 // };
 
-} // namespace ModuleAdapter
-
+}  //  namespace ModuleAdapter

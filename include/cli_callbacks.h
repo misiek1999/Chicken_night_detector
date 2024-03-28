@@ -6,7 +6,7 @@
 
 namespace CLI
 {
-
-extern etl::array<CliCommandBinding, CLI::kMaxBindingCount> cli_callbacks;
+using CliCommandContainer = etl::array<CliCommandBinding, CLI::kMaxBindingCount>;
+extern CliCommandContainer cli_callbacks;
 
 } // namespace CLI
