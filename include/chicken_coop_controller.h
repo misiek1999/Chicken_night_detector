@@ -5,12 +5,14 @@
 #include <functional>
 #include <etl/vector.h>
 #include <etl/array.h>
+#include <etl/unordered_map.h>
 #include "project_pin_definition.h"
 #include "project_const.h"
 #include "chicken_coop_config.h"
 #include "calculate_sunset_and_sunrise_time.h"
 #include "light_state.h"
 #include "bulb_controller.h"
+#include "door_controller.h"
 #include "gpio_driver.h"
 #include "rtc_driver.h"
 /*
@@ -19,6 +21,10 @@
 
 */
 namespace ControlLogic {
+constexpr uint8_t kMaxLightController = 2;
+using LightBulbControllerMap = etl::unordered_map<BuildingId, LightBulbController, kMaxLightController>;
+using DoorControllerMap = etl::unordered_map<BuildingId, DoorController, kMaxLightController>;
+using DoorActionMap = etl::unordered_map<size_t, DoorControl::DoorControlAction, kMaxEventsCount>;
 /*
     * @brief: Main controller class for chicken coop
     * @details: This class is responsible for controlling the lights in the chicken coop and opening and closing the door
@@ -65,16 +71,21 @@ class ChickenCoopController {
         * @return: true if controller is active, false if controller is disabled
     */
     bool checkLightControllerInExternalBuildingIsActive() const;
-    // TODO: Implement rest of interface requied to door control
+    // TODO: change door controller methods to const
+    /*
+        * @brief: Get door action state
+        * @return: DoorActionMap
+    */
+    DoorActionMap getDoorActions();
 
  private:
     DaytimeCalculator daytime_calculator_;
-    LightBulbController bulb_controller_;
+    LightBulbControllerMap bulb_controllers_;
+    DoorControllerMap door_controllers_;
     CoopConfig coop_config_;
     TimeCallback getRtcTime_;
-    // TODO: add door controller
     ControlLogic::LightStateMap light_states_;
-
+    DoorActionMap door_actions_;
 };
 
 }  //  namespace ControlLogic

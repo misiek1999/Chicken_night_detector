@@ -1,10 +1,7 @@
 /*
     Author: M.D
     Date: 2023/05/31
-    Description: This program is for automatic light control system.
-    Support 2 modes:
-        1. RTC clock to determine time of day
-        2. Light sensor to determine light intensity
+    Description: Chicken coop controller
 */
 
 // Include library
@@ -18,7 +15,7 @@
 #include "gpio_driver.h"
 #include "cli_process.h"
 #include "chicken_coop_controller.h"
-#include "chicken_coop_controller_impl.h"
+#include "chicken_coop_controller_instance.h"
 
 // Object of CLI interface controller
 CLI::CLIProcess cli_process;

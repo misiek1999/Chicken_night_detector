@@ -105,38 +105,50 @@ class LightDimmingEvent {
 };
 
 //  Number of total events handled by the bulb light controller
+struct LightDimmingEventAndCallback {
+    LightDimmingEvent event;
+    EventUpdateCallback callback;
+};
+
 static constexpr size_t kMaxEventsCount = 2;    // we dont need more than 2 events
-using LightUpdateCallback = std::function<std::time_t(const std::time_t current_time)>;
-using LightDimmingEventMap = etl::unordered_map<size_t, LightDimmingEvent, kMaxEventsCount>;
+using LightDimmingEventMap = etl::unordered_map<size_t, LightDimmingEventAndCallback, kMaxEventsCount>;
 using LightStateMap = etl::unordered_map<size_t, ControlLogic::LightState, kMaxEventsCount>;
 using RestDimmingTimeMap = etl::unordered_map<size_t, ProjectTypes::time_minute_t, kMaxEventsCount>;
 using RestDimmingTimePercentMap = etl::unordered_map<size_t, float, kMaxEventsCount>;
 
+/*
+    * This class should be used to control signle instance of light bulb.
+*/
 class LightBulbController {
  public:
     LightBulbController() = default;
 
     /*
         @brief: Constructor to create light bulb controller.
-        @param: events_containers - vector of light dimming events
-        @param: updateEventTimeCallback - callback to update event time
+        @param: events_containers - map of light dimming events and coresponding callbacks
     */
-    explicit LightBulbController(const LightDimmingEventMap &events_containers,
-                                 const LightUpdateCallback &updateEventTimeCallback);
+    explicit LightBulbController(const LightDimmingEventMap &events_containers);
 
     /*
-        @brief: get light state for all events
+        @brief: get event state for selected event
         @param: current_time - current time
-        @return: light state for single instance of light controller
+        @return: state for single instance of selected event
     */
-    LightState getLightState(const std::time_t &current_time, const size_t event_index);
+    LightState getEventState(const std::time_t &current_time, const size_t event_index);
 
     /*
-        @brief: get light state for all events
+        @brief: get event state for all events
         @param: current_time - current time
-        @return: etl vector of light state for each instance of light controller
+        @return: etl vector of all event state
     */
-    LightStateMap getAllLightState(const std::time_t &current_time);
+    LightStateMap getAllEventStates(const std::time_t &current_time);
+
+    /*
+        @brief: get light state for current time
+        @param: current_time - current time
+        @return: light state to set.
+    */
+    LightState getLightState(const std::time_t &current_time);
 
     /*
         @brief: add new event to light controller
@@ -145,7 +157,7 @@ class LightBulbController {
         @param: unique event index
         @return: true if event was added, false otherwise
     */
-    bool addEvent(const LightDimmingEvent &new_event, const size_t event_index);
+    bool addEvent(const LightDimmingEventAndCallback &new_event, const size_t event_index);
 
     /*
         @brief: remove event from light controller
@@ -160,7 +172,7 @@ class LightBulbController {
         @param: event_index - index of event to update
         @return: true if dimming time was updated, false otherwise
     */
-    bool updateDimmingTime(const ProjectTypes::time_minute_t &new_dimming_time, const size_t event_index);
+    bool updateEventDimmingTime(const ProjectTypes::time_minute_t &new_dimming_time, const size_t event_index);
 
     /*
         @brief: update activation and deactivation time
@@ -175,28 +187,37 @@ class LightBulbController {
     /*
         @brief: get rest of dimming time
         @param: current_time - current time
+        @param: event_index - index of event
         @return: rest of dimming time in minutes
     */
     std::time_t getRestOfDimmingTime(const std::time_t &current_time, const size_t event_index) const;
 
     /*
-        @brief: get rest of dimming time in percent
-        @param: current_time - current time
-        @return: rest of dimming time in percent [0.0 - 1.0]
+        *   @brief: get rest of dimming time in percent
+        *   @param: current_time - current time
+        *   @param: event_index - index of event
+        *   @return: rest of dimming time in percent [0.0 - 1.0]
     */
     float getRestOfDimmingTimePercent(const std::time_t &current_time, const size_t event_index) const;
 
+    /*
+        @brief: get total of dimming time
+        @param: current_time - current time
+        @return: total of dimming time in minutes
+    */
+    std::time_t getTotalOfDimmingTime(const std::time_t &current_time) const;
+
+    /*
+        @brief: get total of dimming time in percent
+        @param: current_time - current time
+        @return: total of dimming time in percent [0.0 - 1.0]
+    */
+    float getTotalOfDimmingTimePercent(const std::time_t &current_time) const;
     /*
         @brief: update all events
         @param: current_time - current time
     */
     void updateEvents(const std::time_t &current_time);
-
-    /*
-        @brief: set update event time callback
-        @param: updateEventTimeCallback - callback to update event time
-    */
-    void setUpdateEventTimeCallback(const LightUpdateCallback &updateEventTimeCallback);
 
     /*
         @brief: update dimming time for all events
@@ -228,9 +249,12 @@ class LightBulbController {
 
  private:
     LightDimmingEventMap event_containers_;
-    LightUpdateCallback update_event_time_callback_;
 
     bool checkEventIndexIsValid(const size_t &event_index) const;
+
+    RestDimmingTimeMap::iterator getActiveDimmingEvent(const std::time_t &current_time) const;
+
+    size_t getActiveDimmingEventIndex(const std::time_t &current_time) const;
 };  //  class LightBulbController
 
 }  //  namespace ControlLogic

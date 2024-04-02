@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include "door_control_config.h"
+#include "door_control_states.h"
 
 namespace ControlLogic {
 
@@ -49,7 +49,7 @@ struct CoopConfig {
     DoorConfigArray door_config_;
 };
 
-inline size_t getBuildingId(const BuildingId &building_id) {
+inline size_t getBuildingNumber(const BuildingId &building_id) {
     return static_cast<size_t>(building_id);
 }
 

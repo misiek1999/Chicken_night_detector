@@ -1,4 +1,4 @@
-#include "chicken_coop_controller_impl.h"
+#include "chicken_coop_controller_instance.h"
 
 static ControlLogic::CoopConfig getCoopConfig() {
         static auto coop_config = ControlLogic::CoopConfig{

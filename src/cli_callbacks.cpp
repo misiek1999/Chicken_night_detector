@@ -5,7 +5,7 @@
 #include <ctime>
 #include "light_state.h"
 #include "chicken_coop_controller.h"
-#include "chicken_coop_controller_impl.h"
+#include "chicken_coop_controller_instance.h"
 #include "rtc_driver.h"
 
 // declaration of helper function

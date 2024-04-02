@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <ctime>
 #include <cinttypes>
 #include "project_types.h"
@@ -9,9 +10,10 @@
 int64_t convertMinutesToSeconds(const ProjectTypes::time_minute_t & time);
 int64_t convertSecondsToMinutes(const std::time_t & time);
 
+using EventUpdateCallback = std::function<std::time_t(const std::time_t current_time)>;
 
 class TimeEvent {
-public:
+ public:
     TimeEvent();
     explicit TimeEvent(const std::time_t &start_event_time,
                        const std::time_t &stop_event_time);
@@ -42,14 +44,14 @@ public:
     */
     std::time_t getStopEventTime() const;
 
-protected:
+ protected:
     std::time_t start_event_time_;
     std::time_t stop_event_time_;
     static constexpr std::time_t kTimeInitValue = {};
 };
 
 class TimestampEvent : public TimeEvent{
-public:
+ public:
     TimestampEvent();
     explicit TimestampEvent(const std::time_t &event_time,
                           const ProjectTypes::time_minute_t &time_to_turn_on_before_event,
@@ -121,7 +123,7 @@ public:
     using TimeEvent::getStartEventTime;
     using TimeEvent::getStopEventTime;
 
-private:
+ private:
     std::time_t event_time_;
     ProjectTypes::time_minute_t time_to_turn_on_before_event_;
     ProjectTypes::time_minute_t time_to_turn_off_after_event_;

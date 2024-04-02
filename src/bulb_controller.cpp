@@ -98,32 +98,48 @@ ProjectTypes::time_minute_t ControlLogic::LightDimmingEvent::getCurrentDimmingTi
 //                  LightBulbController class implementation
 // -----------------------------------------------------------------------------
 
-ControlLogic::LightBulbController::LightBulbController(const LightDimmingEventMap &events_containers,
-                                                       const LightUpdateCallback &updateEventTimeCallback):
-    event_containers_(events_containers),
-    update_event_time_callback_(updateEventTimeCallback) {
+ControlLogic::LightBulbController::LightBulbController(const LightDimmingEventMap &events_containers):
+    event_containers_(events_containers) {
 }
 
-ControlLogic::LightState ControlLogic::LightBulbController::getLightState(const std::time_t & current_time, const size_t event_index) {
+ControlLogic::LightState ControlLogic::LightBulbController::getEventState(const std::time_t & current_time, const size_t event_index) {
     updateEvents(current_time);
     auto light_state = LightState::Error;
     if (checkEventIndexIsValid(event_index)) {
-        light_state = event_containers_.at(event_index).getLightState(current_time);
+        light_state = event_containers_.at(event_index).event.getLightState(current_time);
     }
     return light_state;
 }
 
-ControlLogic::LightStateMap ControlLogic::LightBulbController::getAllLightState(const std::time_t & current_time) {
+ControlLogic::LightStateMap ControlLogic::LightBulbController::getAllEventStates(const std::time_t & current_time) {
     updateEvents(current_time);
     LightStateMap light_state_map;
     for (auto event : event_containers_) {
         auto itr = event.first;
-        light_state_map[itr] = getLightState(current_time, itr);
+        light_state_map[itr] = getEventState(current_time, itr);
     }
     return light_state_map;
 }
 
-bool ControlLogic::LightBulbController::addEvent(const LightDimmingEvent &new_event, const size_t event_index) {
+ControlLogic::LightState ControlLogic::LightBulbController::getLightState(const std::time_t & current_time) {
+    auto event_states = getAllEventStates(current_time);
+    auto light_state = LightState::Error;
+    for (auto event : event_states) {
+        if (event.second == LightState::On) {
+            light_state = LightState::On;
+            break;
+        }
+        if (event.second == LightState::Dimming) {
+            light_state = LightState::Dimming;
+        }
+        if (event.second == LightState::Off && light_state != LightState::Dimming) {
+            light_state = LightState::Off;
+        }
+    }
+    return light_state;
+}
+
+bool ControlLogic::LightBulbController::addEvent(const LightDimmingEventAndCallback &new_event, const size_t event_index) {
     bool result = false;
     if (event_containers_.full() == false) {
         if (!checkEventIndexIsValid(event_index)) {
@@ -150,10 +166,10 @@ bool ControlLogic::LightBulbController::removeEvent(const size_t event_index) {
     return result;
 }
 
-bool ControlLogic::LightBulbController::updateDimmingTime(const ProjectTypes::time_minute_t &new_dimming_time, const size_t event_index) {
+bool ControlLogic::LightBulbController::updateEventDimmingTime(const ProjectTypes::time_minute_t &new_dimming_time, const size_t event_index) {
     bool status = false;
     if (checkEventIndexIsValid(event_index)) {
-        event_containers_.at(event_index).setNewDimmingTime(new_dimming_time, new_dimming_time);
+        event_containers_.at(event_index).event.setNewDimmingTime(new_dimming_time, new_dimming_time);
         status = true;
     }
     return status;
@@ -164,7 +180,7 @@ bool ControlLogic::LightBulbController::updateActivationAndDeactivationTime(cons
                                                                             const size_t event_index) {
     bool status = false;
     if (checkEventIndexIsValid(event_index)) {
-        event_containers_.at(event_index).setNewActivationTime(new_activation_time, new_deactivation_time);
+        event_containers_.at(event_index).event.setNewActivationTime(new_activation_time, new_deactivation_time);
         status = true;
     }
     return status;
@@ -173,7 +189,7 @@ bool ControlLogic::LightBulbController::updateActivationAndDeactivationTime(cons
 std::time_t ControlLogic::LightBulbController::getRestOfDimmingTime(const std::time_t & current_time, const size_t event_index) const {
     auto rest_dimming_time = 0;
     if (checkEventIndexIsValid(event_index)) {
-        rest_dimming_time = event_containers_.at(event_index).getRestLightDimmingTime(current_time);
+        rest_dimming_time = event_containers_.at(event_index).event.getRestLightDimmingTime(current_time);
     }
     return rest_dimming_time;
 }
@@ -181,56 +197,74 @@ std::time_t ControlLogic::LightBulbController::getRestOfDimmingTime(const std::t
 float ControlLogic::LightBulbController::getRestOfDimmingTimePercent(const std::time_t & current_time, const size_t event_index) const {
     auto rest_dimming_time_percent = 0.0F;
     if (checkEventIndexIsValid(event_index)) {
-        rest_dimming_time_percent = event_containers_.at(event_index).getRestLightDimmingTimePercent(current_time);
+        rest_dimming_time_percent = event_containers_.at(event_index).event.getRestLightDimmingTimePercent(current_time);
     }
     return rest_dimming_time_percent;
 }
 
-void ControlLogic::LightBulbController::updateEvents(const std::time_t & current_time) {
-    // get new event time from callback
-    if (update_event_time_callback_ == nullptr) {
-        //  TODO: add error log
-        return;
-    }
-    auto new_event_time = update_event_time_callback_(current_time);
-    for (auto& event_container : event_containers_) {
-        event_container.second.setEventTime(new_event_time);
-    }
+std::time_t ControlLogic::LightBulbController::getTotalOfDimmingTime(const std::time_t & current_time) const {
+    return getActiveDimmingEvent(current_time)->second;
 }
 
-void ControlLogic::LightBulbController::setUpdateEventTimeCallback(const LightUpdateCallback & updateEventTimeCallback) {
-    update_event_time_callback_ = updateEventTimeCallback;
+float ControlLogic::LightBulbController::getTotalOfDimmingTimePercent(const std::time_t & current_time) const {
+    return getRestOfDimmingTimePercent(current_time, getActiveDimmingEventIndex(current_time));
+}
+
+void ControlLogic::LightBulbController::updateEvents(const std::time_t & current_time) {
+    // get new event time from callback
+    for (auto& event_container : event_containers_) {
+        auto callback = event_container.second.callback;
+        if (callback == nullptr) {
+            // TODO: Add logs
+        } else {
+            auto new_event_time = callback(current_time);
+            event_container.second.event.setEventTime(new_event_time);
+        }
+    }
 }
 
 void ControlLogic::LightBulbController::updateAllDimmingTime(const ProjectTypes::time_minute_t & new_dimming_time) {
     for (auto& event_container : event_containers_) {
-        event_container.second.setNewDimmingTime(new_dimming_time, new_dimming_time);
+        event_container.second.event.setNewDimmingTime(new_dimming_time, new_dimming_time);
     }
 }
 
 void ControlLogic::LightBulbController::updateAllActivationAndDeactivationTime(const ProjectTypes::time_minute_t & new_activation_time,
                                                                                const ProjectTypes::time_minute_t & new_deactivation_time) {
     for (auto& event_container : event_containers_) {
-        event_container.second.setNewActivationTime(new_activation_time, new_deactivation_time);
+        event_container.second.event.setNewActivationTime(new_activation_time, new_deactivation_time);
     }
 }
 
 ControlLogic::RestDimmingTimeMap ControlLogic::LightBulbController::getAllRestOfDimmingTime(const std::time_t & current_time) const {
     RestDimmingTimeMap rest_dimming_time_map;
     for (auto event : event_containers_) {
-        rest_dimming_time_map[event.first] = event.second.getRestLightDimmingTime(current_time);
+        rest_dimming_time_map[event.first] = event.second.event.getRestLightDimmingTime(current_time);
     }
     return rest_dimming_time_map;
 }
 
 ControlLogic::RestDimmingTimePercentMap ControlLogic::LightBulbController::getAllRestOfDimmingTimePercent(const std::time_t & current_time) const {
     RestDimmingTimePercentMap rest_dimming_time_percent_map;
-    for (auto event : event_containers_) {
-        rest_dimming_time_percent_map[event.first] = event.second.getRestLightDimmingTimePercent(current_time);
+    for (auto event_and_callback : event_containers_) {
+        rest_dimming_time_percent_map[event_and_callback.first] =
+                event_and_callback.second.event.getRestLightDimmingTimePercent(current_time);
     }
     return rest_dimming_time_percent_map;
 }
 
 bool ControlLogic::LightBulbController::checkEventIndexIsValid(const size_t & event_index) const {
     return event_containers_.find(event_index) != event_containers_.end();
+}
+
+ControlLogic::RestDimmingTimeMap::iterator ControlLogic::LightBulbController::getActiveDimmingEvent(const std::time_t & current_time) const {
+    auto all_dimming_times = getAllRestOfDimmingTime(current_time);
+    auto elem = etl::max_element(all_dimming_times.begin(), all_dimming_times.end(), [](const auto &a, const auto &b) {
+        return a.second < b.second;
+    });
+    return elem;
+}
+
+size_t ControlLogic::LightBulbController::getActiveDimmingEventIndex(const std::time_t & current_time) const {
+    return getActiveDimmingEvent(current_time)->first;
 }
