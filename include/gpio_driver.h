@@ -97,6 +97,22 @@ class GpioDriver {
         * @param action - action to set
     */
     void setDoorControlAction(const DoorControl::DoorControlAction action);
+
+    /*
+        * Toogle power save mode
+        @param state - true if power mode should be enabled, otherwise disable
+    */
+    void tooglePowerSaveMode(const bool state);
+
+ private:
+    /*
+        When power save mode is enabled and doors are moving, then controller disable light bulbs to decrease power consumption
+    */
+    bool power_save_mode_;
+    /*
+        True if one of door is opening
+    */
+    bool doors_are_opening_;
 };
 
 }  //  namespace GPIO

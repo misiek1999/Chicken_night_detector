@@ -10,7 +10,9 @@ constexpr uint16_t kPwmMinValue = 0;
 constexpr float kLightPercentOff = 0.5;
 constexpr float kLightPercentOn = 1.0;
 
-GPIO::GpioDriver::GpioDriver() {
+GPIO::GpioDriver::GpioDriver():
+        power_save_mode_(true),
+        doors_are_opening_(false) {
     // initialize all gpio
     pinMode(kPinOnboardLed, OUTPUT);
     pinMode(kPinMainLigthOutput, OUTPUT);
@@ -40,7 +42,7 @@ void GPIO::GpioDriver::setPWMLightPercentageExternalBuilding(const float percent
 }
 
 void GPIO::GpioDriver::setNormalLightState(const bool state, const uint16_t pin) {
-    if (state) {
+    if (state && !doors_are_opening_) {
         analogWrite(pin, kPwmMaxValue);
     } else {
         analogWrite(pin, kPwmMinValue);
@@ -82,6 +84,7 @@ bool GPIO::GpioDriver::checkDoorCloseSignalIsActive() {
 }
 
 void GPIO::GpioDriver::setDoorControlAction(const DoorControl::DoorControlAction action) {
+    doors_are_opening_ = power_save_mode_;  // by default set this member to true, if this option is enabled
     if (action == DoorControl::DoorControlAction::Open) {
         digitalWrite(kPinMainDoorOutputUp, HIGH);
         digitalWrite(kPinMainDoorOutputDown, LOW);
@@ -97,5 +100,10 @@ void GPIO::GpioDriver::setDoorControlAction(const DoorControl::DoorControlAction
         delayMicroseconds(kChangeStateDelayUs);
         digitalWrite(kPinMainDoorOutputUp, LOW);
         digitalWrite(kPinMainDoorOutputDown, LOW);
+        doors_are_opening_ = false;
     }
+}
+
+void GPIO::GpioDriver::tooglePowerSaveMode(const bool state) {
+    power_save_mode_ = state;
 }
