@@ -57,6 +57,7 @@ CLI::CliCommandContainer CLI::cli_callbacks = {{{
 
 
 void sendCharOverSerial(EmbeddedCli *embeddedCli, char c) {
+    (void)embeddedCli;
     Serial.write(c);
 }
 
@@ -95,6 +96,8 @@ void saveValueToTimeVariable(std::tm& time_to_set, const int value, const size_t
 }
 
 void setRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+    (void)embeddedCli;
+    (void)context;
     auto* chicken_coop_controller_ptr = ControlLogic::getChickenCoopControllerInstance();
     auto* rtc_driver_ptr = &RtcDriver::getInstance();
     // Time value
@@ -143,6 +146,9 @@ void setRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 }
 
 void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
     auto* rtc_driver_ptr = &RtcDriver::getInstance();
     // read current time
     std::time_t currentTime = rtc_driver_ptr->getCurrentTimeRtc();
@@ -164,6 +170,8 @@ void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 }
 
 void setRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+    (void)embeddedCli;
+    (void)context;
     auto* rtc_driver_ptr = &RtcDriver::getInstance();
     //  check only first token
     constexpr size_t kTokenToCheck = 1;
@@ -179,6 +187,9 @@ void setRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 }
 
 void getRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
     auto* rtc_driver_ptr = &RtcDriver::getInstance();
     RtcSource source = rtc_driver_ptr->getRtcSource();
     switch (source) {
@@ -204,6 +215,9 @@ void getRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 }
 
 void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
     auto* chicken_coop_controller_ptr = ControlLogic::getChickenCoopControllerInstance();
     auto light_status = chicken_coop_controller_ptr->getLightStates();
     for (auto light_status_it : light_status) {

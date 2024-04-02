@@ -19,12 +19,12 @@ class DaytimeCalculator {
  private:
     std::time_t sunset_time;
     std::time_t sunrise_time;
-    std::tm last_input_date;
     ProjectTypes::latitude_t latitude;
     ProjectTypes::longitude_t longitude;
     ProjectTypes::time_zone_t time_zone;
     ProjectTypes::req_t req;
     SunSet sun_set;
+    std::tm last_input_date;
 
     static constexpr ProjectTypes::abs_min_past_midnight_t init_minute_value = 0;
     static constexpr ProjectTypes::latitude_t init_latitude_value = 0;
