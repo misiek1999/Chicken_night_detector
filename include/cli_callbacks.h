@@ -9,4 +9,4 @@ namespace CLI
 using CliCommandContainer = etl::array<CliCommandBinding, CLI::kMaxBindingCount>;
 extern CliCommandContainer cli_callbacks;
 
-} // namespace CLI
+}  // namespace CLI

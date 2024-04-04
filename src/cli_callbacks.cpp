@@ -17,6 +17,9 @@ void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void setRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
+void setExternalLightCli(EmbeddedCli *embeddedCli, char *args, void *context);
+void getExternalLightCli(EmbeddedCli *embeddedCli, char *args, void *context);
+void getDoorStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 
 CLI::CliCommandContainer CLI::cli_callbacks = {{{
         "set_rtc",                      // command name (spaces are not allowed)
@@ -52,6 +55,27 @@ CLI::CliCommandContainer CLI::cli_callbacks = {{{
         false,                          // flag whether to tokenize arguments (see below)
         nullptr,                        // optional pointer to any application context
         getLightStatusCli               // binding function
+    },
+    {
+        "toggle_external_light",           // command name (spaces are not allowed)
+        "toggle external light: 0 - off, 1 -on",  // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        setExternalLightCli             // binding function
+    },
+    {
+        "get_external_light",           // command name (spaces are not allowed)
+        "get external light",           // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getExternalLightCli             // binding function
+    },
+    {
+        "get_door_status",              // command name (spaces are not allowed)
+        "get door status",              // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getDoorStatusCli                // binding function
     }
 }};
 
@@ -246,6 +270,62 @@ void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     }
 }
 
+void setExternalLightCli(EmbeddedCli * embeddedCli, char * args, void * context) {
+    (void)embeddedCli;
+    (void)context;
+    //  check only first token
+    constexpr size_t kTokenToCheck = 1;
+    const char *token = embeddedCliGetToken(args, kTokenToCheck);
+    if (!checkCStringIsNumber(token)) {
+        Serial.println(F("Argument is not number!"));
+        Serial.print(F("arg : "));
+        Serial.println(token);
+        return;
+    }
+    // read state from token
+    const auto state = static_cast<bool>(atoi(token));
+    auto* chicken_coop_controller_ptr = ControlLogic::getChickenCoopControllerInstance();
+    chicken_coop_controller_ptr->toggleLightExternalBuilding(state);
+}
+
+void getExternalLightCli(EmbeddedCli * embeddedCli, char * args, void * context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
+    auto* chicken_coop_controller_ptr = ControlLogic::getChickenCoopControllerInstance();
+    const bool state = chicken_coop_controller_ptr->checkLightControllerInExternalBuildingIsActive();
+    Serial.print("External light state: ");
+    Serial.println(state);
+}
+
+void getDoorStatusCli(EmbeddedCli * embeddedCli, char * args, void * context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
+    auto* chicken_coop_controller_ptr = ControlLogic::getChickenCoopControllerInstance();
+    auto door_status = chicken_coop_controller_ptr->getDoorActions();
+    for (auto door_status_it : door_status) {
+        Serial.print("Building ID: ");
+        Serial.print(static_cast<int>(door_status_it.first));
+        Serial.print(" -> ");
+        switch (door_status_it.second) {
+        case DoorControl::DoorControlAction::Open:
+            Serial.println("Door is open");
+            break;
+        case DoorControl::DoorControlAction::Close:
+            Serial.println("Door is close");
+            break;
+        case DoorControl::DoorControlAction::Disable:
+            Serial.println("Door is disabled");
+            break;
+        default:
+            Serial.println("Door is in error state");
+            break;
+        }
+        Serial.println("");
+    }
+}
+
 /*
     @details check input value is in range
     index 0 - year
@@ -259,25 +339,25 @@ void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
 bool checkInputRtcArgumentValueIsInRange(uint32_t value, size_t index) {
     bool status = false;    // default value
     switch (index) {
-    case 0: // year
-        if(value > 2000 && value < 2100)
+    case 0:  // year
+        if (value > 2000 && value < 2100)
             status = true;
         break;
-    case 1: // month
-        if(value > 0 && value < 13)
+    case 1:  // month
+        if (value > 0 && value < 13)
             status = true;
         break;
-    case 2: // day
-        if(value > 0 && value < 32)
+    case 2:  // day
+        if (value > 0 && value < 32)
             status = true;
         break;
-    case 3: // hour
-        if(value < 24)
+    case 3:  // hour
+        if (value < 24)
             status = true;
         break;
-    case 4: // minute
-    case 5: // second
-        if(value < 60)
+    case 4:  // minute
+    case 5:  // second
+        if (value < 60)
             status = true;
         break;
     default:
@@ -286,3 +366,5 @@ bool checkInputRtcArgumentValueIsInRange(uint32_t value, size_t index) {
 
     return status;
 }
+
+
