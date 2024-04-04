@@ -143,6 +143,16 @@ ControlLogic::LightStateMap ControlLogic::ChickenCoopController::getLightStates(
     return light_states_;
 }
 
+void ControlLogic::ChickenCoopController::toggleLightExternalBuilding(const bool & state) {
+    auto building_id = getBuildingNumber(BuildingId::External);
+    coop_config_.light_state_config_[building_id].is_active_ = state;
+}
+
+bool ControlLogic::ChickenCoopController::checkLightControllerInExternalBuildingIsActive() const {
+    auto building_id = getBuildingNumber(BuildingId::External);
+    return coop_config_.light_state_config_[building_id].is_active_;
+}
+
 ControlLogic::DoorActionMap ControlLogic::ChickenCoopController::getDoorActions() {
     return door_actions_;
 }

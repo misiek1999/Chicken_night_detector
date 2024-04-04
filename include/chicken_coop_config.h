@@ -49,7 +49,7 @@ struct CoopConfig {
     DoorConfigArray door_config_;
 };
 
-inline size_t getBuildingNumber(const BuildingId &building_id) {
+constexpr size_t getBuildingNumber(const BuildingId &building_id) {
     return static_cast<size_t>(building_id);
 }
 
