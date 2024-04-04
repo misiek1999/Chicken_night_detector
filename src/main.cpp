@@ -9,6 +9,7 @@
 #include <climits>
 #include <cmath>
 #include <ctime>
+#include "log.h"
 #include "project_const.h"
 #include "project_pin_definition.h"
 #include "rtc_driver.h"
@@ -41,6 +42,9 @@ void setup() {
     }
     //  Initialize serial
     Serial.begin(ProjectConst::kSerialBaudRate);
+    // Initialize log
+    initLog();
+
     // Initialize GPIO
     gpio_driver = GPIO::GpioDriver::getInstance();
     // Initialize RTC
