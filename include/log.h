@@ -3,6 +3,13 @@
 #include <Arduino.h>
 #include <ArduinoLog.h>
 
+enum class LogSource {
+    UsbSerial,
+    Serial1,
+    UsbAndSerial1,
+    NumberOfSerials
+};
+
 inline void initLog() {
     Log.begin(LOG_LEVEL_NOTICE, &Serial);
     Log.notice("Log initialized");
@@ -16,10 +23,27 @@ inline bool changeLogLevel(const size_t &log_level) {
     return false;
 }
 
-static size_t log_number = 0;
+inline void chengeLogSource(const LogSource &log_source) {
+    switch (log_source) {
+        case LogSource::UsbSerial:
+            Log.begin(LOG_LEVEL_NOTICE, &Serial);
+            break;
+        case LogSource::Serial1:
+            Log.begin(LOG_LEVEL_NOTICE, &Serial1);
+            break;
+        // TODO: Implement this function
+        // case LogSource::UsbAndSerial1:
+        //     break;
+        default:
+            Log.begin(LOG_LEVEL_NOTICE, &Serial);
+            break;
+    }
+}
+
+inline size_t log_number = {};
 
 // LogID [log type][timestamp[ms]] filename:line_number - message
-#define LOG_PREFIX "%u [%s][%s] %s:%d - "
+#define LOG_PREFIX "%u [%s][%d] %s:%d - "
 #define LOG_MS millis()
 #ifndef __FILENAME__
 #define __FILENAME__ __FILE__
