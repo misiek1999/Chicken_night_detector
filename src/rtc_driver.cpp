@@ -1,4 +1,5 @@
 #include "rtc_driver.h"
+#include "log.h"
 
 // TODO: implement this functions
 void RtcDriver::setExternalRtcTime(const std::time_t &time) {
@@ -48,6 +49,7 @@ std::time_t RtcDriver::getCurrentTimeRtc() {
 }
 
 bool RtcDriver::setTimeToRtc(const std::time_t &time) {
+    LOG_DEBUG("Set time to rtc: %d", time);
     // set time to selected rtc
     switch (rtc_source_) {
     case RtcSource::Internal:
@@ -68,6 +70,9 @@ bool RtcDriver::setTimeToRtc(const std::time_t &time) {
 void RtcDriver::setRtcSource(const RtcSource rtc_source_to_set) {
     if (static_cast<int>(rtc_source_to_set) >= 0 && rtc_source_to_set < RtcSource::NumberOfRtcSources) {
         rtc_source_ = rtc_source_to_set;
+        LOG_INFO("Rtc source set to: %d", rtc_source_to_set);
+    } else {
+        LOG_ERROR("Invalid rtc source: %d", rtc_source_to_set);
     }
 }
 

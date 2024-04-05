@@ -11,7 +11,7 @@ enum class LogSource {
 };
 
 inline void initLog() {
-    Log.begin(LOG_LEVEL_NOTICE, &Serial);
+    Log.begin(LOG_LEVEL_TRACE, &Serial);
     Log.notice("Log initialized");
 }
 
@@ -43,15 +43,24 @@ inline void chengeLogSource(const LogSource &log_source) {
 inline size_t log_number = {};
 
 // LogID [log type][timestamp[ms]] filename:line_number - message
-#define LOG_PREFIX "%u [%s][%d] %s:%d - "
+#define LOG_PREFIX "%u [%s][%d] %s:%d- "
 #define LOG_MS millis()
 #ifndef __FILENAME__
-#define __FILENAME__ __FILE__
+constexpr const char* file_name(const char* path) {
+    const char* file = path;
+    while (*path) {
+        if (*path++ == '\\') {
+            file = path;
+        }
+    }
+    return file;
+}
+#define __FILENAME__ file_name(__FILE__)
 #endif
 
-#define LOG_ERROR(MSG, ...) Log.error(LOG_PREFIX MSG, log_number++, "D", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
-#define LOG_WARNING(MSG, ...) Log.warning(LOG_PREFIX MSG, log_number++, "W", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
-#define LOG_NOTICE(MSG, ...) Log.notice(LOG_PREFIX MSG, log_number++, "N", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
-#define LOG_INFO(MSG, ...) Log.info(LOG_PREFIX MSG, log_number++, "I", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
-#define LOG_DEBUG(MSG, ...) Log.debug(LOG_PREFIX MSG, log_number++, "D", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
-#define LOG_VERBOSE(MSG, ...) Log.verbose(LOG_PREFIX MSG, log_number++, "V", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_ERROR(MSG, ...) Log.errorln(LOG_PREFIX MSG, log_number++, "D", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_WARNING(MSG, ...) Log.warningln(LOG_PREFIX MSG, log_number++, "W", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_NOTICE(MSG, ...) Log.noticeln(LOG_PREFIX MSG, log_number++, "N", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_INFO(MSG, ...) Log.infoln(LOG_PREFIX MSG, log_number++, "I", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_DEBUG(MSG, ...) Log.traceln(LOG_PREFIX MSG, log_number++, "D", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_VERBOSE(MSG, ...) Log.verboseln(LOG_PREFIX MSG, log_number++, "V", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)

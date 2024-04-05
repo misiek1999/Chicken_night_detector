@@ -1,4 +1,5 @@
 #include "door_controller.h"
+#include "log.h"
 
 ControlLogic::DoorController::DoorController(DoorEventMap door_event_map):
     door_events_map_(door_event_map) {
@@ -11,7 +12,7 @@ bool ControlLogic::DoorController::updateDoorControllerEvents(const std::time_t 
             auto new_event_stop = door_event.second.second.second(current_time);
             door_event.second.first.setEventTime(new_event_start, new_event_stop);
         } else {
-            //TODO: add error log
+            LOG_ERROR("Invalid callback for door event: %d", door_event.first);
         }
     }
     return true;
@@ -32,18 +33,19 @@ bool ControlLogic::DoorController::addDoorEvent(const DoorEventMap & new_events_
     auto result = true;
     for (auto &new_event : new_events_map) {
         if (door_events_map_.size() >= kMaxDoorEvent) {
-            // TODO: log error
+            LOG_ERROR("Max door event reached");
             result = false;
             break;
         }
-        if (door_events_map_.find(new_event.first) != door_events_map_.end()) {
+        if (door_events_map_.find(new_event.first) == door_events_map_.end()) {
             if (checkCallbacksAreValid(new_event.second.second)) {
                 door_events_map_.insert(new_event);
+                LOG_INFO("Door event added: %d", new_event.first);
             } else {
-                //TODO: add error
+                LOG_ERROR("Invalid callback for door event: %d", new_event.first);
             }
         } else {
-            //TODO: add warning
+            LOG_WARNING("Door event already exist: %d", new_event.first);
         }
     }
     return result;
@@ -55,8 +57,9 @@ bool ControlLogic::DoorController::removeDoorEvent(const size_t & door_event_id)
     if (itr != door_events_map_.end()) {
         door_events_map_.erase(itr);
         result = true;
+        LOG_INFO("Door event removed: %d", door_event_id);
     } else {
-        // TODO: add log warning
+        LOG_WARNING("Door event not found: %d", door_event_id);
     }
     return result;
 }

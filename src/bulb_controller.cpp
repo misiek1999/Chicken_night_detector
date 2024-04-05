@@ -1,6 +1,6 @@
 #include "bulb_controller.h"
 #include "calculate_sunset_and_sunrise_time.h"
-
+#include "log.h"
 
 // LightDimmingEvent class implementation
 ControlLogic::LightDimmingEvent::LightDimmingEvent(const std::time_t &event_time,
@@ -30,6 +30,7 @@ ControlLogic::LightState ControlLogic::LightDimmingEvent::getLightState(const st
 void ControlLogic::LightDimmingEvent::setEventTime(const std::time_t & new_event_time) {
     turn_on_event_.setEventTime(new_event_time);
     start_dimming_event_.setEventTime(new_event_time);
+    LOG_VERBOSE("Event time updated: %d", new_event_time);
 }
 
 void ControlLogic::LightDimmingEvent::setNewActivationAndDimmingTime(const ProjectTypes::time_minute_t & time_to_turn_on_before_event,
@@ -67,7 +68,7 @@ ProjectTypes::time_minute_t ControlLogic::LightDimmingEvent::getRestLightDimming
         } else {
             rest_dimming_time = convertSecondsToMinutes(turn_on_event_.getEventTime() - current_time);
         }
-        // TODO: add logs
+        LOG_DEBUG("Rest dimming time: %d", rest_dimming_time);
     }
     return rest_dimming_time;
 }
@@ -76,6 +77,7 @@ float ControlLogic::LightDimmingEvent::getRestLightDimmingTimePercent(const std:
     auto rest_dimming_time = getRestLightDimmingTime(current_time);
     auto current_dimming_time_ = getCurrentDimmingTime(current_time);
     const auto percent = static_cast<float>(rest_dimming_time) / static_cast<float>(current_dimming_time_);
+    LOG_VERBOSE("Rest prec dimming time: %d", percent);
     return percent;
 }
 
@@ -84,6 +86,9 @@ void ControlLogic::LightDimmingEvent::updateEventActivationAndDimmingTime() {
     turn_on_event_.setNewTimeToTurnOnBeforeEvent(time_to_turn_on_before_event_);
     start_dimming_event_.setNewTimeToTurnOffAfterEvent(time_to_end_dimming_after_turn_off_ + time_to_turn_off_after_event_);
     start_dimming_event_.setNewTimeToTurnOnBeforeEvent(time_to_start_dimming_before_turn_on_ + time_to_turn_on_before_event_);
+    LOG_DEBUG("Event before %d, after %d : Dimming before %d, after %d",
+              time_to_turn_on_before_event_, time_to_turn_off_after_event_,
+              time_to_start_dimming_before_turn_on_, time_to_end_dimming_after_turn_off_);
 }
 
 ProjectTypes::time_minute_t ControlLogic::LightDimmingEvent::getCurrentDimmingTime(const std::time_t & current_time) const {
@@ -145,11 +150,12 @@ bool ControlLogic::LightBulbController::addEvent(const LightDimmingEventAndCallb
         if (!checkEventIndexIsValid(event_index)) {
             event_containers_.insert(etl::make_pair(event_index, new_event));
             result = true;
+            LOG_INFO("Event added: %u", event_index);
         } else {
-            // TODO: add logs
+            LOG_WARNING("Provided event index is not valid: %u", event_index);
         }
     } else {
-        // TODO: add logs
+        LOG_ERROR("Out of space in event container");
     }
     return result;
 }
@@ -160,8 +166,9 @@ bool ControlLogic::LightBulbController::removeEvent(const size_t event_index) {
     if (itr != event_containers_.end()) {
         event_containers_.erase(itr);
         result = true;
+        LOG_INFO("Event removed: %u", itr);
     } else {
-        //TODO: add logs
+        LOG_WARNING("Event not found: %u", itr);
     }
     return result;
 }
@@ -215,7 +222,7 @@ void ControlLogic::LightBulbController::updateEvents(const std::time_t & current
     for (auto& event_container : event_containers_) {
         auto callback = event_container.second.callback;
         if (callback == nullptr) {
-            // TODO: Add logs
+            LOG_ERROR("Callback is not set for event: %u", event_container.first);
         } else {
             auto new_event_time = callback(current_time);
             event_container.second.event.setEventTime(new_event_time);

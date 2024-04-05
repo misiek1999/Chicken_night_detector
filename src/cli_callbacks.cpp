@@ -7,6 +7,7 @@
 #include "chicken_coop_controller.h"
 #include "chicken_coop_controller_instance.h"
 #include "rtc_driver.h"
+#include "log.h"
 
 // declaration of helper function
 bool checkInputRtcArgumentValueIsInRange(uint32_t value, size_t index);
@@ -20,6 +21,7 @@ void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void setExternalLightCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getExternalLightCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getDoorStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
+void changeLogLevelCli(EmbeddedCli *embeddedCli, char *args, void *context);
 
 CLI::CliCommandContainer CLI::cli_callbacks = {{{
         "set_rtc",                      // command name (spaces are not allowed)
@@ -76,6 +78,13 @@ CLI::CliCommandContainer CLI::cli_callbacks = {{{
         false,                          // flag whether to tokenize arguments (see below)
         nullptr,                        // optional pointer to any application context
         getDoorStatusCli                // binding function
+    },
+    {
+        "change_log_level",             // command name (spaces are not allowed)
+        "change log level: 0 - off, 1 - fatal, 2 - error, 3 - warning, 4 - info, 5 - debug, 6 - verbose",  // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        changeLogLevelCli               // binding function
     }
 }};
 
@@ -247,7 +256,7 @@ void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     for (auto light_status_it : light_status) {
         // TODO: Add ID translation to string
         Serial.print("Building ID: ");
-        Serial.print((int)light_status_it.first);
+        Serial.print(static_cast<int>(light_status_it.first));
          Serial.print(" -> ");
         switch (light_status_it.second) {
         case ControlLogic::LightState::On:
@@ -324,6 +333,25 @@ void getDoorStatusCli(EmbeddedCli * embeddedCli, char * args, void * context) {
         }
         Serial.println("");
     }
+}
+
+void changeLogLevelCli(EmbeddedCli * embeddedCli, char * args, void * context) {
+    (void)embeddedCli;
+    (void)context;
+    //  check only first token
+    constexpr size_t kTokenToCheck = 1;
+    const char *token = embeddedCliGetToken(args, kTokenToCheck);
+    if (!checkCStringIsNumber(token)) {
+        Serial.println(F("Argument is not number!"));
+        Serial.print(F("arg : "));
+        Serial.println(token);
+        return;
+    }
+    // set new log level
+    const auto log_level = atoi(token);
+    changeLogLevel(log_level);
+    Serial.print("New log level: ");
+    Serial.println(token);
 }
 
 /*

@@ -57,6 +57,7 @@ void setup() {
 
     // set first entry time for main loop
     main_loop_loop_entry_time_ms = micros();
+    LOG_INFO("Initialization done. Start main loop");
 }
 
 // Main program loop
@@ -79,6 +80,7 @@ void loop() {
     if (next_main_loop_process_time_us - main_loop_current_time_us > ProjectConst::kMainLoopDelayUs) {
         //  overrurn detected
         Serial.println("Overrun main loop detected!!!");
+        LOG_ERROR("Overrun main loop detected!!!");
         // set new time for next main loop process
         next_main_loop_process_time_us = main_loop_current_time_us;
     } else {

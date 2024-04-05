@@ -3,7 +3,7 @@
 #include "gpio_driver.h"
 #include "project_const.h"
 #include "rtc_driver.h"
-
+#include "log.h"
 
 ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_config, TimeCallback get_rtc_time):
         daytime_calculator_(ProjectConst::kInstallationLatitude,
@@ -146,11 +146,15 @@ ControlLogic::LightStateMap ControlLogic::ChickenCoopController::getLightStates(
 void ControlLogic::ChickenCoopController::toggleLightExternalBuilding(const bool & state) {
     auto building_id = getBuildingNumber(BuildingId::External);
     coop_config_.light_state_config_[building_id].is_active_ = state;
+    Serial.println("External building light is " + String(state ? "on" : "off"));
+    LOG_INFO("External building light is %s", state ? "on" : "off");
 }
 
 bool ControlLogic::ChickenCoopController::checkLightControllerInExternalBuildingIsActive() const {
     auto building_id = getBuildingNumber(BuildingId::External);
-    return coop_config_.light_state_config_[building_id].is_active_;
+    auto state = coop_config_.light_state_config_[building_id].is_active_;
+    LOG_DEBUG("External building light is %s", state ? "on" : "off");
+    return state;
 }
 
 ControlLogic::DoorActionMap ControlLogic::ChickenCoopController::getDoorActions() {
