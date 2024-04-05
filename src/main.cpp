@@ -44,7 +44,7 @@ void setup() {
     Serial.begin(ProjectConst::kSerialBaudRate);
     // Initialize log
     initLog();
-
+    LOG_INFO("Chicken coop controller started");
     // Initialize GPIO
     gpio_driver = GPIO::GpioDriver::getInstance();
     // Initialize RTC
