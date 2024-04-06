@@ -56,7 +56,7 @@ void setup() {
     delay(200);  //  delay for RTC to sync time
 
     // set first entry time for main loop
-    main_loop_loop_entry_time_ms = micros();
+    main_loop_current_time_us = micros();
     LOG_INFO("Initialization done. Start main loop");
 }
 
@@ -65,7 +65,7 @@ void loop() {
     // get current time
     main_loop_loop_entry_time_ms = millis();
     // process light control every 1s
-    if ( main_loop_loop_entry_time_ms - light_process_last_time_ms >= ProjectConst::kMainLoopDelayBetweenLightControlProcess) {
+    if (main_loop_loop_entry_time_ms - light_process_last_time_ms >= ProjectConst::kMainLoopDelayBetweenLightControlProcess) {
         light_process_last_time_ms = main_loop_loop_entry_time_ms;
         chicken_coop_controller->periodicUpdateController();
     }
@@ -79,8 +79,7 @@ void loop() {
     main_loop_current_time_us = micros();
     if (next_main_loop_process_time_us - main_loop_current_time_us > ProjectConst::kMainLoopDelayUs) {
         //  overrurn detected
-        Serial.println("Overrun main loop detected!!!");
-        LOG_ERROR("Overrun main loop detected!!!");
+        LOG_ERROR("Overrun main loop detected! Current time: %d, next process time: %d", main_loop_current_time_us, next_main_loop_process_time_us);
         // set new time for next main loop process
         next_main_loop_process_time_us = main_loop_current_time_us;
     } else {
