@@ -57,7 +57,24 @@ bool DaytimeCalculator::checkDataHasChanged(const std::time_t & input_time) cons
 void DaytimeCalculator::updateSunsetAndSunriseTime(const std::time_t & input_time) {
     const auto *const calendar_date = std::localtime(&input_time);
     sun_set.setCurrentDate(calendar_date->tm_year, calendar_date->tm_mon, calendar_date->tm_yday);
-    this->sunset_time = static_cast<ProjectTypes::abs_min_past_midnight_t>(sun_set.calcCivilSunset());
-    this->sunrise_time = static_cast<ProjectTypes::abs_min_past_midnight_t>(sun_set.calcCivilSunrise());
+    this->sunset_time = calcSunsetTime(input_time);
+    this->sunrise_time = calcSunriseTime(input_time);
     this->last_input_date = *calendar_date;
+}
+
+std::time_t DaytimeCalculator::convertTimePastMidnightToCTime(const std::time_t & input_time, const ProjectTypes::abs_min_past_midnight_t & time_past_midnight) {
+    auto daytime = *std::localtime(&input_time);
+    daytime.tm_hour = time_past_midnight / 60;
+    daytime.tm_min = time_past_midnight % 60;
+    return std::mktime(&daytime);
+}
+
+std::time_t DaytimeCalculator::calcSunsetTime(const std::time_t & input_time) {
+    auto min_past_midnight = static_cast<int>(sun_set.calcCivilSunset());
+    return convertTimePastMidnightToCTime(input_time, min_past_midnight);
+}
+
+std::time_t DaytimeCalculator::calcSunriseTime(const std::time_t & input_time) {
+    auto min_past_midnight = static_cast<int>(sun_set.calcCivilSunrise());
+    return convertTimePastMidnightToCTime(input_time, min_past_midnight);
 }

@@ -35,5 +35,8 @@ class DaytimeCalculator {
     void processSunriseAndSunsetTime(const std::time_t & input_time);
     bool checkDataHasChanged(const std::time_t & input_time) const;
     void updateSunsetAndSunriseTime(const std::time_t & input_time);
+    std::time_t convertTimePastMidnightToCTime(const std::time_t & input_time, const ProjectTypes::abs_min_past_midnight_t & time_past_midnight);
+    std::time_t calcSunsetTime(const std::time_t & input_time);
+    std::time_t calcSunriseTime(const std::time_t & input_time);
 };
 
