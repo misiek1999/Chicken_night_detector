@@ -10,8 +10,8 @@ constexpr auto kPinMainDoorOutputDown = PB4;
 
 // control switches
 constexpr auto kPinEnableMainLight = PB5;
-constexpr auto kPinEnableExternalLight = PB6;
-constexpr auto kPinEnableAutoDoorControl = PB7;
+constexpr auto kPinEnableExternalLight = PB9;
+constexpr auto kPinEnableAutoDoorControl = PA9;
 constexpr auto kPinEnableManualDoorControl = PB8;
 constexpr auto kPinControlDoorOpen = PA0;
 constexpr auto kPinControlDoorClose = PA1;
@@ -22,7 +22,6 @@ constexpr auto kPinMainLightIndicator = PA2;
 constexpr auto kPinExternalLightIndicator = PA3;
 constexpr auto kPinErrorIndicator = PA4;
 
-// DS1302 RTC module
-constexpr auto kPinDS1302Clk = PA8;
-constexpr auto kPinDS1302Data = PA9;
-constexpr auto kPinDS1302En = PA10;
+// DS3231 RTC module
+constexpr auto kPinDS3231Clk = PB6;
+constexpr auto kPinDS3231Data = PB7;

@@ -255,6 +255,8 @@ class LightBulbController {
     RestDimmingTimeMap::iterator getActiveDimmingEvent(const std::time_t &current_time) const;
 
     size_t getActiveDimmingEventIndex(const std::time_t &current_time) const;
+
+    std::time_t last_update_time_;
 };  //  class LightBulbController
 
 }  //  namespace ControlLogic

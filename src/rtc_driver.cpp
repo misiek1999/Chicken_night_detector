@@ -49,7 +49,9 @@ std::time_t RtcDriver::getCurrentTimeRtc() {
 }
 
 bool RtcDriver::setTimeToRtc(const std::time_t &time) {
-    LOG_DEBUG("Set time to rtc: %d", time);
+    // TODO: fix this log
+    Serial.println(time);
+    LOG_INFO("Set time to rtc: %l", time);
     // set time to selected rtc
     switch (rtc_source_) {
     case RtcSource::Internal:

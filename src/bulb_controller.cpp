@@ -104,15 +104,20 @@ ProjectTypes::time_minute_t ControlLogic::LightDimmingEvent::getCurrentDimmingTi
 // -----------------------------------------------------------------------------
 
 ControlLogic::LightBulbController::LightBulbController(const LightDimmingEventMap &events_containers):
-    event_containers_(events_containers) {
+    event_containers_(events_containers),
+    last_update_time_(0) {
+    auto size = event_containers_.size();
+    auto size2 = events_containers.size();
+    auto a1 = event_containers_.at(0).callback;
+    auto a2 = event_containers_.at(0).event;
+    for (auto & event : event_containers_) {
+        LOG_DEBUG("Event: %u", event.first);
+    }
 }
 
 ControlLogic::LightState ControlLogic::LightBulbController::getEventState(const std::time_t & current_time, const size_t event_index) {
     updateEvents(current_time);
-    auto light_state = LightState::Error;
-    if (checkEventIndexIsValid(event_index)) {
-        light_state = event_containers_.at(event_index).event.getLightState(current_time);
-    }
+    auto light_state = event_containers_.at(event_index).event.getLightState(current_time);
     return light_state;
 }
 
@@ -218,16 +223,20 @@ float ControlLogic::LightBulbController::getTotalOfDimmingTimePercent(const std:
 }
 
 void ControlLogic::LightBulbController::updateEvents(const std::time_t & current_time) {
+    if (last_update_time_ == current_time) {
+        return;
+    }
     // get new event time from callback
-    for (auto& event_container : event_containers_) {
-        auto callback = event_container.second.callback;
+    for (auto& event : event_containers_) {
+        auto callback = event.second.callback;
         if (callback == nullptr) {
-            LOG_ERROR("Callback is not set for event: %u", event_container.first);
+            LOG_ERROR("Callback is not set for event: %u", event.first);
         } else {
             auto new_event_time = callback(current_time);
-            event_container.second.event.setEventTime(new_event_time);
+            event.second.event.setEventTime(new_event_time);
         }
     }
+    last_update_time_ = current_time;
 }
 
 void ControlLogic::LightBulbController::updateAllDimmingTime(const ProjectTypes::time_minute_t & new_dimming_time) {

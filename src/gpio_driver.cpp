@@ -1,5 +1,6 @@
 #include "gpio_driver.h"
 #include <chrono>
+#include "Wire.h"
 #include "project_types.h"
 #include "project_pin_definition.h"
 
@@ -11,7 +12,7 @@ constexpr float kLightPercentOff = 0.5;
 constexpr float kLightPercentOn = 1.0;
 
 GPIO::GpioDriver::GpioDriver():
-        power_save_mode_(true),
+        power_save_mode_(false),
         doors_are_opening_(false) {
     // initialize all gpio
     pinMode(kPinOnboardLed, OUTPUT);
@@ -20,6 +21,8 @@ GPIO::GpioDriver::GpioDriver():
     // lights are off by default
     digitalWrite(kPinMainLigthOutput, LOW);
     digitalWrite(kPinOnboardLed, HIGH);
+    // Init i2c bus
+    Wire.begin();
 }
 
 void GPIO::GpioDriver::toggleLightMainBuilding(const bool state) {

@@ -58,7 +58,7 @@ constexpr const char* file_name(const char* path) {
 #define __FILENAME__ file_name(__FILE__)
 #endif
 
-#define LOG_ERROR(MSG, ...) Log.errorln(LOG_PREFIX MSG, log_number++, "D", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_ERROR(MSG, ...) Log.errorln(LOG_PREFIX MSG, log_number++, "E", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
 #define LOG_WARNING(MSG, ...) Log.warningln(LOG_PREFIX MSG, log_number++, "W", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
 #define LOG_NOTICE(MSG, ...) Log.noticeln(LOG_PREFIX MSG, log_number++, "N", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
 #define LOG_INFO(MSG, ...) Log.infoln(LOG_PREFIX MSG, log_number++, "I", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)

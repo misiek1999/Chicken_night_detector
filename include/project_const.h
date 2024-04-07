@@ -28,5 +28,6 @@ namespace ProjectConst
     constexpr ProjectTypes::req_t kInstallationReq = -0.833F;
     // external time module const
     constexpr uint8_t kMonthSyncOffset = 1;
+    constexpr int kEpochYear = 1970;
 } // namespace ProjectConst
 #endif // PROJECT_CONST_H

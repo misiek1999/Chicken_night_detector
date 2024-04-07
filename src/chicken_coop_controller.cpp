@@ -34,7 +34,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
     // Add main building to bulb controller
     auto building_id = coop_config_.light_state_config_[0].id_;
     bulb_controllers_.insert(etl::make_pair(building_id,
-                                LightBulbController {
+                                LightBulbController(
                                     LightDimmingEventMap { etl::pair {
                                         getBuildingNumber(building_id),
                                         LightDimmingEventAndCallback {
@@ -47,7 +47,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
                                             .callback = sunset_callback
                                         }
                                     }}
-                                }));
+    )));
 
     // Add external building to bulb controller
     building_id = coop_config_.light_state_config_[1].id_;

@@ -72,14 +72,16 @@ void loop() {
 
     // process CLI
     cli_process.periodicCProcessCLI();
-
     // calculate delay for main loop
     next_main_loop_process_time_us += ProjectConst::kMainLoopDelayUs;
     // get current time in us
     main_loop_current_time_us = micros();
     if (next_main_loop_process_time_us - main_loop_current_time_us > ProjectConst::kMainLoopDelayUs) {
         //  overrurn detected
-        LOG_ERROR("Overrun main loop detected! Current time: %d, next process time: %d", main_loop_current_time_us, next_main_loop_process_time_us);
+        LOG_ERROR("Overrun main loop detected! Loop time: %d Current time: %d, next process time: %d",
+                    next_main_loop_process_time_us - main_loop_current_time_us,
+                    main_loop_current_time_us,
+                    next_main_loop_process_time_us);
         // set new time for next main loop process
         next_main_loop_process_time_us = main_loop_current_time_us;
     } else {

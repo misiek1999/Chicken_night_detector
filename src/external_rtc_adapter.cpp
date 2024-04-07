@@ -1,56 +1,41 @@
 #include "external_rtc_adapter.h"
-#include "DS1302.h"
+#include "DS3231.h"
+#include <wire.h>
 #include "project_const.h"
 
 namespace ModuleAdapter {
-// Class with DS1302 RTC clock
-DS1302 external_rtc(kPinDS1302En, kPinDS1302Data, kPinDS1302Clk);
-
-// Local function declaration
-void convert_internal_rtc_format_to_external_rtc_format(const std::time_t &time_to_convert, Time &converted_time) {
-    auto date = *std::localtime(&time_to_convert);
-    converted_time.yr = date.tm_year;
-    converted_time.mon = date.tm_mon + ProjectConst::kMonthSyncOffset;
-    converted_time.day = static_cast<Time::Day>(date.tm_wday);
-    converted_time.hr = date.tm_hour;
-    converted_time.min = date.tm_min;
-    converted_time.sec = date.tm_sec;
-    converted_time.date = date.tm_mday;
+// Class with DS3231 RTC clock
+DS3231* getExternalRtc() {
+    static DS3231 external_rtc;
+    return &external_rtc;
 }
 
-void convert_external_rtc_format_to_internal_rtc_format(const Time &time_to_convert, std::time_t &converted_time) {
-    std::tm input_date = {};
-    input_date.tm_year = time_to_convert.yr;
-    input_date.tm_mon = time_to_convert.mon - ProjectConst::kMonthSyncOffset;
-    input_date.tm_mday = time_to_convert.date;
-    input_date.tm_hour = time_to_convert.hr;
-    input_date.tm_min = time_to_convert.min;
-    input_date.tm_sec = time_to_convert.sec;
-    converted_time = std::mktime(&input_date);
-}
-
-
+bool kCentury = false;
+bool kH24 = false;
+bool kAM = false;
 
 // Global function definitions
-
 void init_external_rtc_module() {
-    external_rtc.writeProtect(false);
-    external_rtc.halt(false);
+    auto *external_rtc = getExternalRtc();
+    external_rtc->setClockMode(false);
 }
 
 void get_external_rtc_time(std::time_t &time) {
-    // read time from external rtc
-    const Time ds1302_time = external_rtc.time();
-    // convert time format
-    convert_external_rtc_format_to_internal_rtc_format(ds1302_time, time);
+    auto *external_rtc = getExternalRtc();
+    std::tm tm_date = {};
+    tm_date.tm_year = external_rtc->getYear();
+    tm_date.tm_mon = external_rtc->getMonth(kCentury) - ProjectConst::kMonthSyncOffset;
+    tm_date.tm_mday = external_rtc->getDate();
+    tm_date.tm_hour = external_rtc->getHour(kH24, kAM);
+    tm_date.tm_min = external_rtc->getMinute();
+    tm_date.tm_sec = external_rtc->getSecond();
+    time = std::mktime(&tm_date);
 }
 
 void set_external_rtc_time(const std::time_t &time) {
-    // convert rtc time format
-    Time ds1302_time(0, 0, 0, 0, 0, 0, Time::Day::kMonday);
-    convert_internal_rtc_format_to_external_rtc_format(time, ds1302_time);
+    auto *external_rtc = getExternalRtc();
     // set new time to external rtc
-    external_rtc.time(ds1302_time);
+    external_rtc->setEpoch(time);
 }
 
 }  //  namespace ModuleAdapter
