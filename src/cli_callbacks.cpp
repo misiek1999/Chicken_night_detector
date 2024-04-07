@@ -109,7 +109,7 @@ void saveValueToTimeVariable(std::tm& time_to_set, const int value, const size_t
             time_to_set.tm_year = value;
             break;
         case 1:
-            time_to_set.tm_mon = value;
+            time_to_set.tm_mon = value - ProjectConst::kMonthSyncOffset;
             break;
         case 2:
             time_to_set.tm_mday = value;
@@ -191,7 +191,7 @@ void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     char buf[50];
     // Get the time from the RTC
     snprintf(buf, sizeof(buf), "Time: %04d-%02d-%02d %02d:%02d:%02d",
-        currentTimeTm.tm_year, currentTimeTm.tm_mon, currentTimeTm.tm_mday,
+        currentTimeTm.tm_year, currentTimeTm.tm_mon + ProjectConst::kMonthSyncOffset, currentTimeTm.tm_mday,
         currentTimeTm.tm_hour, currentTimeTm.tm_min, currentTimeTm.tm_sec);
     // Print the formatted string to serial so we can see the time.
     Serial.println(buf);

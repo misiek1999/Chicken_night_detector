@@ -26,5 +26,7 @@ namespace ProjectConst
     constexpr ProjectTypes::longitude_t kInstallationLongitude = 21.341718388675318F;
     constexpr ProjectTypes::time_zone_t kInstallationTimeZone = 1;
     constexpr ProjectTypes::req_t kInstallationReq = -0.833F;
+    // external time module const
+    constexpr uint8_t kMonthSyncOffset = 1;
 } // namespace ProjectConst
 #endif // PROJECT_CONST_H
