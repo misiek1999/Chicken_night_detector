@@ -29,5 +29,6 @@ namespace ProjectConst
     // external time module const
     constexpr uint8_t kMonthSyncOffset = 1;
     constexpr int kEpochYear = 1970;
+    constexpr int kTmStructInitYear = 1900;
 } // namespace ProjectConst
 #endif // PROJECT_CONST_H

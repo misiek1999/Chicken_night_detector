@@ -28,9 +28,9 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
 
     // Add bulb light controller callback to update sunrise and sunset time
     auto sunset_callback = std::bind(&DaytimeCalculator::getSunsetTime,
-                daytime_calculator_, std::placeholders::_1);
+                &daytime_calculator_, std::placeholders::_1);
     auto sunrise_callback = std::bind(&DaytimeCalculator::getSunriseTime,
-                daytime_calculator_, std::placeholders::_1);
+                &daytime_calculator_, std::placeholders::_1);
     // Add main building to bulb controller
     auto building_id = coop_config_.light_state_config_[0].id_;
     bulb_controllers_.insert(etl::make_pair(building_id,
@@ -67,14 +67,14 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
                                     }}
                                 }));
     // Add door controller event to main building
-    auto doorEventFirstUpdate = [&](const std::time_t &current_time) {
+    auto doorEventFirstUpdate = [&] (const std::time_t &current_time) mutable {
         auto tm  = *std::localtime(&current_time);
         tm.tm_hour = 6;
         tm.tm_min = 0;
         auto new_open_time = std::mktime(&tm);
-        return sunrise_callback(new_open_time);
+        return new_open_time;
     };
-    auto doorEventSecondUpdate = [&](const std::time_t &current_time) {
+    auto doorEventSecondUpdate = [&] (const std::time_t &current_time) mutable {
         return sunset_callback(current_time);
     };
     building_id = coop_config_.door_config_[0].id_;
@@ -96,7 +96,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
 bool ControlLogic::ChickenCoopController::periodicUpdateController() {
     bool result = true;
     // get current rtc time
-    std::time_t rtc_time = std::invoke(getRtcTime_);
+    const std::time_t rtc_time = std::invoke(getRtcTime_);
     // update door controller
     for (auto &door_controller : door_controllers_) {
         auto door_action = DoorControl::DoorControlAction::Disable;

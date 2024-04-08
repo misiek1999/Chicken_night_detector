@@ -1,5 +1,6 @@
 #include "rtc_driver.h"
 #include "log.h"
+#include "project_const.h"
 
 // TODO: implement this functions
 void RtcDriver::setExternalRtcTime(const std::time_t &time) {
@@ -82,6 +83,8 @@ RtcSource RtcDriver::getRtcSource() {
     return rtc_source_;
 }
 
+constexpr auto kMinValidYear = 2020 - ProjectConst::kTmStructInitYear;
+constexpr auto kMaxValidYear = 2100 - ProjectConst::kTmStructInitYear;
 RtcStatus RtcDriver::getRtcStatus() {
     // read current time from rtc
     std::time_t time_from_sensor = getCurrentTimeRtc();
@@ -90,7 +93,7 @@ RtcStatus RtcDriver::getRtcStatus() {
     if (time_from_sensor == 0) {
         return RtcStatus::Uninitialized;
     }
-    if (date.tm_year < 2020 || date.tm_year > 2100) {
+    if (date.tm_year < kMinValidYear || date.tm_year > kMaxValidYear) {
         return RtcStatus::Uninitialized;
     }
     return RtcStatus::Ok;

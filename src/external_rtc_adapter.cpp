@@ -13,7 +13,8 @@ DS3231* getExternalRtc() {
 bool kCentury = false;
 bool kH24 = false;
 bool kAM = false;
-
+constexpr int kDS3231InitYear = 2000;
+constexpr int kYearOffset = kDS3231InitYear - ProjectConst::kTmStructInitYear;
 // Global function definitions
 void init_external_rtc_module() {
     auto *external_rtc = getExternalRtc();
@@ -23,7 +24,7 @@ void init_external_rtc_module() {
 void get_external_rtc_time(std::time_t &time) {
     auto *external_rtc = getExternalRtc();
     std::tm tm_date = {};
-    tm_date.tm_year = external_rtc->getYear();
+    tm_date.tm_year = external_rtc->getYear() + kYearOffset;
     tm_date.tm_mon = external_rtc->getMonth(kCentury) - ProjectConst::kMonthSyncOffset;
     tm_date.tm_mday = external_rtc->getDate();
     tm_date.tm_hour = external_rtc->getHour(kH24, kAM);

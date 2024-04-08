@@ -232,7 +232,7 @@ void ControlLogic::LightBulbController::updateEvents(const std::time_t & current
         if (callback == nullptr) {
             LOG_ERROR("Callback is not set for event: %u", event.first);
         } else {
-            auto new_event_time = callback(current_time);
+            auto new_event_time = std::invoke(callback, current_time);
             event.second.event.setEventTime(new_event_time);
         }
     }
