@@ -86,6 +86,22 @@ class ChickenCoopController {
     TimeCallback getRtcTime_;
     ControlLogic::LightStateMap light_states_;
     DoorActionMap door_actions_;
+
+    static constexpr double kMaxDoorMovementTime = 10.0;    // 10 seconds
+    std::time_t last_change_time_;
+    DoorControl::DoorControlAction last_door_action_;
+
+    /*
+        * @brief: Update door controller
+        * @param rtc_time: RTC time
+    */
+    void updateDoorController(const std::time_t &rtc_time);
+
+    /*
+        * @brief: Update light controller
+        * @param rtc_time: RTC time
+    */
+    void updateLightController(const std::time_t &rtc_time);
 };
 
 }  //  namespace ControlLogic

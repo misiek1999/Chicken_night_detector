@@ -15,7 +15,9 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
         coop_config_(coop_config),
         getRtcTime_(get_rtc_time),
         light_states_(),
-        door_actions_() {
+        door_actions_(),
+        last_change_time_(0),
+        last_door_action_(DoorControl::DoorControlAction::Disable) {
     // check provided pointers to rtc and gpio drivers are not null
     assert(gpio_driver_ != nullptr && getRtcTime_ != nullptr && "GPIO or getRtcTime is nullptr!");
     // Calculate current sunset and sunrise time to rtc light controller
@@ -75,7 +77,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
         return new_open_time;
     };
     auto doorEventSecondUpdate = [&] (const std::time_t &current_time) mutable {
-        return sunset_callback(current_time);
+        return sunset_callback(current_time) + ProjectConst::kLightControlSecondsToTurnOffLights;
     };
     building_id = coop_config_.door_config_[0].id_;
     door_controllers_.insert(etl::make_pair(building_id,
@@ -98,39 +100,9 @@ bool ControlLogic::ChickenCoopController::periodicUpdateController() {
     // get current rtc time
     const std::time_t rtc_time = std::invoke(getRtcTime_);
     // update door controller
-    for (auto &door_controller : door_controllers_) {
-        auto door_action = DoorControl::DoorControlAction::Disable;
-        if (coop_config_.door_config_.at(getBuildingNumber(door_controller.first)).is_active_) {
-            if (door_controller.second.updateDoorControllerEvents(rtc_time)) {
-                door_action = door_controller.second.getDoorState(rtc_time);
-            }
-        }
-        door_actions_[getBuildingNumber(door_controller.first)] = door_action;
-    }
-    // iterate over all bulb light controllers
-    for (auto &light_controller : bulb_controllers_) {
-        auto bulb_light_state = light_controller.second.getLightState(rtc_time);
-        auto light_state_conf = coop_config_.light_state_config_.at(getBuildingNumber(light_controller.first));
-        // When light controller is not active, force turn off the light
-        if (!light_state_conf.is_active_) {
-            bulb_light_state = LightState::Off;
-        }
-        light_states_[getBuildingNumber(light_controller.first)] = bulb_light_state;
-        auto dimming_prec = light_controller.second.getTotalOfDimmingTimePercent(rtc_time);
-        switch (bulb_light_state) {
-            case LightState::On:
-                light_state_conf.callback_.toogle_light_state(true);
-                break;
-            case LightState::Off:
-                light_state_conf.callback_.toogle_light_state(false);
-                break;
-            case LightState::Dimming:
-                light_state_conf.callback_.set_pwm_light_percentage(dimming_prec);
-                break;
-            default:
-                break;
-            }
-    }
+    updateDoorController(rtc_time);
+    // update light controller
+    updateLightController(rtc_time);
     return result;
 }
 
@@ -159,4 +131,59 @@ bool ControlLogic::ChickenCoopController::checkLightControllerInExternalBuilding
 
 ControlLogic::DoorActionMap ControlLogic::ChickenCoopController::getDoorActions() {
     return door_actions_;
+}
+
+void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t & rtc_time) {
+    for (auto &door_controller : door_controllers_) {
+        auto door_action = DoorControl::DoorControlAction::Disable;
+        auto light_state_conf = coop_config_.door_config_.at(getBuildingNumber(door_controller.first));
+        if (light_state_conf.is_active_) {
+            if (door_controller.second.updateDoorControllerEvents(rtc_time)) {
+                door_action = door_controller.second.getDoorState(rtc_time);
+            }
+        }
+        // if door state has changed, update last change time and last door action
+        if (door_action != last_door_action_) {
+            last_change_time_ = rtc_time;
+            last_door_action_ = door_action;
+            LOG_INFO("Door controller %d action changed to %d", door_controller.first, door_action);
+        }
+        // if door is moving, check if it is moving too long
+        if (door_action == DoorControl::DoorControlAction::Open ||
+            door_action == DoorControl::DoorControlAction::Close) {
+            // if door is moving too long, disable door controller
+            if (std::difftime(rtc_time, last_change_time_) > kMaxDoorMovementTime) {
+                door_action = DoorControl::DoorControlAction::Disable;
+            }
+        }
+        light_state_conf.callback_.toogle_door_state(door_action);
+        door_actions_[getBuildingNumber(door_controller.first)] = door_action;
+    }
+}
+
+void ControlLogic::ChickenCoopController::updateLightController(const std::time_t & rtc_time) {
+    // iterate over all bulb light controllers
+    for (auto &light_controller : bulb_controllers_) {
+        auto bulb_light_state = light_controller.second.getLightState(rtc_time);
+        auto light_state_conf = coop_config_.light_state_config_.at(getBuildingNumber(light_controller.first));
+        // When light controller is not active, force turn off the light
+        if (!light_state_conf.is_active_) {
+            bulb_light_state = LightState::Off;
+        }
+        light_states_[getBuildingNumber(light_controller.first)] = bulb_light_state;
+        auto dimming_prec = light_controller.second.getTotalOfDimmingTimePercent(rtc_time);
+        switch (bulb_light_state) {
+            case LightState::On:
+                light_state_conf.callback_.toogle_light_state(true);
+                break;
+            case LightState::Off:
+                light_state_conf.callback_.toogle_light_state(false);
+                break;
+            case LightState::Dimming:
+                light_state_conf.callback_.set_pwm_light_percentage(dimming_prec);
+                break;
+            default:
+                break;
+            }
+    }
 }

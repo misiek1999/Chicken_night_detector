@@ -12,7 +12,7 @@ constexpr float kLightPercentOff = 0.5;
 constexpr float kLightPercentOn = 1.0;
 
 GPIO::GpioDriver::GpioDriver():
-        power_save_mode_(false),
+        power_save_mode_(true),
         doors_are_opening_(false) {
     // initialize all gpio
     pinMode(kPinOnboardLed, OUTPUT);
