@@ -25,7 +25,7 @@ CLI::CLIProcess cli_process;
 ControlLogic::ChickenCoopController *chicken_coop_controller;
 
 // Gpio driver
-GPIO::GpioDriver *gpio_driver;
+GPIOInterface::GpioDriver *gpio_driver;
 // Rtc driver
 RtcDriver *rtc_driver;
 
@@ -46,7 +46,7 @@ void setup() {
     initLog();
     LOG_INFO("Chicken coop controller started");
     // Initialize GPIO
-    gpio_driver = GPIO::GpioDriver::getInstance();
+    gpio_driver = GPIOInterface::GpioDriver::getInstance();
     // Initialize RTC
     rtc_driver = &RtcDriver::getInstance();
     // Set rtc source to external module

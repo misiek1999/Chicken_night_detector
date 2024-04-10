@@ -11,7 +11,7 @@ constexpr uint16_t kPwmMinValue = 0;
 constexpr float kLightPercentOff = 0.5;
 constexpr float kLightPercentOn = 1.0;
 
-GPIO::GpioDriver::GpioDriver():
+GPIOInterface::GpioDriver::GpioDriver():
         power_save_mode_(true),
         doors_are_opening_(false) {
     // initialize all gpio
@@ -25,25 +25,25 @@ GPIO::GpioDriver::GpioDriver():
     Wire.begin();
 }
 
-void GPIO::GpioDriver::toggleLightMainBuilding(const bool state) {
+void GPIOInterface::GpioDriver::toggleLightMainBuilding(const bool state) {
     setNormalLightState(state, kPinMainLigthOutput);
     digitalWrite(kPinOnboardLed, static_cast<uint32_t>(!state));
 }
 
-void GPIO::GpioDriver::setPWMLightPercentageMainBuilding(const float percent_light) {
+void GPIOInterface::GpioDriver::setPWMLightPercentageMainBuilding(const float percent_light) {
     setPWMLight(percent_light, kPinMainLigthOutput);
     digitalWrite(kPinOnboardLed, HIGH);
 }
 
-void GPIO::GpioDriver::toggleLightExternalBuilding(const bool state) {
+void GPIOInterface::GpioDriver::toggleLightExternalBuilding(const bool state) {
     setNormalLightState(state, kPinMainLigthOutput);
 }
 
-void GPIO::GpioDriver::setPWMLightPercentageExternalBuilding(const float percent_light) {
+void GPIOInterface::GpioDriver::setPWMLightPercentageExternalBuilding(const float percent_light) {
     setPWMLight(percent_light, kPinExternalLigthOutput);
 }
 
-void GPIO::GpioDriver::setNormalLightState(const bool state, const uint16_t pin) {
+void GPIOInterface::GpioDriver::setNormalLightState(const bool state, const uint16_t pin) {
     if (state && !doors_are_opening_) {
         analogWrite(pin, kPwmMaxValue);
     } else {
@@ -51,7 +51,7 @@ void GPIO::GpioDriver::setNormalLightState(const bool state, const uint16_t pin)
     }
 }
 
-void GPIO::GpioDriver::setPWMLight(const float percent_light, const uint16_t pin) {
+void GPIOInterface::GpioDriver::setPWMLight(const float percent_light, const uint16_t pin) {
     // scale percent range
     const float scaled_percent_light = percent_light * (kLightPercentOn - kLightPercentOff) + kLightPercentOff;
     // convert percent light to the range of 0 to 1023
@@ -59,15 +59,15 @@ void GPIO::GpioDriver::setPWMLight(const float percent_light, const uint16_t pin
     analogWrite(pin, pwm);
 }
 
-bool GPIO::GpioDriver::getMainBuildingEnableControl() {
+bool GPIOInterface::GpioDriver::getMainBuildingEnableControl() {
     return digitalRead(kPinEnableMainLight);
 }
 
-bool GPIO::GpioDriver::getExternalBuildingEnableControl() {
+bool GPIOInterface::GpioDriver::getExternalBuildingEnableControl() {
     return digitalRead(kPinEnableExternalLight);
 }
 
-DoorControl::DoorControlMode GPIO::GpioDriver::getMainBuildingDoorControlMode() {
+DoorControl::DoorControlMode GPIOInterface::GpioDriver::getMainBuildingDoorControlMode() {
     auto state = DoorControl::DoorControlMode::Off;
     if (digitalRead(kPinEnableAutoDoorControl) == LOW) {
         state = DoorControl::DoorControlMode::Auto;
@@ -77,15 +77,15 @@ DoorControl::DoorControlMode GPIO::GpioDriver::getMainBuildingDoorControlMode() 
     return state;
 }
 
-bool GPIO::GpioDriver::checkDoorOpenSignalIsActive() {
+bool GPIOInterface::GpioDriver::checkDoorOpenSignalIsActive() {
     return digitalRead(kPinControlDoorOpen);
 }
 
-bool GPIO::GpioDriver::checkDoorCloseSignalIsActive() {
+bool GPIOInterface::GpioDriver::checkDoorCloseSignalIsActive() {
     return digitalRead(kPinControlDoorClose);
 }
 
-void GPIO::GpioDriver::setDoorControlAction(const DoorControl::DoorControlAction action) {
+void GPIOInterface::GpioDriver::setDoorControlAction(const DoorControl::DoorControlAction action) {
     doors_are_opening_ = power_save_mode_;  // by default set this member to true, if this option is enabled
     if (action == DoorControl::DoorControlAction::Open) {
         digitalWrite(kPinMainDoorOutputUp, HIGH);
@@ -106,6 +106,6 @@ void GPIO::GpioDriver::setDoorControlAction(const DoorControl::DoorControlAction
     }
 }
 
-void GPIO::GpioDriver::tooglePowerSaveMode(const bool state) {
+void GPIOInterface::GpioDriver::tooglePowerSaveMode(const bool state) {
     power_save_mode_ = state;
 }

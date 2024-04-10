@@ -18,8 +18,8 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
         door_actions_(),
         last_change_time_(0),
         last_door_action_(DoorControl::DoorControlAction::Disable) {
-    // check provided pointers to rtc and gpio drivers are not null
-    assert(gpio_driver_ != nullptr && getRtcTime_ != nullptr && "GPIO or getRtcTime is nullptr!");
+    // check provided pointers to rtc is not null
+    assert(getRtcTime_ != nullptr && "getRtcTime is nullptr!");
     // Calculate current sunset and sunrise time to rtc light controller
     std::time_t rtc_time = getRtcTime_();
     auto event_time = daytime_calculator_.getSunsetTime(rtc_time);

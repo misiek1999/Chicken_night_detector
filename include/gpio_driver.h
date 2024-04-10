@@ -3,7 +3,8 @@
 #include <Arduino.h>
 #include <door_control_states.h>
 
-namespace GPIO {
+
+namespace GPIOInterface {
 
 class GpioDriver {
  private:
@@ -115,4 +116,4 @@ class GpioDriver {
     bool doors_are_opening_;
 };
 
-}  //  namespace GPIO
+}  //  namespace GPIOInterface

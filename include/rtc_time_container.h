@@ -80,13 +80,13 @@ public:
         if (date < minDate || date > maxDate) {
             return RtcTimeContainerError::InvalidDate;
         }
-        if (hr < minHour || hr > maxHour) {
+        if (hr > maxHour) {
             return RtcTimeContainerError::InvalidDate;
         }
-        if (min < minMinute || min > maxMinute) {
+        if (min > maxMinute) {
             return RtcTimeContainerError::InvalidDate;
         }
-        if (sec < minSecond || sec > maxSecond) {
+        if (sec > maxSecond) {
             return RtcTimeContainerError::InvalidDate;
         }
         return RtcTimeContainerError::Ok;

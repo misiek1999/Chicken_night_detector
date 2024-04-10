@@ -6,10 +6,10 @@ static ControlLogic::CoopConfig getCoopConfig() {
             ControlLogic::LightStateConfig{
                 .callback_ = {
                     .toogle_light_state = [](const bool &state) {
-                        GPIO::GpioDriver::getInstance()->toggleLightMainBuilding(state);
+                        GPIOInterface::GpioDriver::getInstance()->toggleLightMainBuilding(state);
                     },
                     .set_pwm_light_percentage = [](const float &percent_light) {
-                        GPIO::GpioDriver::getInstance()->setPWMLightPercentageMainBuilding(percent_light);
+                        GPIOInterface::GpioDriver::getInstance()->setPWMLightPercentageMainBuilding(percent_light);
                     }
                 },
                 .id_ = ControlLogic::BuildingId::Main,
@@ -18,10 +18,10 @@ static ControlLogic::CoopConfig getCoopConfig() {
             {
                 .callback_ = {
                     .toogle_light_state = [](const bool &state) {
-                        GPIO::GpioDriver::getInstance()->toggleLightExternalBuilding(state);
+                        GPIOInterface::GpioDriver::getInstance()->toggleLightExternalBuilding(state);
                     },
                     .set_pwm_light_percentage = [](const float &percent_light) {
-                        GPIO::GpioDriver::getInstance()->setPWMLightPercentageExternalBuilding(percent_light);
+                        GPIOInterface::GpioDriver::getInstance()->setPWMLightPercentageExternalBuilding(percent_light);
                     }
                 },
                 .id_ = ControlLogic::BuildingId::External,
@@ -32,7 +32,7 @@ static ControlLogic::CoopConfig getCoopConfig() {
             ControlLogic::DoorStateConfig{
                 .callback_ = {
                     .toogle_door_state = [](const DoorControl::DoorControlAction &state) {
-                        GPIO::GpioDriver::getInstance()->setDoorControlAction(state);
+                        GPIOInterface::GpioDriver::getInstance()->setDoorControlAction(state);
                     }
                 },
                 .id_ = ControlLogic::BuildingId::Main,
