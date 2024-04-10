@@ -27,7 +27,7 @@ GPIO::GpioDriver::GpioDriver():
 
 void GPIO::GpioDriver::toggleLightMainBuilding(const bool state) {
     setNormalLightState(state, kPinMainLigthOutput);
-    digitalWrite(kPinOnboardLed, static_cast<uint32_t>(state));
+    digitalWrite(kPinOnboardLed, static_cast<uint32_t>(!state));
 }
 
 void GPIO::GpioDriver::setPWMLightPercentageMainBuilding(const float percent_light) {
@@ -37,7 +37,6 @@ void GPIO::GpioDriver::setPWMLightPercentageMainBuilding(const float percent_lig
 
 void GPIO::GpioDriver::toggleLightExternalBuilding(const bool state) {
     setNormalLightState(state, kPinMainLigthOutput);
-    digitalWrite(kPinOnboardLed, static_cast<uint32_t>(state));
 }
 
 void GPIO::GpioDriver::setPWMLightPercentageExternalBuilding(const float percent_light) {
