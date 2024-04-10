@@ -39,7 +39,7 @@ class DoorController {
         @brief: Get door state
         @return: door action state
     */
-    DoorControl::DoorControlAction getDoorState(const std::time_t &current_time);
+    DoorControl::DoorControlAction getDoorState(const std::time_t &current_time) const;
 
     /*
         @brief: Add door event

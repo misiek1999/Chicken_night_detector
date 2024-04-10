@@ -18,7 +18,7 @@ bool ControlLogic::DoorController::updateDoorControllerEvents(const std::time_t 
     return true;
 }
 
-DoorControl::DoorControlAction ControlLogic::DoorController::getDoorState(const std::time_t &current_time) {
+DoorControl::DoorControlAction ControlLogic::DoorController::getDoorState(const std::time_t &current_time) const {
     auto action = DoorControl::DoorControlAction::Close;
     for (auto &door_event : door_events_map_) {
         if (door_event.second.first.checkEventIsActive(current_time)) {

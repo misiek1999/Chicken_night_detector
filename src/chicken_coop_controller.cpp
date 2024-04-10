@@ -129,7 +129,7 @@ bool ControlLogic::ChickenCoopController::checkLightControllerInExternalBuilding
     return state;
 }
 
-ControlLogic::DoorActionMap ControlLogic::ChickenCoopController::getDoorActions() {
+ControlLogic::DoorActionMap ControlLogic::ChickenCoopController::getDoorActions() const {
     return door_actions_;
 }
 

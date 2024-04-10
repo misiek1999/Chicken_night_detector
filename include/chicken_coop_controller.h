@@ -71,12 +71,11 @@ class ChickenCoopController {
         * @return: true if controller is active, false if controller is disabled
     */
     bool checkLightControllerInExternalBuildingIsActive() const;
-    // TODO: change door controller methods to const
     /*
         * @brief: Get door action state
         * @return: DoorActionMap
     */
-    DoorActionMap getDoorActions();
+    DoorActionMap getDoorActions() const;
 
  private:
     DaytimeCalculator daytime_calculator_;
