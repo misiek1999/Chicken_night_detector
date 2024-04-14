@@ -16,11 +16,43 @@ GPIOInterface::GpioDriver::GpioDriver():
         doors_are_opening_(false) {
     // initialize all gpio
     pinMode(kPinOnboardLed, OUTPUT);
+
     pinMode(kPinMainLigthOutput, OUTPUT);
+    pinMode(kPinExternalLigthOutput, OUTPUT);
+
+    pinMode(kPinMainDoorOutputDown, OUTPUT);
+    pinMode(kPinMainDoorOutputUp, OUTPUT);
+    pinMode(kPinMainDoorOutputPowerOn, OUTPUT);
+
+    pinMode(kPinDoorMoveIndicator, OUTPUT);
+    pinMode(kPinMainLightIndicator, OUTPUT);
+    pinMode(kPinExternalLightIndicator, OUTPUT);
+    pinMode(kPinErrorIndicator, OUTPUT);
+
+    pinMode(kPinEnableMainLight, INPUT_PULLUP);
+    pinMode(kPinEnableExternalLight, INPUT_PULLUP);
+    pinMode(kPinEnableAutoDoorControl, INPUT_PULLUP);
+    pinMode(kPinEnableManualDoorControl, INPUT_PULLUP);
+
+    pinMode(kPinControlDoorClose, INPUT_PULLUP);
+    pinMode(kPinControlDoorOpen, INPUT_PULLUP);
+
     analogWriteFrequency(kPwmFrequency);
+
     // lights are off by default
-    digitalWrite(kPinMainLigthOutput, LOW);
     digitalWrite(kPinOnboardLed, HIGH);
+    digitalWrite(kPinMainLigthOutput, LOW);
+    digitalWrite(kPinExternalLigthOutput, LOW);
+
+    digitalWrite(kPinMainDoorOutputDown, LOW);
+    digitalWrite(kPinMainDoorOutputUp, LOW);
+    digitalWrite(kPinMainDoorOutputPowerOn, LOW);
+
+    digitalWrite(kPinDoorMoveIndicator, LOW);
+    digitalWrite(kPinMainLightIndicator, LOW);
+    digitalWrite(kPinExternalLightIndicator, LOW);
+    digitalWrite(kPinErrorIndicator, LOW);
+
     // Init i2c bus
     Wire.begin();
 }
@@ -77,11 +109,11 @@ DoorControl::DoorControlMode GPIOInterface::GpioDriver::getMainBuildingDoorContr
     return state;
 }
 
-bool GPIOInterface::GpioDriver::checkDoorOpenSignalIsActive() {
+bool GPIOInterface::GpioDriver::checkDoorControlOpenSignalIsActive() {
     return digitalRead(kPinControlDoorOpen);
 }
 
-bool GPIOInterface::GpioDriver::checkDoorCloseSignalIsActive() {
+bool GPIOInterface::GpioDriver::checkDoorControlCloseSignalIsActive() {
     return digitalRead(kPinControlDoorClose);
 }
 
@@ -106,6 +138,30 @@ void GPIOInterface::GpioDriver::setDoorControlAction(const DoorControl::DoorCont
     }
 }
 
-void GPIOInterface::GpioDriver::tooglePowerSaveMode(const bool state) {
+void GPIOInterface::GpioDriver::togglePowerSaveMode(const bool state) {
     power_save_mode_ = state;
+}
+
+void GPIOInterface::GpioDriver::setErrorIndicator() {
+    toggleErrorIndicator(true);
+}
+
+void GPIOInterface::GpioDriver::clearErrorIndicator() {
+    toggleErrorIndicator(false);
+}
+
+void GPIOInterface::GpioDriver::toggleLightMainBuildingIndicator(const bool state) {
+    digitalWrite(kPinMainLightIndicator, state);
+}
+
+void GPIOInterface::GpioDriver::toggleLightExternalBuildingIndicator(const bool state) {
+    digitalWrite(kPinExternalLightIndicator, state);
+}
+
+void GPIOInterface::GpioDriver::toggleDoorMoveIndicator(const bool state) {
+    digitalWrite(kPinDoorMoveIndicator, state);
+}
+
+void GPIOInterface::GpioDriver::toggleErrorIndicator(const bool state) {
+    digitalWrite(kPinErrorIndicator, state);
 }

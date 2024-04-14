@@ -21,6 +21,7 @@ constexpr auto kPinOnboardLed = 36;
 constexpr auto kPinMainLightIndicator = 39;
 constexpr auto kPinExternalLightIndicator = 34;
 constexpr auto kPinErrorIndicator = 35;
+constexpr auto kPinDoorMoveIndicator = 32;
 
 // DS3231 RTC module
 constexpr auto kPinDS3231Clk = 22;
