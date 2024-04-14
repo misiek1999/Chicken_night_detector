@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <door_control_states.h>
 
-namespace GPIO {
+namespace GPIOInterface {
 
 class GpioDriver {
  private:
@@ -80,13 +80,13 @@ class GpioDriver {
         * Check door open signal in main building is active
         * @return true if door open signal is active, false otherwise
     */
-    bool checkDoorOpenSignalIsActive();
+    bool checkDoorControlOpenSignalIsActive();
 
     /*
         * Check door close signal in main building is active
         * @return true if door close signal is active, false otherwise
     */
-    bool checkDoorCloseSignalIsActive();
+    bool checkDoorControlCloseSignalIsActive();
 
     /*
         * Set door control action
@@ -102,7 +102,11 @@ class GpioDriver {
         * Toogle power save mode
         @param state - true if power mode should be enabled, otherwise disable
     */
-    void tooglePowerSaveMode(const bool state);
+    void togglePowerSaveMode(const bool state);
+
+    void setErrorIndicator();
+
+    void clearErrorIndicator();
 
  private:
     /*
@@ -113,6 +117,14 @@ class GpioDriver {
         True if one of door is opening
     */
     bool doors_are_opening_;
+
+    void toggleLightMainBuildingIndicator(const bool state);
+
+    void toggleLightExternalBuildingIndicator(const bool state);
+
+    void toggleDoorMoveIndicator(const bool state);
+
+    void toggleErrorIndicator(const bool state);
 };
 
-}  //  namespace GPIO
+}  //  namespace GPIOInterface

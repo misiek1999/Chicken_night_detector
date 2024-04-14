@@ -1,4 +1,4 @@
-#include "gpio_driver.h"
+ #include "gpio_driver.h"
 #include <chrono>
 #include "Wire.h"
 #include "project_types.h"
@@ -11,39 +11,71 @@ constexpr uint16_t kPwmMinValue = 0;
 constexpr float kLightPercentOff = 0.5;
 constexpr float kLightPercentOn = 1.0;
 
-GPIO::GpioDriver::GpioDriver():
+GPIOInterface::GpioDriver::GpioDriver():
         power_save_mode_(true),
         doors_are_opening_(false) {
     // initialize all gpio
     pinMode(kPinOnboardLed, OUTPUT);
+
     pinMode(kPinMainLigthOutput, OUTPUT);
+    pinMode(kPinExternalLigthOutput, OUTPUT);
+
+    pinMode(kPinMainDoorOutputDown, OUTPUT);
+    pinMode(kPinMainDoorOutputUp, OUTPUT);
+    pinMode(kPinMainDoorOutputPowerOn, OUTPUT);
+
+    pinMode(kPinDoorMoveIndicator, OUTPUT);
+    pinMode(kPinMainLightIndicator, OUTPUT);
+    pinMode(kPinExternalLightIndicator, OUTPUT);
+    pinMode(kPinErrorIndicator, OUTPUT);
+
+    pinMode(kPinEnableMainLight, INPUT_PULLUP);
+    pinMode(kPinEnableExternalLight, INPUT_PULLUP);
+    pinMode(kPinEnableAutoDoorControl, INPUT_PULLUP);
+    pinMode(kPinEnableManualDoorControl, INPUT_PULLUP);
+
+    pinMode(kPinControlDoorClose, INPUT_PULLUP);
+    pinMode(kPinControlDoorOpen, INPUT_PULLUP);
+
     analogWriteFrequency(kPwmFrequency);
+
     // lights are off by default
-    digitalWrite(kPinMainLigthOutput, LOW);
     digitalWrite(kPinOnboardLed, HIGH);
+    digitalWrite(kPinMainLigthOutput, LOW);
+    digitalWrite(kPinExternalLigthOutput, LOW);
+
+    digitalWrite(kPinMainDoorOutputDown, LOW);
+    digitalWrite(kPinMainDoorOutputUp, LOW);
+    digitalWrite(kPinMainDoorOutputPowerOn, LOW);
+
+    digitalWrite(kPinDoorMoveIndicator, LOW);
+    digitalWrite(kPinMainLightIndicator, LOW);
+    digitalWrite(kPinExternalLightIndicator, LOW);
+    digitalWrite(kPinErrorIndicator, LOW);
+
     // Init i2c bus
     Wire.begin();
 }
 
-void GPIO::GpioDriver::toggleLightMainBuilding(const bool state) {
+void GPIOInterface::GpioDriver::toggleLightMainBuilding(const bool state) {
     setNormalLightState(state, kPinMainLigthOutput);
     digitalWrite(kPinOnboardLed, static_cast<uint32_t>(!state));
 }
 
-void GPIO::GpioDriver::setPWMLightPercentageMainBuilding(const float percent_light) {
+void GPIOInterface::GpioDriver::setPWMLightPercentageMainBuilding(const float percent_light) {
     setPWMLight(percent_light, kPinMainLigthOutput);
     digitalWrite(kPinOnboardLed, HIGH);
 }
 
-void GPIO::GpioDriver::toggleLightExternalBuilding(const bool state) {
+void GPIOInterface::GpioDriver::toggleLightExternalBuilding(const bool state) {
     setNormalLightState(state, kPinMainLigthOutput);
 }
 
-void GPIO::GpioDriver::setPWMLightPercentageExternalBuilding(const float percent_light) {
+void GPIOInterface::GpioDriver::setPWMLightPercentageExternalBuilding(const float percent_light) {
     setPWMLight(percent_light, kPinExternalLigthOutput);
 }
 
-void GPIO::GpioDriver::setNormalLightState(const bool state, const uint16_t pin) {
+void GPIOInterface::GpioDriver::setNormalLightState(const bool state, const uint16_t pin) {
     if (state && !doors_are_opening_) {
         analogWrite(pin, kPwmMaxValue);
     } else {
@@ -51,7 +83,7 @@ void GPIO::GpioDriver::setNormalLightState(const bool state, const uint16_t pin)
     }
 }
 
-void GPIO::GpioDriver::setPWMLight(const float percent_light, const uint16_t pin) {
+void GPIOInterface::GpioDriver::setPWMLight(const float percent_light, const uint16_t pin) {
     // scale percent range
     const float scaled_percent_light = percent_light * (kLightPercentOn - kLightPercentOff) + kLightPercentOff;
     // convert percent light to the range of 0 to 1023
@@ -59,15 +91,15 @@ void GPIO::GpioDriver::setPWMLight(const float percent_light, const uint16_t pin
     analogWrite(pin, pwm);
 }
 
-bool GPIO::GpioDriver::getMainBuildingEnableControl() {
+bool GPIOInterface::GpioDriver::getMainBuildingEnableControl() {
     return digitalRead(kPinEnableMainLight);
 }
 
-bool GPIO::GpioDriver::getExternalBuildingEnableControl() {
+bool GPIOInterface::GpioDriver::getExternalBuildingEnableControl() {
     return digitalRead(kPinEnableExternalLight);
 }
 
-DoorControl::DoorControlMode GPIO::GpioDriver::getMainBuildingDoorControlMode() {
+DoorControl::DoorControlMode GPIOInterface::GpioDriver::getMainBuildingDoorControlMode() {
     auto state = DoorControl::DoorControlMode::Off;
     if (digitalRead(kPinEnableAutoDoorControl) == LOW) {
         state = DoorControl::DoorControlMode::Auto;
@@ -77,15 +109,15 @@ DoorControl::DoorControlMode GPIO::GpioDriver::getMainBuildingDoorControlMode() 
     return state;
 }
 
-bool GPIO::GpioDriver::checkDoorOpenSignalIsActive() {
+bool GPIOInterface::GpioDriver::checkDoorControlOpenSignalIsActive() {
     return digitalRead(kPinControlDoorOpen);
 }
 
-bool GPIO::GpioDriver::checkDoorCloseSignalIsActive() {
+bool GPIOInterface::GpioDriver::checkDoorControlCloseSignalIsActive() {
     return digitalRead(kPinControlDoorClose);
 }
 
-void GPIO::GpioDriver::setDoorControlAction(const DoorControl::DoorControlAction action) {
+void GPIOInterface::GpioDriver::setDoorControlAction(const DoorControl::DoorControlAction action) {
     doors_are_opening_ = power_save_mode_;  // by default set this member to true, if this option is enabled
     if (action == DoorControl::DoorControlAction::Open) {
         digitalWrite(kPinMainDoorOutputUp, HIGH);
@@ -106,6 +138,30 @@ void GPIO::GpioDriver::setDoorControlAction(const DoorControl::DoorControlAction
     }
 }
 
-void GPIO::GpioDriver::tooglePowerSaveMode(const bool state) {
+void GPIOInterface::GpioDriver::togglePowerSaveMode(const bool state) {
     power_save_mode_ = state;
+}
+
+void GPIOInterface::GpioDriver::setErrorIndicator() {
+    toggleErrorIndicator(true);
+}
+
+void GPIOInterface::GpioDriver::clearErrorIndicator() {
+    toggleErrorIndicator(false);
+}
+
+void GPIOInterface::GpioDriver::toggleLightMainBuildingIndicator(const bool state) {
+    digitalWrite(kPinMainLightIndicator, state);
+}
+
+void GPIOInterface::GpioDriver::toggleLightExternalBuildingIndicator(const bool state) {
+    digitalWrite(kPinExternalLightIndicator, state);
+}
+
+void GPIOInterface::GpioDriver::toggleDoorMoveIndicator(const bool state) {
+    digitalWrite(kPinDoorMoveIndicator, state);
+}
+
+void GPIOInterface::GpioDriver::toggleErrorIndicator(const bool state) {
+    digitalWrite(kPinErrorIndicator, state);
 }
