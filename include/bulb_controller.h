@@ -6,7 +6,6 @@
 #include <etl/unordered_map.h>
 #include <etl/vector.h>
 #include "project_types.h"
-#include "rtc_time_container.h"
 #include "light_state.h"
 #include "time_event.h"
 

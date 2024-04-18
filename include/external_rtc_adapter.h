@@ -5,7 +5,6 @@
 #include "rtc_adapter.h"
 #include "project_pin_definition.h"
 #include "project_types.h"
-#include "rtc_time_container.h"
 
 namespace ModuleAdapter {
     /*
