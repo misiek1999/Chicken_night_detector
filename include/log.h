@@ -42,8 +42,8 @@ inline void chengeLogSource(const LogSource &log_source) {
 
 inline size_t log_number = {};
 
-// LogID [log type][timestamp[ms]] filename:line_number - message
-#define LOG_PREFIX "%u [%s][%d] %s:%d- "
+// logCount [timestamp[ms]] filename:line_number - message
+#define LOG_PREFIX "%u [%d] %s:%d- "
 #define LOG_MS millis()
 #ifndef __FILENAME__
 constexpr const char* file_name(const char* path) {
@@ -58,9 +58,9 @@ constexpr const char* file_name(const char* path) {
 #define __FILENAME__ file_name(__FILE__)
 #endif
 
-#define LOG_ERROR(MSG, ...) Log.errorln(LOG_PREFIX MSG, log_number++, "E", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
-#define LOG_WARNING(MSG, ...) Log.warningln(LOG_PREFIX MSG, log_number++, "W", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
-#define LOG_NOTICE(MSG, ...) Log.noticeln(LOG_PREFIX MSG, log_number++, "N", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
-#define LOG_INFO(MSG, ...) Log.infoln(LOG_PREFIX MSG, log_number++, "I", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
-#define LOG_DEBUG(MSG, ...) Log.traceln(LOG_PREFIX MSG, log_number++, "D", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
-#define LOG_VERBOSE(MSG, ...) Log.verboseln(LOG_PREFIX MSG, log_number++, "V", LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_ERROR(MSG, ...) Log.errorln(LOG_PREFIX MSG, log_number++, LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_WARNING(MSG, ...) Log.warningln(LOG_PREFIX MSG, log_number++, LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_NOTICE(MSG, ...) Log.noticeln(LOG_PREFIX MSG, log_number++, LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_INFO(MSG, ...) Log.infoln(LOG_PREFIX MSG, log_number++, LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_DEBUG(MSG, ...) Log.traceln(LOG_PREFIX MSG, log_number++, LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)
+#define LOG_VERBOSE(MSG, ...) Log.verboseln(LOG_PREFIX MSG, log_number++, LOG_MS, __FILENAME__, __LINE__, ##__VA_ARGS__)

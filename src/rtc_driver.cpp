@@ -1,4 +1,5 @@
 #include "rtc_driver.h"
+#include "string"
 #include "log.h"
 #include "project_const.h"
 
@@ -50,9 +51,7 @@ std::time_t RtcDriver::getCurrentTimeRtc() {
 }
 
 bool RtcDriver::setTimeToRtc(const std::time_t &time) {
-    // TODO: fix this log
-    Serial.println(time);
-    LOG_INFO("Set time to rtc: %l", time);
+    LOG_INFO("Set time to rtc: %s", std::to_string(time).c_str());
     // set time to selected rtc
     switch (rtc_source_) {
     case RtcSource::Internal:
