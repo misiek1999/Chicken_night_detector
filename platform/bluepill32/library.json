@@ -1,0 +1,16 @@
+{
+    "name": "stm32_target_hal",
+    "version": "1.0",
+    "frameworks": "arduino",
+    "platforms": [
+        "ststm32"
+    ],
+    "build": {
+        "includeDir": "include",
+        "srcDir": "src",
+        "srcFilter": [
+        ],
+        "flags": [
+        ]
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "name": "esp32_target_hal",
+    "version": "1.0",
+    "frameworks": "arduino",
+    "platforms": [
+        "espressif32"
+    ],
+    "build": {
+        "includeDir": "include",
+        "srcDir": "src",
+        "srcFilter": [
+        ],
+        "flags": [
+        ]
+    }
+}
