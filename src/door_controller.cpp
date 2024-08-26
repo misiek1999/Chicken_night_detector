@@ -66,6 +66,7 @@ bool ControlLogic::DoorController::removeDoorEvent(const size_t & door_event_id)
 
 bool ControlLogic::checkCallbacksAreValid(const DoorEventUpdateCallbacks & callbacks) {
     if (callbacks.first == nullptr || callbacks.second == nullptr) {
+        LOG_WARNING("Invalid callback");
         return false;
     }
     return true;

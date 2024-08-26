@@ -104,12 +104,8 @@ ProjectTypes::time_minute_t ControlLogic::LightDimmingEvent::getCurrentDimmingTi
 // -----------------------------------------------------------------------------
 
 ControlLogic::LightBulbController::LightBulbController(const LightDimmingEventMap &events_containers):
-    event_containers_(events_containers),
-    last_update_time_(0) {
-    auto size = event_containers_.size();
-    auto size2 = events_containers.size();
-    auto a1 = event_containers_.at(0).callback;
-    auto a2 = event_containers_.at(0).event;
+        event_containers_(events_containers),
+        last_update_time_(0) {
     for (auto & event : event_containers_) {
         LOG_DEBUG("Event: %u", event.first);
     }

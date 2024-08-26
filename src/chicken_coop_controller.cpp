@@ -3,6 +3,7 @@
 #include "gpio_driver.h"
 #include "project_const.h"
 #include "rtc_driver.h"
+#include "light_activation_duration.h"
 #include "log.h"
 
 ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_config, TimeCallback get_rtc_time):
@@ -23,10 +24,9 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
     // Calculate current sunset and sunrise time to rtc light controller
     std::time_t rtc_time = getRtcTime_();
     auto event_time = daytime_calculator_.getSunsetTime(rtc_time);
-    const ProjectTypes::time_minute_t time_to_turn_on_before_event = ProjectConst::kLightControlSecondsToTurnOnLights/60;
-    const ProjectTypes::time_minute_t time_to_turn_off_after_event = ProjectConst::kLightControlSecondsToTurnOffLights/60;
-    const ProjectTypes::time_minute_t time_to_blink_before_event = 0;
-    const ProjectTypes::time_minute_t time_to_blink_after_event = ProjectConst::kLightControlSecondsToDimmingLight/60;
+    const auto date = *std::localtime(&rtc_time);
+    const auto month = static_cast<uint8_t>(date.tm_mon);
+    const auto [time_to_blink_before_event, time_to_blink_after_event, time_to_turn_on_before_event, time_to_turn_off_after_event] = ControlLogic::getEventDurationTime(month);
 
     // Add bulb light controller callback to update sunrise and sunset time
     auto sunset_callback = std::bind(&DaytimeCalculator::getSunsetTime,
@@ -134,21 +134,22 @@ ControlLogic::DoorActionMap ControlLogic::ChickenCoopController::getDoorActions(
 }
 
 void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t & rtc_time) {
-    for (auto &door_controller : door_controllers_) {
+    // Check all door controllers
+    for (auto &[buildingId, doorController] : door_controllers_) {
         auto door_action = DoorControl::DoorControlAction::Disable;
-        auto light_state_conf = coop_config_.door_config_.at(getBuildingNumber(door_controller.first));
+        auto light_state_conf = coop_config_.door_config_.at(getBuildingNumber(buildingId));
         if (light_state_conf.is_active_) {
-            if (door_controller.second.updateDoorControllerEvents(rtc_time)) {
-                door_action = door_controller.second.getDoorState(rtc_time);
+            if (doorController.updateDoorControllerEvents(rtc_time)) {
+                door_action = doorController.getDoorState(rtc_time);
             }
         }
         // if door state has changed, update last change time and last door action
         if (door_action != last_door_action_) {
             last_change_time_ = rtc_time;
             last_door_action_ = door_action;
-            LOG_INFO("Door controller %d action changed to %d", door_controller.first, door_action);
+            LOG_INFO("Door controller %d action changed to %d", buildingId, door_action);
         }
-        // if door is moving, check if it is moving too long
+        // After 10 seconds of door movement, disable door controller to save power
         if (door_action == DoorControl::DoorControlAction::Open ||
             door_action == DoorControl::DoorControlAction::Close) {
             // if door is moving too long, disable door controller
@@ -157,21 +158,29 @@ void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t
             }
         }
         light_state_conf.callback_.toogle_door_state(door_action);
-        door_actions_[getBuildingNumber(door_controller.first)] = door_action;
+        door_actions_[getBuildingNumber(buildingId)] = door_action;
     }
 }
 
 void ControlLogic::ChickenCoopController::updateLightController(const std::time_t & rtc_time) {
     // iterate over all bulb light controllers
-    for (auto &light_controller : bulb_controllers_) {
-        auto bulb_light_state = light_controller.second.getLightState(rtc_time);
-        auto light_state_conf = coop_config_.light_state_config_.at(getBuildingNumber(light_controller.first));
+    for (auto &[buildingId, lightBulbController] : bulb_controllers_) {
+        // update dimming and light event duration time
+        const auto month = (*std::localtime(&rtc_time)).tm_mon;
+        const auto [time_to_blink_before_event, time_to_blink_after_event, time_to_turn_on_before_event, time_to_turn_off_after_event] = ControlLogic::getEventDurationTime(month);
+        lightBulbController.updateEventDimmingTime(time_to_blink_after_event, getBuildingNumber(buildingId));
+        lightBulbController.updateActivationAndDeactivationTime(time_to_turn_on_before_event, time_to_turn_off_after_event, getBuildingNumber(buildingId));
+        LOG_VERBOSE("Update dimming time %d for %d", time_to_blink_after_event, getBuildingNumber(buildingId));
+        LOG_VERBOSE("Update activation time Bef: %d Aft: %d for %d", time_to_turn_on_before_event, time_to_turn_off_after_event, getBuildingNumber(buildingId));
+        // get current light state
+        auto bulb_light_state = lightBulbController.getLightState(rtc_time);
+        auto light_state_conf = coop_config_.light_state_config_.at(getBuildingNumber(buildingId));
         // When light controller is not active, force turn off the light
         if (!light_state_conf.is_active_) {
             bulb_light_state = LightState::Off;
         }
-        light_states_[getBuildingNumber(light_controller.first)] = bulb_light_state;
-        auto dimming_prec = light_controller.second.getTotalOfDimmingTimePercent(rtc_time);
+        light_states_[getBuildingNumber(buildingId)] = bulb_light_state;
+        auto dimming_prec = lightBulbController.getTotalOfDimmingTimePercent(rtc_time);
         switch (bulb_light_state) {
             case LightState::On:
                 light_state_conf.callback_.toogle_light_state(true);

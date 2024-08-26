@@ -41,6 +41,7 @@ std::time_t TimeEvent::getStopEventTime() const {
     return stop_event_time_;
 }
 
+
 // TimestampEvent class implementation
 TimestampEvent::TimestampEvent():
     event_time_(kTimeInitValue),
