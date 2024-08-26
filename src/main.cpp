@@ -53,7 +53,7 @@ void setup() {
     rtc_driver->setRtcSource(RtcSource::External);
     // Create chicken coop controller
     chicken_coop_controller = ControlLogic::getChickenCoopControllerInstance();
-    delay(200);  //  delay for RTC to sync time
+    delay(200);  //  delay for RTC to sync with controller
 
     // set first entry time for main loop
     main_loop_current_time_us = micros();
