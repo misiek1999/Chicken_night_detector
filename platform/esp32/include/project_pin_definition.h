@@ -1,27 +1,27 @@
 #pragma once
 #include <Arduino.h>
 
-// control outputs
-constexpr auto kPinMainLigthOutput = 13;
-constexpr auto kPinExternalLigthOutput = 12;
-constexpr auto kPinMainDoorOutputPowerOn = 14;
-constexpr auto kPinMainDoorOutputUp = 27;
-constexpr auto kPinMainDoorOutputDown = 26;
+// actuators outputs
+constexpr auto kPinMainLigthOutput = 0;
+constexpr auto kPinExternalLigthOutput = 2;
+constexpr auto kPinMainDoorOutputPowerOn = 4;
+constexpr auto kPinMainDoorOutputUp = 16;
+constexpr auto kPinMainDoorOutputDown = 17;
 
 // control switches
-constexpr auto kPinEnableMainLight = 15;
-constexpr auto kPinEnableExternalLight = 2;
-constexpr auto kPinEnableAutoDoorControl = 4;
-constexpr auto kPinEnableManualDoorControl = 16;
-constexpr auto kPinControlDoorOpen = 17;
-constexpr auto kPinControlDoorClose = 5;
+constexpr auto kPinEnableMainLight = 36;
+constexpr auto kPinEnableExternalLight = 39;
+constexpr auto kPinEnableAutoDoorControl = 34;
+constexpr auto kPinEnableManualDoorControl = 35;
+constexpr auto kPinControlDoorOpen = 32;
+constexpr auto kPinControlDoorClose = 33;
 
 // control indicators
-constexpr auto kPinOnboardLed = 36;
-constexpr auto kPinMainLightIndicator = 39;
-constexpr auto kPinExternalLightIndicator = 34;
-constexpr auto kPinErrorIndicator = 35;
-constexpr auto kPinDoorMoveIndicator = 32;
+constexpr auto kPinOnboardLed = 23;
+constexpr auto kPinMainLightIndicator = 1;
+constexpr auto kPinExternalLightIndicator = 3;
+constexpr auto kPinErrorIndicator = 19;
+constexpr auto kPinDoorMoveIndicator = 18;
 
 // DS3231 RTC module
 constexpr auto kPinDS3231Clk = 22;

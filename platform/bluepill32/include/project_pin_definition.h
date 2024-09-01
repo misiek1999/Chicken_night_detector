@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 
-// control outputs
+// actuators outputs
 constexpr auto kPinMainLigthOutput = PB0;
 constexpr auto kPinExternalLigthOutput = PB1;
 constexpr auto kPinMainDoorOutputPowerOn = PB2;
