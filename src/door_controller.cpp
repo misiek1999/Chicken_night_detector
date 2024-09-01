@@ -1,18 +1,19 @@
 #include "door_controller.h"
 #include "log.h"
 
-ControlLogic::DoorController::DoorController(DoorEventMap door_event_map):
+ControlLogic::DoorController::DoorController(const DoorEventMap& door_event_map):
     door_events_map_(door_event_map) {
 }
 
 bool ControlLogic::DoorController::updateDoorControllerEvents(const std::time_t &current_time) {
-    for (auto &door_event : door_events_map_) {
-        if (checkCallbacksAreValid(door_event.second.second)) {
-            auto new_event_start = door_event.second.second.first(current_time);
-            auto new_event_stop = door_event.second.second.second(current_time);
-            door_event.second.first.setEventTime(new_event_start, new_event_stop);
+    for (auto &[door_id, door_event_and_callback] : door_events_map_) {
+        const auto& door_callback = door_event_and_callback.second;
+        if (checkCallbacksAreValid(door_callback)) {
+            auto new_event_start = door_callback.first(current_time);
+            auto new_event_stop = door_callback.second(current_time);
+            door_event_and_callback.first.setEventTime(new_event_start, new_event_stop);
         } else {
-            LOG_ERROR("Invalid callback for door event: %d", door_event.first);
+            LOG_ERROR("Invalid callback for door event: %d", door_id);
         }
     }
     return true;
@@ -20,8 +21,8 @@ bool ControlLogic::DoorController::updateDoorControllerEvents(const std::time_t 
 
 DoorControl::DoorControlAction ControlLogic::DoorController::getDoorState(const std::time_t &current_time) const {
     auto action = DoorControl::DoorControlAction::Close;
-    for (auto &door_event : door_events_map_) {
-        if (door_event.second.first.checkEventIsActive(current_time)) {
+    for (const auto &[door_id, door_event_and_callback] : door_events_map_) {
+        if (door_event_and_callback.first.checkEventIsActive(current_time)) {
             action = DoorControl::DoorControlAction::Open;
             break;
         }

@@ -26,7 +26,7 @@ class DoorController {
         @brief: Constructor of class
         @param: door_event_map - map of door events
     */
-    explicit DoorController(DoorEventMap door_event_map);
+    explicit DoorController(const DoorEventMap& door_event_map);
 
     /*
         @brief: Update door controller, should be called periodically
