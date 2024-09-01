@@ -55,6 +55,13 @@ class ChickenCoopController {
     bool changeDimmingTime(const ProjectTypes::time_minute_t &new_dimming_time, const BuildingId &building_id);
 
     /*
+        * @brief: Get dimming time
+        * @param building_id: building id
+        * @return: rest of dimming time
+    */
+    ProjectTypes::time_minute_t getDimmingTime(const BuildingId &building_id) const;
+
+    /*
         * @brief: Get light state
         * @return: map of current light states
     */
@@ -82,7 +89,7 @@ class ChickenCoopController {
     LightBulbControllerMap bulb_controllers_;
     DoorControllerMap door_controllers_;
     CoopConfig coop_config_;
-    TimeCallback getRtcTime_;
+    TimeCallback rtc_callback_;
     ControlLogic::LightStateMap light_states_;
     DoorActionMap door_actions_;
 

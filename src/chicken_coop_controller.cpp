@@ -6,7 +6,7 @@
 #include "light_activation_duration.h"
 #include "log.h"
 
-ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_config, TimeCallback get_rtc_time):
+ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_config, TimeCallback rtc_callback):
         daytime_calculator_(ProjectConst::kInstallationLatitude,
                             ProjectConst::kInstallationLongitude,
                             ProjectConst::kInstallationTimeZone,
@@ -14,15 +14,15 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
         bulb_controllers_(),
         door_controllers_(),
         coop_config_(coop_config),
-        getRtcTime_(get_rtc_time),
+        rtc_callback_(rtc_callback),
         light_states_(),
         door_actions_(),
         last_change_time_(0),
         last_door_action_(DoorControl::DoorControlAction::Disable) {
     // check provided pointers to rtc and gpio drivers are not null
-    assert(getRtcTime_ != nullptr && "RTC time callback is nullptr!");
+    assert(rtc_callback_ != nullptr && "RTC time callback is nullptr!");
     // Calculate current sunset and sunrise time to rtc light controller
-    std::time_t rtc_time = getRtcTime_();
+    std::time_t rtc_time = rtc_callback_();
     auto event_time = daytime_calculator_.getSunsetTime(rtc_time);
     const auto date = *std::localtime(&rtc_time);
     const auto month = static_cast<uint8_t>(date.tm_mon);
@@ -98,7 +98,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
 bool ControlLogic::ChickenCoopController::periodicUpdateController() {
     bool result = true;
     // get current rtc time
-    const std::time_t rtc_time = std::invoke(getRtcTime_);
+    const std::time_t rtc_time = std::invoke(rtc_callback_);
     // update door controller
     updateDoorController(rtc_time);
     // update light controller
@@ -111,7 +111,13 @@ bool ControlLogic::ChickenCoopController::changeDimmingTime(const ProjectTypes::
     return true;
 }
 
-ControlLogic::LightStateMap ControlLogic::ChickenCoopController::getLightStates() const {
+ProjectTypes::time_minute_t ControlLogic::ChickenCoopController::getDimmingTime(const BuildingId &building_id) const {
+    const auto time = rtc_callback_();
+    return bulb_controllers_.at(building_id).getTotalOfDimmingTime(time);
+}
+
+ControlLogic::LightStateMap ControlLogic::ChickenCoopController::getLightStates() const
+{
     return light_states_;
 }
 

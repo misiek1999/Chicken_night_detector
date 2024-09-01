@@ -15,8 +15,8 @@ constexpr auto kMaxDoor = 1;
     *          External - External building, active only during summer time
 */
 enum class BuildingId {
-    Main,       // Main building
-    External,   // External building, active only during summer time
+    Main = 0,       // Main building
+    External,       // External building, active only during summer time
     NumberOfBuildings
 };
 

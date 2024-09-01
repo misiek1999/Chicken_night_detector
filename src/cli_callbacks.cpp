@@ -253,12 +253,13 @@ void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     (void)args;
     auto* chicken_coop_controller_ptr = ControlLogic::getChickenCoopControllerInstance();
     auto light_status = chicken_coop_controller_ptr->getLightStates();
-    for (auto light_status_it : light_status) {
+    for (auto& [building_id, light_state] : light_status) {
         // TODO: Add ID translation to string
+        const auto  rest_of_time = chicken_coop_controller_ptr->getDimmingTime(static_cast<ControlLogic::BuildingId>(building_id));
         Serial.print("Building ID: ");
-        Serial.print(static_cast<int>(light_status_it.first));
-         Serial.print(" -> ");
-        switch (light_status_it.second) {
+        Serial.print(static_cast<int>(building_id));
+        Serial.print(" -> ");
+        switch (light_state) {
         case ControlLogic::LightState::On:
             Serial.println("Light is on");
             break;
@@ -266,7 +267,8 @@ void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
             Serial.println("Light is off");
             break;
         case ControlLogic::LightState::Dimming:
-            Serial.println("Light is dimming");
+            Serial.print("Light is dimming. Rest of time: ");
+            Serial.print(rest_of_time);
             break;
         case ControlLogic::LightState::Error:
             Serial.println("Light is in error state");
