@@ -6,6 +6,8 @@
 #include "light_activation_duration.h"
 #include "log.h"
 
+EventUpdateCallback sunset_callback;
+
 ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_config, TimeCallback rtc_callback):
         daytime_calculator_(ProjectConst::kInstallationLatitude,
                             ProjectConst::kInstallationLongitude,
@@ -29,10 +31,9 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
     const auto [time_to_blink_before_event, time_to_blink_after_event, time_to_turn_on_before_event, time_to_turn_off_after_event] = ControlLogic::getEventDurationTime(month);
 
     // Add bulb light controller callback to update sunrise and sunset time
-    auto sunset_callback = std::bind(&DaytimeCalculator::getSunsetTime,
+    sunset_callback = std::bind(&DaytimeCalculator::getSunsetTime,
                 &daytime_calculator_, std::placeholders::_1);
-    auto sunrise_callback = std::bind(&DaytimeCalculator::getSunriseTime,
-                &daytime_calculator_, std::placeholders::_1);
+
     // Add main building to bulb controller
     auto building_id = coop_config_.light_state_config_[0].id_;
     bulb_controllers_.insert(etl::make_pair(building_id,

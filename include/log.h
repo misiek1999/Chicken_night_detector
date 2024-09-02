@@ -12,7 +12,7 @@ enum class LogSource {
 
 inline void initLog() {
     Log.begin(LOG_LEVEL_TRACE, &Serial);
-    Log.notice("Log initialized");
+    Log.noticeln("Log initialized");
 }
 
 inline bool changeLogLevel(const size_t &log_level) {
