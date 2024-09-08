@@ -12,7 +12,7 @@ void serial_write_wrapper(EmbeddedCli * cli, char c) {
 }
 
 char serial_read_wrapper() {
-    return Serial.read();
+    return static_cast<char>(Serial.read());
 }
 
 CLI::CLIProcess::CLIProcess():
