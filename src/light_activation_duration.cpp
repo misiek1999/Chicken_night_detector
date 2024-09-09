@@ -37,5 +37,5 @@ ControlLogic::BulbEventDurationTime ControlLogic::getEventDurationTime(const uin
         default:
             break;
     }
-    return BulbEventDurationTime();
+    return event_duration_time;
 }
