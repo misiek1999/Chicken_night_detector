@@ -37,11 +37,11 @@ ProjectTypes::time_us_t main_loop_current_time_us = 0;
 
 // Setup program
 void setup() {
+    //  Initialize serial
+    Serial.begin(ProjectConst::kSerialBaudRate);
     if (sizeof(std::time_t) == 4) {
         Serial.println("Time_t is 4 bytes, may overflow in 2038.");
     }
-    //  Initialize serial
-    Serial.begin(ProjectConst::kSerialBaudRate);
     // Initialize log
     initLog();
     LOG_INFO("Chicken coop controller started");
