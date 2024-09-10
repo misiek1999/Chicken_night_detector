@@ -68,7 +68,7 @@ void GPIOInterface::GpioDriver::setPWMLightPercentageMainBuilding(const float pe
 }
 
 void GPIOInterface::GpioDriver::toggleLightExternalBuilding(const bool state) {
-    setNormalLightState(state, kPinMainLigthOutput);
+    setNormalLightState(state, kPinExternalLigthOutput);
 }
 
 void GPIOInterface::GpioDriver::setPWMLightPercentageExternalBuilding(const float percent_light) {

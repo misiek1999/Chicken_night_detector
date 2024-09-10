@@ -12,7 +12,7 @@ constexpr float kLightPercentOff = 0.5;
 constexpr float kLightPercentOn = 1.0;
 
 GPIOInterface::GpioDriver::GpioDriver():
-        power_save_mode_(true),
+        power_save_mode_(false),
         doors_are_opening_(false) {
     // initialize all gpio
     pinMode(kPinOnboardLed, OUTPUT);
@@ -36,8 +36,6 @@ GPIOInterface::GpioDriver::GpioDriver():
 
     pinMode(kPinControlDoorClose, INPUT_PULLUP);
     pinMode(kPinControlDoorOpen, INPUT_PULLUP);
-
-    analogWriteFrequency(kPwmFrequency);
 
     // lights are off by default
     digitalWrite(kPinOnboardLed, HIGH);
@@ -68,14 +66,14 @@ void GPIOInterface::GpioDriver::setPWMLightPercentageMainBuilding(const float pe
 }
 
 void GPIOInterface::GpioDriver::toggleLightExternalBuilding(const bool state) {
-    setNormalLightState(state, kPinMainLigthOutput);
+    setNormalLightState(state, kPinExternalLigthOutput);
 }
 
 void GPIOInterface::GpioDriver::setPWMLightPercentageExternalBuilding(const float percent_light) {
     setPWMLight(percent_light, kPinExternalLigthOutput);
 }
 
-void GPIOInterface::GpioDriver::setNormalLightState(const bool state, const uint16_t pin) {
+void GPIOInterface::GpioDriver:: setNormalLightState(const bool state, const uint16_t pin) {
     if (state && !doors_are_opening_) {
         analogWrite(pin, kPwmMaxValue);
     } else {
@@ -87,7 +85,7 @@ void GPIOInterface::GpioDriver::setPWMLight(const float percent_light, const uin
     // scale percent range
     const float scaled_percent_light = percent_light * (kLightPercentOn - kLightPercentOff) + kLightPercentOff;
     // convert percent light to the range of 0 to 1023
-    const auto pwm = static_cast<uint16_t>(scaled_percent_light * 255.0);
+    const auto pwm = static_cast<uint16_t>(scaled_percent_light * kPwmMaxValue);
     analogWrite(pin, pwm);
 }
 
