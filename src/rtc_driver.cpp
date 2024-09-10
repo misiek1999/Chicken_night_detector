@@ -30,6 +30,8 @@ void RtcDriver::getIntWithExtSyncRtcTime(std::time_t &time) {
 
 RtcDriver::RtcDriver(RtcSource rtc_source_to_set):
     rtc_source_(rtc_source_to_set) {
+    // initialize external rtc module
+    ModuleAdapter::init_external_rtc_module();
 }
 
 std::time_t RtcDriver::getCurrentTimeRtc() {

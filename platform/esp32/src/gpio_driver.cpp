@@ -1,6 +1,6 @@
 #include "gpio_driver.h"
 #include <chrono>
-#include "Wire.h"
+#include <Wire.h>
 #include "project_types.h"
 #include "project_pin_definition.h"
 
@@ -54,7 +54,7 @@ GPIOInterface::GpioDriver::GpioDriver():
     digitalWrite(kPinErrorIndicator, LOW);
 
     // Init i2c bus
-    Wire.begin();
+    Wire.begin(kPinDS3231Data, kPinDS3231Clk);
 }
 
 void GPIOInterface::GpioDriver::toggleLightMainBuilding(const bool state) {
