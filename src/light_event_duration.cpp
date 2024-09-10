@@ -1,4 +1,4 @@
-#include "light_activation_duration.h"
+#include "light_event_duration.h"
 #include <etl/array.h>
 
 enum class Season

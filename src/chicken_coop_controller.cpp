@@ -3,7 +3,7 @@
 #include "gpio_driver.h"
 #include "project_const.h"
 #include "rtc_driver.h"
-#include "light_activation_duration.h"
+#include "light_event_duration.h"
 #include "log.h"
 
 EventUpdateCallback sunset_callback;
