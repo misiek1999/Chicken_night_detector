@@ -117,22 +117,33 @@ ProjectTypes::time_minute_t ControlLogic::ChickenCoopController::getDimmingTime(
     return bulb_controllers_.at(building_id).getTotalOfDimmingTime(time);
 }
 
-ControlLogic::LightStateMap ControlLogic::ChickenCoopController::getLightStates() const
-{
+ControlLogic::LightStateMap ControlLogic::ChickenCoopController::getLightStates() const {
     return light_states_;
 }
 
 void ControlLogic::ChickenCoopController::toggleLightExternalBuilding(const bool & state) {
-    auto building_id = getBuildingNumber(BuildingId::External);
+    const auto building_id = getBuildingNumber(BuildingId::External);
     coop_config_.light_state_config_[building_id].is_active_ = state;
-    Serial.println("External building light is " + String(state ? "on" : "off"));
-    LOG_INFO("External building light is %s", state ? "on" : "off");
+    LOG_INFO("Toggle external building light to %s", state ? "on" : "off");
+}
+
+void ControlLogic::ChickenCoopController::toggleLightMainBuilding(const bool & state) {
+    const auto building_id = getBuildingNumber(BuildingId::Main);
+    coop_config_.light_state_config_[building_id].is_active_ = state;
+    LOG_INFO("Toggle main building light to %s", state ? "on" : "off");
 }
 
 bool ControlLogic::ChickenCoopController::checkLightControllerInExternalBuildingIsActive() const {
-    auto building_id = getBuildingNumber(BuildingId::External);
-    auto state = coop_config_.light_state_config_[building_id].is_active_;
+    const auto building_id = getBuildingNumber(BuildingId::External);
+    const auto state = coop_config_.light_state_config_[building_id].is_active_;
     LOG_DEBUG("External building light is %s", state ? "on" : "off");
+    return state;
+}
+
+bool ControlLogic::ChickenCoopController::checkLightControllerInMainBuildingIsActive() const {
+    const auto building_id = getBuildingNumber(BuildingId::Main);
+    const auto state = coop_config_.light_state_config_[building_id].is_active_;
+    LOG_DEBUG("Main building light is %s", state ? "on" : "off");
     return state;
 }
 

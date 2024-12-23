@@ -92,11 +92,13 @@ void GPIOInterface::GpioDriver::setPWMLight(const float percent_light, const uin
 }
 
 bool GPIOInterface::GpioDriver::getMainBuildingEnableControl() {
-    return digitalRead(kPinEnableMainLight);
+    // by default this pin is active on low state
+    return !digitalRead(kPinEnableMainLight);
 }
 
 bool GPIOInterface::GpioDriver::getExternalBuildingEnableControl() {
-    return digitalRead(kPinEnableExternalLight);
+    // by default this pin is active on low state
+    return !digitalRead(kPinEnableExternalLight);
 }
 
 DoorControl::DoorControlMode GPIOInterface::GpioDriver::getMainBuildingDoorControlMode() {

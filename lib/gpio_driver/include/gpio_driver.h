@@ -104,8 +104,14 @@ class GpioDriver {
     */
     void togglePowerSaveMode(const bool state);
 
+    /*
+        * Set error indicator
+    */
     void setErrorIndicator();
 
+    /*
+        * Clear error indicator
+    */
     void clearErrorIndicator();
 
  private:

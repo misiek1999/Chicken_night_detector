@@ -68,16 +68,29 @@ class ChickenCoopController {
     ControlLogic::LightStateMap getLightStates() const;
 
     /*
-        * @brief: Get light state
+        * @brief: Toggle light controller in external building
         * @param state: true - activate controller, false - disable controller
     */
     void toggleLightExternalBuilding(const bool &state);
+
+    /*
+        * @brief: Toggle light controller in main building
+        * @param state: true - activate controller, false - disable controller
+    */
+    void toggleLightMainBuilding(const bool &state);
 
     /*
         * @brief: Check if light controller is active in external building
         * @return: true if controller is active, false if controller is disabled
     */
     bool checkLightControllerInExternalBuildingIsActive() const;
+
+    /*
+        * @brief: Check if light controller is active in main building
+        * @return: true if controller is active, false if controller is disabled
+    */
+    bool checkLightControllerInMainBuildingIsActive() const;
+
     /*
         * @brief: Get door action state
         * @return: DoorActionMap

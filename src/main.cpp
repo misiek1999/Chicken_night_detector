@@ -29,9 +29,14 @@ GPIOInterface::GpioDriver *gpio_driver;
 // Rtc driver
 RtcDriver *rtc_driver;
 
+// Status of active light source
+bool main_light_enabled = true;
+bool external_light_enabled = true;
+
+// Time of last light process
 ProjectTypes::time_ms_t light_process_last_time_ms = 0;
-ProjectTypes::time_ms_t main_loop_loop_entry_time_ms = 0;
-ProjectTypes::time_us_t main_loop_calculated_delay_us = 0;
+ProjectTypes::time_ms_t gpio_update_last_time_ms = 0;
+ProjectTypes::time_ms_t main_loop_entry_time_ms = 0;
 ProjectTypes::time_us_t next_main_loop_process_time_us = 0;
 ProjectTypes::time_us_t main_loop_current_time_us = 0;
 
@@ -63,15 +68,34 @@ void setup() {
 // Main program loop
 void loop() {
     // get current time
-    main_loop_loop_entry_time_ms = millis();
+    main_loop_entry_time_ms = millis();
+
     // process light control every 1s
-    if (main_loop_loop_entry_time_ms - light_process_last_time_ms >= ProjectConst::kMainLoopDelayBetweenLightControlProcess) {
-        light_process_last_time_ms = main_loop_loop_entry_time_ms;
+    if (main_loop_entry_time_ms - light_process_last_time_ms >= ProjectConst::kMainLoopDelayBetweenLightControlProcess) {
+        light_process_last_time_ms = main_loop_entry_time_ms;
         chicken_coop_controller->periodicUpdateController();
+    }
+
+    // read control signals from external switch and buttons
+    if (main_loop_entry_time_ms - gpio_update_last_time_ms >= ProjectConst::kMainLoopDelayBetweenUpdateGPIO) {
+        gpio_update_last_time_ms = main_loop_entry_time_ms;
+        // check if external light is enabled
+        const auto external_light_source = gpio_driver->getExternalBuildingEnableControl();
+        if (external_light_source != external_light_enabled) {
+            external_light_enabled = external_light_source;
+            chicken_coop_controller->toggleLightExternalBuilding(external_light_enabled);
+        }
+        // check if internal light is enabled
+        const auto main_light_source = gpio_driver->getMainBuildingEnableControl();
+        if (main_light_source != main_light_enabled) {
+            main_light_enabled = main_light_source;
+            chicken_coop_controller->toggleLightMainBuilding(main_light_source);
+        }
     }
 
     // process CLI
     cli_process.periodicCProcessCLI();
+
     // calculate delay for main loop
     next_main_loop_process_time_us += ProjectConst::kMainLoopDelayUs;
     // get current time in us
