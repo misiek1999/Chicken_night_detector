@@ -43,7 +43,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
                                         LightDimmingEventAndCallback {
                                             .event =
                                                 LightDimmingEvent(event_time,
-                                                    time_to_turn_on_before_event,
+                                                    0,
                                                     time_to_turn_off_after_event,
                                                     time_to_blink_before_event,
                                                     time_to_blink_after_event),
@@ -61,7 +61,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
                                         LightDimmingEventAndCallback {
                                             .event =
                                                 LightDimmingEvent(event_time,
-                                                    time_to_turn_on_before_event,
+                                                    0,
                                                     time_to_turn_off_after_event,
                                                     time_to_blink_before_event,
                                                     time_to_blink_after_event),
@@ -187,6 +187,7 @@ void ControlLogic::ChickenCoopController::updateLightController(const std::time_
             bulb_light_state = LightState::Off;
         }
         light_states_[getBuildingNumber(buildingId)] = bulb_light_state;
+        // set control signal to output control elements
         auto dimming_prec = lightBulbController.getTotalOfDimmingTimePercent(rtc_time);
         switch (bulb_light_state) {
             case LightState::On:
