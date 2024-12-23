@@ -151,32 +151,38 @@ ControlLogic::DoorActionMap ControlLogic::ChickenCoopController::getDoorActions(
     return door_actions_;
 }
 
+void ControlLogic::ChickenCoopController::toggleAutomaticDoorController(const bool &state) {
+    const auto building_id = getBuildingNumber(BuildingId::Main);
+    coop_config_.door_config_[building_id].is_active_ = state;
+    LOG_INFO("Toggle automatic door controller to %s", state ? "on" : "off");
+}
+
 void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t & rtc_time) {
     // Check all door controllers
     for (auto &[buildingId, doorController] : door_controllers_) {
         auto door_action = DoorControl::DoorControlAction::Disable;
-        auto light_state_conf = coop_config_.door_config_.at(getBuildingNumber(buildingId));
-        if (light_state_conf.is_active_) {
+        auto door_state_conf = coop_config_.door_config_.at(getBuildingNumber(buildingId));
+        if (door_state_conf.is_active_) {
             if (doorController.updateDoorControllerEvents(rtc_time)) {
                 door_action = doorController.getDoorState(rtc_time);
             }
-        }
-        // if door state has changed, update last change time and last door action
-        if (door_action != last_door_action_) {
-            last_change_time_ = rtc_time;
-            last_door_action_ = door_action;
-            LOG_INFO("Door controller %d action changed to %d", buildingId, door_action);
-        }
-        // After kMaxDoorMovementTime seconds of door movement, disable door controller to save power
-        if (door_action == DoorControl::DoorControlAction::Open ||
-            door_action == DoorControl::DoorControlAction::Close) {
-            // if door is moving too long, disable door controller
-            if (std::abs(std::difftime(rtc_time, last_change_time_)) > kMaxDoorMovementTime) {
-                door_action = DoorControl::DoorControlAction::Disable;
+            // if door state has changed, update last change time and last door action
+            if (door_action != last_door_action_) {
+                last_change_time_ = rtc_time;
+                last_door_action_ = door_action;
+                LOG_INFO("Door controller %d action changed to %d", buildingId, door_action);
             }
+            // After kMaxDoorMovementTime seconds of door movement, disable door controller to save power
+            if (door_action == DoorControl::DoorControlAction::Open ||
+                door_action == DoorControl::DoorControlAction::Close) {
+                // if door is moving too long, disable door controller
+                if (std::abs(std::difftime(rtc_time, last_change_time_)) > kMaxDoorMovementTime) {
+                    door_action = DoorControl::DoorControlAction::Disable;
+                }
+            }
+            door_state_conf.callback_.toogle_door_state(door_action);
+            door_actions_[getBuildingNumber(buildingId)] = door_action;
         }
-        light_state_conf.callback_.toogle_door_state(door_action);
-        door_actions_[getBuildingNumber(buildingId)] = door_action;
     }
 }
 

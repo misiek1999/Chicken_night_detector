@@ -97,6 +97,12 @@ class ChickenCoopController {
     */
     DoorActionMap getDoorActions() const;
 
+    /*
+        * @brief: Toggle automatic door controller
+        * @param state: true - enable automatic door controller, false - disable automatic door controller
+    */
+    void toggleAutomaticDoorController(const bool &state);
+
  private:
     DaytimeCalculator daytime_calculator_;
     LightBulbControllerMap bulb_controllers_;

@@ -33,6 +33,9 @@ RtcDriver *rtc_driver;
 bool main_light_enabled = true;
 bool external_light_enabled = true;
 
+// Door status
+auto door_control_mode = DoorControl::DoorControlMode::Off;
+
 // Time of last light process
 ProjectTypes::time_ms_t light_process_last_time_ms = 0;
 ProjectTypes::time_ms_t gpio_update_last_time_ms = 0;
@@ -90,6 +93,25 @@ void loop() {
         if (main_light_source != main_light_enabled) {
             main_light_enabled = main_light_source;
             chicken_coop_controller->toggleLightMainBuilding(main_light_source);
+        }
+        // check status of selected mode of main door
+        const auto input_door_status = gpio_driver->getMainBuildingDoorControlMode();
+        if (input_door_status != door_control_mode) {
+            door_control_mode = input_door_status;
+            // toggle main door controller based on selected mode
+            chicken_coop_controller->toggleAutomaticDoorController(door_control_mode == DoorControl::DoorControlMode::Auto);
+            LOG_INFO("Door status changed to %d", door_control_mode);
+        }
+        // take action when selected mode is manual
+        if (door_control_mode == DoorControl::DoorControlMode::Manual) {
+            // check if open signal is active
+            if (gpio_driver->checkDoorControlOpenSignalIsActive()) {
+                gpio_driver->setDoorControlAction(DoorControl::DoorControlAction::Open);
+            } else if (gpio_driver->checkDoorControlCloseSignalIsActive()) {
+                gpio_driver->setDoorControlAction(DoorControl::DoorControlAction::Close);
+            } else {
+                gpio_driver->setDoorControlAction(DoorControl::DoorControlAction::Disable);
+            }
         }
     }
 
