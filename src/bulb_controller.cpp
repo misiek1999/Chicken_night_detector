@@ -83,7 +83,7 @@ float ControlLogic::LightDimmingEvent::getRestLightDimmingTimePercent(const std:
 
 void ControlLogic::LightDimmingEvent::updateEventActivationAndDimmingTime() {
     turn_on_event_.setNewTimeToTurnOffAfterEvent(time_to_turn_off_after_event_);
-    turn_on_event_.setNewTimeToTurnOnBeforeEvent(time_to_turn_on_before_event_);
+    turn_on_event_.setNewTimeToTurnOnBeforeEvent(0);
     start_dimming_event_.setNewTimeToTurnOffAfterEvent(time_to_end_dimming_after_turn_off_ + time_to_turn_off_after_event_);
     start_dimming_event_.setNewTimeToTurnOnBeforeEvent(time_to_start_dimming_before_turn_on_ + time_to_turn_on_before_event_);
     LOG_DEBUG("Event before %d, after %d : Dimming before %d, after %d",
@@ -130,15 +130,15 @@ ControlLogic::LightStateMap ControlLogic::LightBulbController::getAllEventStates
 ControlLogic::LightState ControlLogic::LightBulbController::getLightState(const std::time_t & current_time) {
     auto event_states = getAllEventStates(current_time);
     auto light_state = LightState::Error;
-    for (const auto event : event_states) {
-        if (event.second == LightState::On) {
+    for (const auto [id, state] : event_states) {
+        if (state == LightState::On) {
             light_state = LightState::On;
             break;
         }
-        if (event.second == LightState::Dimming) {
+        if (state == LightState::Dimming) {
             light_state = LightState::Dimming;
         }
-        if (event.second == LightState::Off && light_state != LightState::Dimming) {
+        if (state == LightState::Off && light_state != LightState::Dimming) {
             light_state = LightState::Off;
         }
     }
@@ -177,7 +177,7 @@ bool ControlLogic::LightBulbController::removeEvent(const size_t event_index) {
 bool ControlLogic::LightBulbController::updateEventDimmingTime(const ProjectTypes::time_minute_t &new_dimming_time, const size_t event_index) {
     bool status = false;
     if (checkEventIndexIsValid(event_index)) {
-        event_containers_.at(event_index).event.setNewDimmingTime(new_dimming_time, new_dimming_time);
+        event_containers_.at(event_index).event.setNewDimmingTime(0, new_dimming_time);
         status = true;
     }
     return status;
@@ -237,7 +237,7 @@ void ControlLogic::LightBulbController::updateEvents(const std::time_t & current
 
 void ControlLogic::LightBulbController::updateAllDimmingTime(const ProjectTypes::time_minute_t & new_dimming_time) {
     for (auto& event_container : event_containers_) {
-        event_container.second.event.setNewDimmingTime(new_dimming_time, new_dimming_time);
+        event_container.second.event.setNewDimmingTime(0, new_dimming_time);
     }
 }
 
