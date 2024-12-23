@@ -156,11 +156,11 @@ void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t
             last_door_action_ = door_action;
             LOG_INFO("Door controller %d action changed to %d", buildingId, door_action);
         }
-        // After 10 seconds of door movement, disable door controller to save power
+        // After kMaxDoorMovementTime seconds of door movement, disable door controller to save power
         if (door_action == DoorControl::DoorControlAction::Open ||
             door_action == DoorControl::DoorControlAction::Close) {
             // if door is moving too long, disable door controller
-            if (std::difftime(rtc_time, last_change_time_) > kMaxDoorMovementTime) {
+            if (std::abs(std::difftime(rtc_time, last_change_time_)) > kMaxDoorMovementTime) {
                 door_action = DoorControl::DoorControlAction::Disable;
             }
         }
