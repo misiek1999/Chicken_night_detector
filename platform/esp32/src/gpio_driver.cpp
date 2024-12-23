@@ -58,19 +58,23 @@ GPIOInterface::GpioDriver::GpioDriver():
 void GPIOInterface::GpioDriver::toggleLightMainBuilding(const bool state) {
     setNormalLightState(state, kPinMainLigthOutput);
     digitalWrite(kPinOnboardLed, static_cast<uint32_t>(!state));
+    toggleLightMainBuildingIndicator(state);
 }
 
 void GPIOInterface::GpioDriver::setPWMLightPercentageMainBuilding(const float percent_light) {
     setPWMLight(percent_light, kPinMainLigthOutput);
     digitalWrite(kPinOnboardLed, HIGH);
+    toggleLightMainBuildingIndicator(true);
 }
 
 void GPIOInterface::GpioDriver::toggleLightExternalBuilding(const bool state) {
     setNormalLightState(state, kPinExternalLigthOutput);
+    toggleLightExternalBuildingIndicator(state);
 }
 
 void GPIOInterface::GpioDriver::setPWMLightPercentageExternalBuilding(const float percent_light) {
     setPWMLight(percent_light, kPinExternalLigthOutput);
+    toggleLightExternalBuildingIndicator(true);
 }
 
 void GPIOInterface::GpioDriver:: setNormalLightState(const bool state, const uint16_t pin) {
@@ -136,6 +140,7 @@ void GPIOInterface::GpioDriver::setDoorControlAction(const DoorControl::DoorCont
         digitalWrite(kPinMainDoorOutputDown, LOW);
         doors_are_opening_ = false;
     }
+    toggleDoorMoveIndicator(action != DoorControl::DoorControlAction::Disable);
 }
 
 void GPIOInterface::GpioDriver::togglePowerSaveMode(const bool state) {
