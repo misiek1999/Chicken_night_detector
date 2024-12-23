@@ -268,7 +268,7 @@ void getLightStatusCli(EmbeddedCli *embeddedCli, char *args, void *context) {
             break;
         case ControlLogic::LightState::Dimming:
             Serial.print("Light is dimming. Rest of time: ");
-            Serial.print(rest_of_time);
+            Serial.println(rest_of_time);
             break;
         case ControlLogic::LightState::Error:
             Serial.println("Light is in error state");
