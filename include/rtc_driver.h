@@ -4,6 +4,7 @@
 #include <ctime>
 #include "project_pin_definition.h"
 #include "project_types.h"
+#include "error_manager.h"
 #include "rtc_adapter.h"
 #include "external_rtc_adapter.h"
 #include "internal_rtc_adapter.h"
@@ -41,7 +42,7 @@ private:
     /*
         @details get current time from rtc
     */
-    std::time_t getCurrentTimeRtc();
+    std::time_t getTimeFromRtc();
 
     /*
         @details set current time to rtc
@@ -64,7 +65,14 @@ private:
         @details get rtc status
         @return RtcStatus enum with current status of rtc
     */
-    RtcStatus getRtcStatus();
+    RtcStatus checkRtcIsOk();
+
+    /*
+        @details check that time is valid
+        @param time time to check
+        @return true if time is valid, false otherwise
+    */
+    static bool checkRtcTimeIsValid(const std::time_t &time);
 
  private:
     RtcSource rtc_source_ = RtcSource::None;
@@ -76,5 +84,6 @@ private:
     void setIntWithExtSyncRtcTime(const std::time_t &time);
     void getIntWithExtSyncRtcTime(std::time_t &time);
 
+    void reportRtcError() const;
 };
 

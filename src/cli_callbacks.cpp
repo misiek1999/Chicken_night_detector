@@ -184,7 +184,7 @@ void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     (void)args;
     auto* rtc_driver_ptr = &RtcDriver::getInstance();
     // read current time
-    std::time_t currentTime = rtc_driver_ptr->getCurrentTimeRtc();
+    std::time_t currentTime = rtc_driver_ptr->getTimeFromRtc();
     // convert time_t to tm
     auto currentTimeTm = *std::localtime(&currentTime);
     // print current time
@@ -195,7 +195,7 @@ void getRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
         currentTimeTm.tm_mday, currentTimeTm.tm_hour, currentTimeTm.tm_min, currentTimeTm.tm_sec);
     // Print the formatted string to serial so we can see the time.
     Serial.println(buf);
-    const RtcStatus rtc_status = rtc_driver_ptr->getRtcStatus();
+    const RtcStatus rtc_status = rtc_driver_ptr->checkRtcIsOk();
     if (rtc_status == RtcStatus::Disconnected)
         Serial.println("Sensor is disconnected!");
     else if (rtc_status == RtcStatus::Uninitialized)

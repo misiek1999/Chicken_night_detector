@@ -45,7 +45,7 @@ static ControlLogic::CoopConfig getCoopConfig() {
 
 ControlLogic::ChickenCoopController* ControlLogic::getChickenCoopControllerInstance() {
     static auto getRtcTime = []() {
-        return RtcDriver::getInstance().getCurrentTimeRtc();
+        return RtcDriver::getInstance().getTimeFromRtc();
     };
     static ControlLogic::ChickenCoopController chicken_coop_controller_instance(getCoopConfig(), getRtcTime);
     return &chicken_coop_controller_instance;

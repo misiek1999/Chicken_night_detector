@@ -3,7 +3,11 @@
 #include "log.h"
 #include "project_const.h"
 
+constexpr auto kMinValidYear = 2020 - ProjectConst::kTmStructInitYear;
+constexpr auto kMaxValidYear = 2100 - ProjectConst::kTmStructInitYear;
+
 // TODO: implement this functions
+// TODO: chang implememnntation to class inheritance
 void RtcDriver::setExternalRtcTime(const std::time_t &time) {
     ModuleAdapter::set_external_rtc_time(time);
 }
@@ -28,13 +32,18 @@ void RtcDriver::getIntWithExtSyncRtcTime(std::time_t &time) {
     ModuleAdapter::get_inter_and_exter_sync_rtc_time(time);
 }
 
+void RtcDriver::reportRtcError() const {
+    auto* error_manager = SystemControl::ErrorManager::getInstance();
+    error_manager->setError(SystemControl::ErrorCode::kRtcTimeNotSet);
+}
+
 RtcDriver::RtcDriver(RtcSource rtc_source_to_set):
     rtc_source_(rtc_source_to_set) {
     // initialize external rtc module
     ModuleAdapter::init_external_rtc_module();
 }
 
-std::time_t RtcDriver::getCurrentTimeRtc() {
+std::time_t RtcDriver::getTimeFromRtc() {
     std::time_t time = {};
     switch (rtc_source_) {
     case RtcSource::Internal:
@@ -48,6 +57,10 @@ std::time_t RtcDriver::getCurrentTimeRtc() {
         break;
     default:
         break;
+    }
+    if (!checkRtcTimeIsValid(time)) {
+        reportRtcError();
+        LOG_WARNING("Rtc time is not valid");
     }
     return time;
 }
@@ -78,24 +91,37 @@ void RtcDriver::setRtcSource(const RtcSource rtc_source_to_set) {
     } else {
         LOG_ERROR("Invalid rtc source: %d", rtc_source_to_set);
     }
+    if (checkRtcIsOk() != RtcStatus::Ok) {
+        LOG_ERROR("Rtc is not set correctly");
+    }
 }
 
 RtcSource RtcDriver::getRtcSource() {
     return rtc_source_;
 }
 
-constexpr auto kMinValidYear = 2020 - ProjectConst::kTmStructInitYear;
-constexpr auto kMaxValidYear = 2100 - ProjectConst::kTmStructInitYear;
-RtcStatus RtcDriver::getRtcStatus() {
+RtcStatus RtcDriver::checkRtcIsOk() {
     // read current time from rtc
-    std::time_t time_from_sensor = getCurrentTimeRtc();
-    std::tm date = *std::localtime(&time_from_sensor);
+    std::time_t time_from_sensor = getTimeFromRtc();
     // check if time is valid
-    if (time_from_sensor == 0) {
-        return RtcStatus::Uninitialized;
+    auto status = RtcStatus::Ok;
+    // in case of error, notify error manager
+    if (!checkRtcTimeIsValid(time_from_sensor)) {
+        status = RtcStatus::Uninitialized;
+        // set error code in error manager
+        reportRtcError();
+    }
+    return status;
+}
+
+bool RtcDriver::checkRtcTimeIsValid(const std::time_t &time) {
+    bool status = true;
+    const std::tm date = *std::localtime(&time);
+    if (time == 0) {
+        status =  false;
     }
     if (date.tm_year < kMinValidYear || date.tm_year > kMaxValidYear) {
-        return RtcStatus::Uninitialized;
+        status = false;
     }
-    return RtcStatus::Ok;
+    return status;
 }
