@@ -22,6 +22,9 @@ void setExternalLightCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getExternalLightCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getDoorStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void changeLogLevelCli(EmbeddedCli *embeddedCli, char *args, void *context);
+void getErrorStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
+void getDoorControlModeCli(EmbeddedCli *embeddedCli, char *args, void *context);
+void clearAllErrorStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 
 CLI::CliCommandContainer CLI::cli_callbacks = {{{
         "set_rtc",                      // command name (spaces are not allowed)
@@ -85,6 +88,27 @@ CLI::CliCommandContainer CLI::cli_callbacks = {{{
         false,                          // flag whether to tokenize arguments (see below)
         nullptr,                        // optional pointer to any application context
         changeLogLevelCli               // binding function
+    },
+    {
+        "get_error_status",             // command name (spaces are not allowed)
+        "get error status",             // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getErrorStatusCli               // binding function
+    },
+    {
+        "get_door_control_mode",        // command name (spaces are not allowed)
+        "get door control mode",        // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getDoorControlModeCli           // binding function
+    },
+    {
+        "clear_error_status",           // command name (spaces are not allowed)
+        "clear error status",           // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        clearAllErrorStatusCli          // binding function
     }
 }};
 
@@ -397,4 +421,39 @@ bool checkInputRtcArgumentValueIsInRange(uint32_t value, size_t index) {
     return status;
 }
 
+void getErrorStatusCli(EmbeddedCli * embeddedCli, char * args, void * context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
+    auto* error_manager_ptr = SystemControl::ErrorManager::getInstance();
+    const bool error_status = error_manager_ptr->checkIsError();
+    if (error_status) {
+        Serial.print("Error: ");
+        for (const auto& error_code : error_manager_ptr->getErrorSet()) {
+            Serial.print(SystemControl::getErrorCodeName(error_code));
+            Serial.print(", ");
+        }
+        Serial.println("");
+    } else {
+        Serial.println("No errors");
+    }
+}
 
+void getDoorControlModeCli(EmbeddedCli * embeddedCli, char * args, void * context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
+    auto* gpio_driver_ptr = GPIOInterface::GpioDriver::getInstance();
+    const auto door_control_mode = gpio_driver_ptr->getMainBuildingDoorControlMode();
+    Serial.print("Door control mode: ");
+    Serial.println(static_cast<int>(door_control_mode));
+}
+
+void clearAllErrorStatusCli(EmbeddedCli * embeddedCli, char * args, void * context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
+    auto* error_manager_ptr = SystemControl::ErrorManager::getInstance();
+    error_manager_ptr->resetAllError();
+    Serial.println("All errors are cleared");
+}
