@@ -114,6 +114,12 @@ class GpioDriver {
     */
     void clearErrorIndicator();
 
+    /*
+        * Toggle error indicator
+        * @param state - true if error indicator should be enabled, otherwise disable
+    */
+    void toggleErrorIndicator(const bool state);
+
  private:
     /*
         When power save mode is enabled and doors are moving, then controller disable light bulbs to decrease power consumption
@@ -129,8 +135,6 @@ class GpioDriver {
     void toggleLightExternalBuildingIndicator(const bool state);
 
     void toggleDoorMoveIndicator(const bool state);
-
-    void toggleErrorIndicator(const bool state);
 };
 
 }  //  namespace GPIOInterface

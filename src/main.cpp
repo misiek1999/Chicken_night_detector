@@ -12,6 +12,7 @@
 #include "log.h"
 #include "project_const.h"
 #include "project_pin_definition.h"
+#include "error_manager.h"
 #include "rtc_driver.h"
 #include "gpio_driver.h"
 #include "cli_process.h"
@@ -24,6 +25,8 @@ CLI::CLIProcess cli_process;
 // Main chicken coop controller
 ControlLogic::ChickenCoopController *chicken_coop_controller;
 
+// Error manager instance pointer
+SystemControl::ErrorManager *error_manager;
 // Gpio driver
 GPIOInterface::GpioDriver *gpio_driver;
 // Rtc driver
@@ -35,11 +38,13 @@ bool external_light_enabled = true;
 
 // Door status
 auto door_control_mode = DoorControl::DoorControlMode::Off;
+auto last_error_indicator_state = false;
 
 // Time of last light process
 ProjectTypes::time_ms_t light_process_last_time_ms = 0;
 ProjectTypes::time_ms_t gpio_update_last_time_ms = 0;
 ProjectTypes::time_ms_t main_loop_entry_time_ms = 0;
+ProjectTypes::time_ms_t last_change_error_indicator = 0;
 ProjectTypes::time_us_t next_main_loop_process_time_us = 0;
 ProjectTypes::time_us_t main_loop_current_time_us = 0;
 
@@ -53,6 +58,8 @@ void setup() {
     // Initialize log
     initLog();
     LOG_INFO("Chicken coop controller started");
+    // Initialize error manager
+    error_manager = SystemControl::ErrorManager::getInstance();
     // Initialize GPIO
     gpio_driver = GPIOInterface::GpioDriver::getInstance();
     // Initialize RTC
@@ -113,6 +120,21 @@ void loop() {
                 gpio_driver->setDoorControlAction(DoorControl::DoorControlAction::Disable);
             }
         }
+    }
+
+    // show error indicator if error was occurred
+    if (error_manager->checkIsError()) {
+        if (error_manager->checkIsCriticalError()) {
+            gpio_driver->setErrorIndicator();
+        } else {
+            if (main_loop_entry_time_ms - last_change_error_indicator >= ProjectConst::kMainLoopDelayBetweenBlinkingErrorIndicator) {
+                last_change_error_indicator = main_loop_entry_time_ms;
+                last_error_indicator_state = !last_error_indicator_state;
+                gpio_driver->toggleErrorIndicator(last_error_indicator_state);
+            }
+        }
+    } else {
+        gpio_driver->clearErrorIndicator();
     }
 
     // process CLI

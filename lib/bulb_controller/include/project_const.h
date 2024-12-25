@@ -13,6 +13,7 @@ namespace ProjectConst
     constexpr unsigned kSerialBaudRate = 115200U;
     constexpr ProjectTypes::time_ms_t kMainLoopDelayBetweenLightControlProcess = 1000;  // 1000ms
     constexpr ProjectTypes::time_ms_t kMainLoopDelayBetweenUpdateGPIO = 100;  // 100ms
+    constexpr ProjectTypes::time_ms_t kMainLoopDelayBetweenBlinkingErrorIndicator = 2000;  // 2s
     constexpr ProjectTypes::time_us_t kMainLoopDelayUs = 20000; // 20 ms
     constexpr uint32_t kPhotoresistorSensorCount = 5;
     constexpr float kLightControlMinimumDutyCycle = 0.5F;
