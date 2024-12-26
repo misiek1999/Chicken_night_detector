@@ -32,7 +32,7 @@ struct DoorOpenCloseGpioCallback {
 struct LightStateConfig {
     LightStateGpioCallback callback_;
     BuildingId id_;             // building id
-    bool is_active_;            // default is active
+    bool is_active_ = true;     // default is active
 };
 
 struct DoorStateConfig {
