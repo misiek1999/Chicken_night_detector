@@ -26,3 +26,6 @@ constexpr auto kPinDoorMoveIndicator = 12;
 // DS3231 RTC module
 constexpr auto kPinDS3231Clk = 22;
 constexpr auto kPinDS3231Data = 21;
+
+// external light sensor'
+constexpr auto kPinLightSensor = 23;
