@@ -69,6 +69,7 @@ namespace SystemControl
         bool checkIsAnyError() const;
         bool checkIsError(const ErrorCode &error_code) const;
         bool checkIsCriticalError() const;
+        bool checkIsRtcError() const;
         bool resetError(const ErrorCode &error_code);
         void resetAllError();
         etl::unordered_set<ErrorCode, kErrorCodeSetSize> getErrorSet() const;

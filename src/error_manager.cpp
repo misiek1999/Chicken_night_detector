@@ -24,6 +24,12 @@ namespace SystemControl {
         });
     }
 
+    bool ErrorManager::checkIsRtcError() const {
+        return  checkIsError(ErrorCode::kRtcTimeNotSet) ||
+                checkIsError(ErrorCode::kRtcTimeNotUpdated) ||
+                checkIsError(ErrorCode::kI2CModuleConnectionFailed);
+    }
+
     bool ErrorManager::resetError(const ErrorCode &error_code) {
         return error_set_.erase(error_code);
     }
