@@ -22,7 +22,6 @@ GPIOInterface::GpioDriver::GpioDriver():
 
     pinMode(kPinMainDoorOutputDown, OUTPUT);
     pinMode(kPinMainDoorOutputUp, OUTPUT);
-    pinMode(kPinMainDoorOutputPowerOn, OUTPUT);
 
     pinMode(kPinDoorMoveIndicator, OUTPUT);
     pinMode(kPinMainLightIndicator, OUTPUT);
@@ -46,7 +45,6 @@ GPIOInterface::GpioDriver::GpioDriver():
 
     digitalWrite(kPinMainDoorOutputDown, LOW);
     digitalWrite(kPinMainDoorOutputUp, LOW);
-    digitalWrite(kPinMainDoorOutputPowerOn, LOW);
 
     digitalWrite(kPinDoorMoveIndicator, LOW);
     digitalWrite(kPinMainLightIndicator, LOW);
@@ -131,11 +129,7 @@ void GPIOInterface::GpioDriver::setDoorControlAction(const DoorControl::DoorCont
     } else if (action == DoorControl::DoorControlAction::Close) {
         digitalWrite(kPinMainDoorOutputUp, LOW);
         digitalWrite(kPinMainDoorOutputDown, HIGH);
-        delayMicroseconds(kChangeStateDelayUs);
-        digitalWrite(kPinMainDoorOutputPowerOn, HIGH);
     } else {
-        digitalWrite(kPinMainDoorOutputPowerOn, LOW);
-        delayMicroseconds(kChangeStateDelayUs);
         digitalWrite(kPinMainDoorOutputUp, LOW);
         digitalWrite(kPinMainDoorOutputDown, LOW);
         doors_are_opening_ = false;

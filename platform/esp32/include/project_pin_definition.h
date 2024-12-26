@@ -4,7 +4,6 @@
 // actuators outputs
 constexpr auto kPinMainLigthOutput = 0;
 constexpr auto kPinExternalLigthOutput = 4;
-constexpr auto kPinMainDoorOutputPowerOn = 16;
 constexpr auto kPinMainDoorOutputUp = 17;
 constexpr auto kPinMainDoorOutputDown = 5;
 
