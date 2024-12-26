@@ -5,8 +5,8 @@
 
 namespace ControlLogic {
 
-constexpr auto kMaxLightBulb = 2;
-constexpr auto kMaxDoor = 1;
+constexpr auto kMaxLightBulb = 2u;
+constexpr auto kMaxDoor = 1u;
 
 /*
     * @brief: Building id
