@@ -27,5 +27,5 @@ constexpr auto kPinDoorMoveIndicator = 12;
 constexpr auto kPinDS3231Clk = 22;
 constexpr auto kPinDS3231Data = 21;
 
-// external light sensor'
-constexpr auto kPinLightSensor = 23;
+// external light sensor
+constexpr auto kPinExternalLightSensor = 34;
