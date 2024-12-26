@@ -14,7 +14,7 @@ namespace SystemControl
     enum class ErrorCode : ErrorCodeType
     {
         // non critical errors
-        kRtcConnectionFailed    =  0,
+        kI2CModuleConnectionFailed    =  0,
         kRtcTimeNotSet,
         kRtcTimeNotUpdated,
         kLightSensorError,
@@ -30,7 +30,7 @@ namespace SystemControl
     {
         switch (error_code)
         {
-            GET_ERROR_CODE_NAME(ErrorCode::kRtcConnectionFailed)
+            GET_ERROR_CODE_NAME(ErrorCode::kI2CModuleConnectionFailed)
             GET_ERROR_CODE_NAME(ErrorCode::kRtcTimeNotSet)
             GET_ERROR_CODE_NAME(ErrorCode::kRtcTimeNotUpdated)
             GET_ERROR_CODE_NAME(ErrorCode::kLightSensorError)
@@ -65,7 +65,8 @@ namespace SystemControl
 
 
         void setError(const ErrorCode &error_code);
-        bool checkIsError() const;
+        bool checkIsAnyError() const;
+        bool checkIsError(const ErrorCode &error_code) const;
         bool checkIsCriticalError() const;
         bool resetError(const ErrorCode &error_code);
         void resetAllError();

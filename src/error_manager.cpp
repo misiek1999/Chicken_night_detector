@@ -7,8 +7,12 @@ namespace SystemControl {
         error_set_.insert(error_code);
     }
 
-    bool ErrorManager::checkIsError() const{
+    bool ErrorManager::checkIsAnyError() const{
         return !error_set_.empty();
+    }
+
+    bool ErrorManager::checkIsError(const ErrorCode &error_code) const {
+        return error_set_.find(error_code) != error_set_.end();
     }
 
     bool ErrorManager::checkIsCriticalError() const {

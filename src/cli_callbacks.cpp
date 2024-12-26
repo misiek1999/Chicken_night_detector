@@ -426,7 +426,7 @@ void getErrorStatusCli(EmbeddedCli * embeddedCli, char * args, void * context) {
     (void)context;
     (void)args;
     auto* error_manager_ptr = SystemControl::ErrorManager::getInstance();
-    const bool error_status = error_manager_ptr->checkIsError();
+    const bool error_status = error_manager_ptr->checkIsAnyError();
     if (error_status) {
         Serial.print("Error: ");
         for (const auto& error_code : error_manager_ptr->getErrorSet()) {

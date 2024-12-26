@@ -13,6 +13,7 @@
 #include "project_const.h"
 #include "project_pin_definition.h"
 #include "error_manager.h"
+#include "diagnostic_manager.h"
 #include "rtc_driver.h"
 #include "gpio_driver.h"
 #include "cli_process.h"
@@ -27,6 +28,8 @@ ControlLogic::ChickenCoopController *chicken_coop_controller;
 
 // Error manager instance pointer
 SystemControl::ErrorManager *error_manager;
+// Diagnostic manager instance pointer
+Diagnostic::DiagnosticManager *diagnostic_manager;
 // Gpio driver
 GPIOInterface::GpioDriver *gpio_driver;
 // Rtc driver
@@ -60,6 +63,8 @@ void setup() {
     LOG_INFO("Chicken coop controller started");
     // Initialize error manager
     error_manager = SystemControl::ErrorManager::getInstance();
+    // Initialize diagnostic manager
+    diagnostic_manager = Diagnostic::DiagnosticManager::getInstance();
     // Initialize GPIO
     gpio_driver = GPIOInterface::GpioDriver::getInstance();
     // Initialize RTC
@@ -122,8 +127,11 @@ void loop() {
         }
     }
 
+    // perform diagnostic
+    diagnostic_manager->performDiagnostic();
+
     // show error indicator if error was occurred
-    if (error_manager->checkIsError()) {
+    if (error_manager->checkIsAnyError()) {
         if (error_manager->checkIsCriticalError()) {
             gpio_driver->setErrorIndicator();
         } else {
