@@ -37,6 +37,8 @@ GPIOInterface::GpioDriver::GpioDriver():
     pinMode(kPinControlDoorClose, INPUT_PULLUP);
     pinMode(kPinControlDoorOpen, INPUT_PULLUP);
 
+    pinMode(kPinExternalLightSensor, INPUT);
+
     // lights are off by default
     digitalWrite(kPinOnboardLed, HIGH);
     digitalWrite(kPinMainLigthOutput, LOW);
@@ -167,4 +169,8 @@ void GPIOInterface::GpioDriver::toggleDoorMoveIndicator(const bool state) {
 
 void GPIOInterface::GpioDriver::toggleErrorIndicator(const bool state) {
     digitalWrite(kPinErrorIndicator, state);
+}
+
+bool GPIOInterface::GpioDriver::getExternalLightSensor() {
+    return digitalRead(kPinExternalLightSensor);
 }

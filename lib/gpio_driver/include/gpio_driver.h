@@ -120,6 +120,12 @@ class GpioDriver {
     */
     void toggleErrorIndicator(const bool state);
 
+    /*
+        @details get external light sensor value
+        @return true if external light sensor is active, false otherwise
+    */
+    bool getExternalLightSensor();
+
  private:
     /*
         When power save mode is enabled and doors are moving, then controller disable light bulbs to decrease power consumption
