@@ -85,12 +85,6 @@ void loop() {
     // get current time
     main_loop_entry_time_ms = millis();
 
-    // process light control every 1s
-    if (main_loop_entry_time_ms - light_process_last_time_ms >= ProjectConst::kMainLoopDelayBetweenLightControlProcess) {
-        light_process_last_time_ms = main_loop_entry_time_ms;
-        chicken_coop_controller->periodicUpdateController();
-    }
-
     // read control signals from external switch and buttons
     if (main_loop_entry_time_ms - gpio_update_last_time_ms >= ProjectConst::kMainLoopDelayBetweenUpdateGPIO) {
         gpio_update_last_time_ms = main_loop_entry_time_ms;
@@ -129,6 +123,12 @@ void loop() {
 
     // perform diagnostic
     diagnostic_manager->performDiagnostic();
+
+    // process light control every 1s
+    if (main_loop_entry_time_ms - light_process_last_time_ms >= ProjectConst::kMainLoopDelayBetweenLightControlProcess) {
+        light_process_last_time_ms = main_loop_entry_time_ms;
+        chicken_coop_controller->periodicUpdateController();
+    }
 
     // show error indicator if error was occurred
     if (error_manager->checkIsAnyError()) {
