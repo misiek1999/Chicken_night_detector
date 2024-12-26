@@ -2,6 +2,9 @@
 #include "etl/algorithm.h"
 
 namespace SystemControl {
+    size_t ErrorManager::getErrorCount() const {
+        return error_set_.size();
+    }
 
     void ErrorManager::setError(const ErrorCode &error_code) {
         error_set_.insert(error_code);

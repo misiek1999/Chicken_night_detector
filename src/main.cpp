@@ -132,16 +132,20 @@ void loop() {
 
     // show error indicator if error was occurred
     if (error_manager->checkIsAnyError()) {
+        LOG_DEBUG("Error detected, count of errors: %d", error_manager->getErrorSet().size());
         if (error_manager->checkIsCriticalError()) {
+            LOG_DEBUG("Critical error detected, light will be active whole time");
             gpio_driver->setErrorIndicator();
         } else {
             if (main_loop_entry_time_ms - last_change_error_indicator >= ProjectConst::kMainLoopDelayBetweenBlinkingErrorIndicator) {
+                LOG_DEBUG("Normal error detected, state %d", static_cast<int>(last_error_indicator_state));
                 last_change_error_indicator = main_loop_entry_time_ms;
                 last_error_indicator_state = !last_error_indicator_state;
                 gpio_driver->toggleErrorIndicator(last_error_indicator_state);
             }
         }
     } else {
+        LOG_VERBOSE("No error detected");
         gpio_driver->clearErrorIndicator();
     }
 

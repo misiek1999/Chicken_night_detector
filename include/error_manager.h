@@ -64,6 +64,7 @@ namespace SystemControl
         ErrorManager &operator=(ErrorManager &&) = delete;
 
 
+        size_t getErrorCount() const;
         void setError(const ErrorCode &error_code);
         bool checkIsAnyError() const;
         bool checkIsError(const ErrorCode &error_code) const;
