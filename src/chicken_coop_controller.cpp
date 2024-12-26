@@ -35,7 +35,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
                 &daytime_calculator_, std::placeholders::_1);
 
     // Add main building to bulb controller
-    auto building_id = coop_config_.light_state_config_[0].id_;
+    auto building_id = coop_config_.light_config_[0].id_;
     bulb_controllers_.insert(etl::make_pair(building_id,
                                 LightBulbController(
                                     LightDimmingEventMap { etl::pair {
@@ -53,7 +53,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
     )));
 
     // Add external building to bulb controller
-    building_id = coop_config_.light_state_config_[1].id_;
+    building_id = coop_config_.light_config_[1].id_;
     bulb_controllers_.insert(etl::make_pair(building_id,
                                 LightBulbController {
                                     LightDimmingEventMap { etl::pair {
@@ -123,26 +123,26 @@ ControlLogic::LightStateMap ControlLogic::ChickenCoopController::getLightStates(
 
 void ControlLogic::ChickenCoopController::toggleLightExternalBuilding(const bool & state) {
     const auto building_id = getBuildingNumber(BuildingId::External);
-    coop_config_.light_state_config_[building_id].is_active_ = state;
+    coop_config_.light_config_[building_id].is_active_ = state;
     LOG_INFO("Toggle external building light to %s", state ? "on" : "off");
 }
 
 void ControlLogic::ChickenCoopController::toggleLightMainBuilding(const bool & state) {
     const auto building_id = getBuildingNumber(BuildingId::Main);
-    coop_config_.light_state_config_[building_id].is_active_ = state;
+    coop_config_.light_config_[building_id].is_active_ = state;
     LOG_INFO("Toggle main building light to %s", state ? "on" : "off");
 }
 
 bool ControlLogic::ChickenCoopController::checkLightControllerInExternalBuildingIsActive() const {
     const auto building_id = getBuildingNumber(BuildingId::External);
-    const auto state = coop_config_.light_state_config_[building_id].is_active_;
+    const auto state = coop_config_.light_config_[building_id].is_active_;
     LOG_DEBUG("External building light is %s", state ? "on" : "off");
     return state;
 }
 
 bool ControlLogic::ChickenCoopController::checkLightControllerInMainBuildingIsActive() const {
     const auto building_id = getBuildingNumber(BuildingId::Main);
-    const auto state = coop_config_.light_state_config_[building_id].is_active_;
+    const auto state = coop_config_.light_config_[building_id].is_active_;
     LOG_DEBUG("Main building light is %s", state ? "on" : "off");
     return state;
 }
@@ -198,7 +198,7 @@ void ControlLogic::ChickenCoopController::updateLightController(const std::time_
         LOG_VERBOSE("Update activation time Bef: %d Aft: %d for %d", time_to_turn_on_before_event, time_to_turn_off_after_event, getBuildingNumber(buildingId));
         // get current light state
         auto bulb_light_state = lightBulbController.getLightState(rtc_time);
-        auto light_state_conf = coop_config_.light_state_config_.at(getBuildingNumber(buildingId));
+        auto light_state_conf = coop_config_.light_config_.at(getBuildingNumber(buildingId));
         // When light controller is not active, force turn off the light
         if (!light_state_conf.is_active_) {
             bulb_light_state = LightState::Off;

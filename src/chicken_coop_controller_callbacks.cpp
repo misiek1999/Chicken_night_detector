@@ -2,7 +2,7 @@
 
 static ControlLogic::CoopConfig getCoopConfig() {
         static auto coop_config = ControlLogic::CoopConfig{
-            .light_state_config_ ={
+            .light_config_ ={
             ControlLogic::LightStateConfig{
                 .callback_ = {
                     .toogle_light_state = [](const bool &state) {

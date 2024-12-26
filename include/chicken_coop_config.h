@@ -45,7 +45,7 @@ using LightBulbConfigArray = etl::array<LightStateConfig, kMaxLightBulb>;
 using DoorConfigArray = etl::array<DoorStateConfig, kMaxDoor>;
 
 struct CoopConfig {
-    LightBulbConfigArray light_state_config_;
+    LightBulbConfigArray light_config_;
     DoorConfigArray door_config_;
 };
 
