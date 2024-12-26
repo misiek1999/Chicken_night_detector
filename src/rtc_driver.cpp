@@ -32,9 +32,27 @@ void RtcDriver::getIntWithExtSyncRtcTime(std::time_t &time) {
     ModuleAdapter::get_inter_and_exter_sync_rtc_time(time);
 }
 
-void RtcDriver::reportRtcError() const {
+void RtcDriver::reportRtcError() {
+    if (last_rtc_status_ != RtcStatus::Uninitialized) {
+        LOG_WARNING("Report error code with unititialized rtc");
+    }
     auto* error_manager = SystemControl::ErrorManager::getInstance();
     error_manager->setError(SystemControl::ErrorCode::kRtcTimeNotSet);
+    last_rtc_status_ = RtcStatus::Uninitialized;
+}
+
+void RtcDriver::clearRtcError() {
+    if (last_rtc_status_ == RtcStatus::Ok) {
+        LOG_DEBUG("Skip clear error code, rtc status is ok");
+        return;
+    }
+    last_rtc_status_ = RtcStatus::Ok;
+    auto* error_manager = SystemControl::ErrorManager::getInstance();
+    if (error_manager->checkIsError(SystemControl::ErrorCode::kRtcTimeNotSet)) {
+        error_manager->resetError(SystemControl::ErrorCode::kRtcTimeNotSet);
+    } else {
+        LOG_WARNING("Error code is not set");
+    }
 }
 
 RtcDriver::RtcDriver(RtcSource rtc_source_to_set):
@@ -61,6 +79,8 @@ std::time_t RtcDriver::getTimeFromRtc() {
     if (!checkRtcTimeIsValid(time)) {
         reportRtcError();
         LOG_WARNING("Rtc time is not valid");
+    } else {
+        clearRtcError();
     }
     return time;
 }
@@ -105,11 +125,14 @@ RtcStatus RtcDriver::checkRtcIsOk() {
     std::time_t time_from_sensor = getTimeFromRtc();
     // check if time is valid
     auto status = RtcStatus::Ok;
+    last_rtc_status_ = status;
     // in case of error, notify error manager
     if (!checkRtcTimeIsValid(time_from_sensor)) {
         status = RtcStatus::Uninitialized;
         // set error code in error manager
         reportRtcError();
+    } else {
+        clearRtcError();
     }
     return status;
 }

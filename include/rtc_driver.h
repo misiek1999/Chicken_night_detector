@@ -76,6 +76,7 @@ private:
 
  private:
     RtcSource rtc_source_ = RtcSource::None;
+    RtcStatus last_rtc_status_ = RtcStatus::Ok;
 
     void setExternalRtcTime(const std::time_t &time);
     void getExternalRtcTime(std::time_t &time);
@@ -84,6 +85,7 @@ private:
     void setIntWithExtSyncRtcTime(const std::time_t &time);
     void getIntWithExtSyncRtcTime(std::time_t &time);
 
-    void reportRtcError() const;
+    void reportRtcError();
+    void clearRtcError();
 };
 
