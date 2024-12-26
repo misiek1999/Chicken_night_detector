@@ -130,7 +130,7 @@ ControlLogic::LightStateMap ControlLogic::LightBulbController::getAllEventStates
 ControlLogic::LightState ControlLogic::LightBulbController::getLightState(const std::time_t & current_time) {
     auto event_states = getAllEventStates(current_time);
     auto light_state = LightState::Error;
-    for (const auto [id, state] : event_states) {
+    for (const auto &[id, state] : event_states) {
         if (state == LightState::On) {
             light_state = LightState::On;
             break;
