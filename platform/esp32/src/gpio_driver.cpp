@@ -43,13 +43,13 @@ GPIOInterface::GpioDriver::GpioDriver():
     digitalWrite(kPinMainLigthOutput, LOW);
     digitalWrite(kPinExternalLigthOutput, LOW);
 
-    digitalWrite(kPinMainDoorOutputDown, LOW);
-    digitalWrite(kPinMainDoorOutputUp, LOW);
+    digitalWrite(kPinMainDoorOutputDown, HIGH);
+    digitalWrite(kPinMainDoorOutputUp, HIGH);
 
-    digitalWrite(kPinDoorMoveIndicator, LOW);
-    digitalWrite(kPinMainLightIndicator, LOW);
-    digitalWrite(kPinExternalLightIndicator, LOW);
-    digitalWrite(kPinErrorIndicator, LOW);
+    digitalWrite(kPinDoorMoveIndicator, HIGH);
+    digitalWrite(kPinMainLightIndicator, HIGH);
+    digitalWrite(kPinExternalLightIndicator, HIGH);
+    digitalWrite(kPinErrorIndicator, HIGH);
 
     // Init i2c bus
     Wire.begin(kPinDS3231Data, kPinDS3231Clk);
@@ -78,7 +78,7 @@ void GPIOInterface::GpioDriver::setPWMLightPercentageExternalBuilding(const floa
 }
 
 void GPIOInterface::GpioDriver:: setNormalLightState(const bool state, const uint16_t pin) {
-    if (state && !doors_are_opening_) {
+    if (!state && !doors_are_opening_) {
         analogWrite(pin, kPwmMaxValue);
     } else {
         analogWrite(pin, kPwmMinValue);
@@ -87,7 +87,7 @@ void GPIOInterface::GpioDriver:: setNormalLightState(const bool state, const uin
 
 void GPIOInterface::GpioDriver::setPWMLight(const float percent_light, const uint16_t pin) {
     // scale percent range
-    const float scaled_percent_light = percent_light * (kLightPercentOn - kLightPercentOff) + kLightPercentOff;
+    const float scaled_percent_light = 1 -(percent_light * (kLightPercentOn - kLightPercentOff) + kLightPercentOff);
     // convert percent light to the range of 0 to 1023
     const auto pwm = static_cast<uint16_t>(scaled_percent_light * kPwmMaxValue);
     analogWrite(pin, pwm);
@@ -112,24 +112,24 @@ DoorControl::DoorControlMode GPIOInterface::GpioDriver::getMainBuildingDoorContr
 }
 
 bool GPIOInterface::GpioDriver::checkDoorControlOpenSignalIsActive() {
-    return digitalRead(kPinControlDoorOpen);
+    return !digitalRead(kPinControlDoorOpen);
 }
 
 bool GPIOInterface::GpioDriver::checkDoorControlCloseSignalIsActive() {
-    return digitalRead(kPinControlDoorClose);
+    return !digitalRead(kPinControlDoorClose);
 }
 
 void GPIOInterface::GpioDriver::setDoorControlAction(const DoorControl::DoorControlAction action) {
     doors_are_opening_ = power_save_mode_;  // by default set this member to true, if this option is enabled
     if (action == DoorControl::DoorControlAction::Open) {
-        digitalWrite(kPinMainDoorOutputUp, HIGH);
-        digitalWrite(kPinMainDoorOutputDown, LOW);
-    } else if (action == DoorControl::DoorControlAction::Close) {
         digitalWrite(kPinMainDoorOutputUp, LOW);
         digitalWrite(kPinMainDoorOutputDown, HIGH);
-    } else {
-        digitalWrite(kPinMainDoorOutputUp, LOW);
+    } else if (action == DoorControl::DoorControlAction::Close) {
+        digitalWrite(kPinMainDoorOutputUp, HIGH);
         digitalWrite(kPinMainDoorOutputDown, LOW);
+    } else {
+        digitalWrite(kPinMainDoorOutputUp, HIGH);
+        digitalWrite(kPinMainDoorOutputDown, HIGH);
         doors_are_opening_ = false;
     }
     toggleDoorMoveIndicator(action != DoorControl::DoorControlAction::Disable);
@@ -148,19 +148,19 @@ void GPIOInterface::GpioDriver::clearErrorIndicator() {
 }
 
 void GPIOInterface::GpioDriver::toggleLightMainBuildingIndicator(const bool state) {
-    digitalWrite(kPinMainLightIndicator, state);
+    digitalWrite(kPinMainLightIndicator, !state);
 }
 
 void GPIOInterface::GpioDriver::toggleLightExternalBuildingIndicator(const bool state) {
-    digitalWrite(kPinExternalLightIndicator, state);
+    digitalWrite(kPinExternalLightIndicator, !state);
 }
 
 void GPIOInterface::GpioDriver::toggleDoorMoveIndicator(const bool state) {
-    digitalWrite(kPinDoorMoveIndicator, state);
+    digitalWrite(kPinDoorMoveIndicator, !state);
 }
 
 void GPIOInterface::GpioDriver::toggleErrorIndicator(const bool state) {
-    digitalWrite(kPinErrorIndicator, state);
+    digitalWrite(kPinErrorIndicator, !state);
 }
 
 bool GPIOInterface::GpioDriver::getExternalLightSensor() {
