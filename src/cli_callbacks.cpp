@@ -168,7 +168,11 @@ void setRtcTimeCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     // get tokens
     for (size_t i = 1; i <= token_count; ++i) {
         // check if token is number
-          const char *token = embeddedCliGetToken(args, i);
+        const char *token = embeddedCliGetToken(args, i);
+            if (token == nullptr) {
+            Serial.println(F("No argument!"));
+            return;
+        }
         if (!checkCStringIsNumber(token)) {
             Serial.println(F("Argument is not number!"));
             Serial.print(F("arg "));
@@ -233,6 +237,10 @@ void setRtcSourceCli(EmbeddedCli *embeddedCli, char *args, void *context) {
     //  check only first token
     constexpr size_t kTokenToCheck = 1;
     const char *token = embeddedCliGetToken(args, kTokenToCheck);
+    if (token == nullptr) {
+        Serial.println(F("No argument!"));
+        return;
+    }
     if (!checkCStringIsNumber(token)) {
         Serial.println(F("Argument is not number!"));
         Serial.print(F("arg : "));
@@ -311,6 +319,10 @@ void setExternalLightCli(EmbeddedCli * embeddedCli, char * args, void * context)
     //  check only first token
     constexpr size_t kTokenToCheck = 1;
     const char *token = embeddedCliGetToken(args, kTokenToCheck);
+    if (token == nullptr) {
+        Serial.println(F("No argument!"));
+        return;
+    }
     if (!checkCStringIsNumber(token)) {
         Serial.println(F("Argument is not number!"));
         Serial.print(F("arg : "));
@@ -367,6 +379,10 @@ void changeLogLevelCli(EmbeddedCli * embeddedCli, char * args, void * context) {
     //  check only first token
     constexpr size_t kTokenToCheck = 1;
     const char *token = embeddedCliGetToken(args, kTokenToCheck);
+    if (token == nullptr) {
+        Serial.println(F("No argument!"));
+        return;
+    }
     if (!checkCStringIsNumber(token)) {
         Serial.println(F("Argument is not number!"));
         Serial.print(F("arg : "));
