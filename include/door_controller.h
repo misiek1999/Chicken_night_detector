@@ -16,10 +16,29 @@ using DoorEventAndCallback = etl::pair<TimeEvent, DoorEventUpdateCallbacks>;
 using DoorEventMap = etl::unordered_map<size_t, DoorEventAndCallback, kMaxDoorEvent>;
 
 bool checkCallbacksAreValid(const DoorEventUpdateCallbacks &callbacks);
+
 /*
-    * Class to controll door
+    * Interface to controll door
 */
-class RtcDoorController {
+class IDoorController {
+    public:
+        virtual ~IDoorController() = default;
+        /*
+            @brief: Update door controller, should be called periodically
+            @return: true if success, false if failed
+        */
+        virtual bool updateDoorControllerEvents() = 0;
+        /*
+            @brief: Get door state
+            @return: door action state
+        */
+        virtual DoorControl::DoorControlAction getDoorState() const = 0;
+};
+
+/*
+    * Class to controll door based on rtc time
+*/
+class RtcDoorController : public IDoorController {
  public:
     RtcDoorController() = default;
     /*
@@ -31,15 +50,20 @@ class RtcDoorController {
     /*
         @brief: Update door controller, should be called periodically
         @param: current_time - current time
+    */
+    void updateTime(const std::time_t &current_time);
+
+    /*
+        @brief: Update door controller, should be called periodically
         @return: true if success, false if failed
     */
-    bool updateDoorControllerEvents(const std::time_t &current_time);
+    bool updateDoorControllerEvents();
 
     /*
         @brief: Get door state
         @return: door action state
     */
-    DoorControl::DoorControlAction getDoorState(const std::time_t &current_time) const;
+    DoorControl::DoorControlAction getDoorState() const;
 
     /*
         @brief: Add door event
@@ -57,6 +81,7 @@ class RtcDoorController {
 
  private:
     DoorEventMap door_events_map_;
+    std::time_t current_time_;
 };
 
 }   // namespace ControlLogic

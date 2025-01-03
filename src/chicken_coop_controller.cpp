@@ -160,11 +160,12 @@ void ControlLogic::ChickenCoopController::toggleAutomaticDoorController(const bo
 void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t & rtc_time) {
     // Check all door controllers
     for (auto &[buildingId, doorController] : door_controllers_) {
+        doorController.updateTime(rtc_time);
         auto door_action = DoorControl::DoorControlAction::Disable;
         auto door_state_conf = coop_config_.door_config_.at(getBuildingNumber(buildingId));
         if (door_state_conf.is_active_) {
-            if (doorController.updateDoorControllerEvents(rtc_time)) {
-                door_action = doorController.getDoorState(rtc_time);
+            if (doorController.updateDoorControllerEvents()) {
+                door_action = doorController.getDoorState();
             }
             // if door state has changed, update last change time and last door action
             if (door_action != last_door_action_) {
