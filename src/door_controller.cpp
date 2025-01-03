@@ -1,11 +1,11 @@
 #include "door_controller.h"
 #include "log.h"
 
-ControlLogic::DoorController::DoorController(const DoorEventMap& door_event_map):
+ControlLogic::RtcDoorController::RtcDoorController(const DoorEventMap& door_event_map):
     door_events_map_(door_event_map) {
 }
 
-bool ControlLogic::DoorController::updateDoorControllerEvents(const std::time_t &current_time) {
+bool ControlLogic::RtcDoorController::updateDoorControllerEvents(const std::time_t &current_time) {
     for (auto &[door_id, door_event_and_callback] : door_events_map_) {
         const auto& door_callback = door_event_and_callback.second;
         if (checkCallbacksAreValid(door_callback)) {
@@ -19,7 +19,7 @@ bool ControlLogic::DoorController::updateDoorControllerEvents(const std::time_t 
     return true;
 }
 
-DoorControl::DoorControlAction ControlLogic::DoorController::getDoorState(const std::time_t &current_time) const {
+DoorControl::DoorControlAction ControlLogic::RtcDoorController::getDoorState(const std::time_t &current_time) const {
     auto action = DoorControl::DoorControlAction::Close;
     for (const auto &[door_id, door_event_and_callback] : door_events_map_) {
         if (door_event_and_callback.first.checkEventIsActive(current_time)) {
@@ -30,7 +30,7 @@ DoorControl::DoorControlAction ControlLogic::DoorController::getDoorState(const 
     return action;
 }
 
-bool ControlLogic::DoorController::addDoorEvent(const DoorEventMap & new_events_map) {
+bool ControlLogic::RtcDoorController::addDoorEvent(const DoorEventMap & new_events_map) {
     auto result = true;
     for (auto &new_event : new_events_map) {
         if (door_events_map_.size() >= kMaxDoorEvent) {
@@ -52,7 +52,7 @@ bool ControlLogic::DoorController::addDoorEvent(const DoorEventMap & new_events_
     return result;
 }
 
-bool ControlLogic::DoorController::removeDoorEvent(const size_t & door_event_id) {
+bool ControlLogic::RtcDoorController::removeDoorEvent(const size_t & door_event_id) {
     auto result = false;
     auto itr = door_events_map_.find(door_event_id);
     if (itr != door_events_map_.end()) {

@@ -82,7 +82,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
     };
     building_id = coop_config_.door_config_[0].id_;
     door_controllers_.insert(etl::make_pair(building_id,
-                                DoorController {
+                                RtcDoorController {
                                     DoorEventMap { etl::pair {
                                         getBuildingNumber(building_id),
                                         DoorEventAndCallback {

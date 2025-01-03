@@ -23,7 +23,7 @@
 namespace ControlLogic {
 constexpr uint8_t kMaxLightController = 2;
 using LightBulbControllerMap = etl::unordered_map<BuildingId, LightBulbController, kMaxLightController>;
-using DoorControllerMap = etl::unordered_map<BuildingId, DoorController, kMaxLightController>;
+using DoorControllerMap = etl::unordered_map<BuildingId, RtcDoorController, kMaxLightController>;
 using DoorActionMap = etl::unordered_map<size_t, DoorControl::DoorControlAction, kMaxEventsCount>;
 /*
     * @brief: Main controller class for chicken coop

@@ -19,14 +19,14 @@ bool checkCallbacksAreValid(const DoorEventUpdateCallbacks &callbacks);
 /*
     * Class to controll door
 */
-class DoorController {
+class RtcDoorController {
  public:
-    DoorController() = default;
+    RtcDoorController() = default;
     /*
         @brief: Constructor of class
         @param: door_event_map - map of door events
     */
-    explicit DoorController(const DoorEventMap& door_event_map);
+    explicit RtcDoorController(const DoorEventMap& door_event_map);
 
     /*
         @brief: Update door controller, should be called periodically
