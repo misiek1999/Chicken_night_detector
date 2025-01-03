@@ -53,5 +53,4 @@ constexpr size_t getBuildingNumber(const BuildingId &building_id) {
     return static_cast<size_t>(building_id);
 }
 
-using TimeCallback = std::function<std::time_t(void)>;
 }  // namespace ControlLogic

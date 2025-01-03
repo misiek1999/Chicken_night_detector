@@ -10,6 +10,9 @@
 #include "internal_rtc_adapter.h"
 #include "internal_and_external_sync_adapter.h"
 
+// callback funtion to get current time from rtc
+using TimeCallback = std::function<std::time_t(void)>;
+
 enum class RtcSource {
     Internal,   // use only internal RTC clock
     External,   // use external RTC clock
