@@ -161,6 +161,31 @@ void ControlLogic::ChickenCoopController::toggleAutomaticDoorController(const bo
     LOG_INFO("Toggle automatic door controller to %s", state ? "on" : "off");
 }
 
+void ControlLogic::ChickenCoopController::setDoorControllerMode(const DoorControllerMode &mode) {
+    LOG_INFO("Set door controller mode to %d", static_cast<int>(mode));
+    door_controller_mode_ = mode;
+    // change door controller mode
+    switch (mode) {
+        case DoorControllerMode::Rtc:
+            // change door controller to rtc mode
+            for (auto &[buildingId, doorController] : door_controllers_) {
+                // check if rtc door controller is exist
+                if (rtc_door_controllers_.find(buildingId) == rtc_door_controllers_.end()) {
+                    LOG_WARNING("Rtc door controller for building %d is not exist", buildingId);
+                    continue;
+                }
+                doorController = &rtc_door_controllers_.at(buildingId);
+            }
+            break;
+        case DoorControllerMode::ExternalLightSensor:
+            // change door controller to external light sensor mode
+            break;
+        default:
+            LOG_WARNING("Invalid door controller mode %d", static_cast<int>(mode));
+            break;
+    }
+}
+
 void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t & rtc_time) {
     // Check all door controllers
     for (auto &[buildingId, doorController] : door_controllers_) {

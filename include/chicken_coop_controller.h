@@ -104,6 +104,20 @@ class ChickenCoopController {
     */
     void toggleAutomaticDoorController(const bool &state);
 
+    /*
+        * @brief: Get door controller mode
+        * @return: DoorControllerMode
+    */
+    DoorControllerMode getDoorControllerMode() const {
+        return door_controller_mode_;
+    }
+
+    /*
+        * @brief: Set door controller mode
+        * @param mode: DoorControllerMode
+    */
+    void setDoorControllerMode(const DoorControllerMode &mode);
+
  private:
     DaytimeCalculator daytime_calculator_;
     LightBulbControllerMap bulb_controllers_;
