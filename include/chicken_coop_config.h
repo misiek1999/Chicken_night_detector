@@ -20,6 +20,19 @@ enum class BuildingId {
     NumberOfBuildings
 };
 
+/*
+    * @brief: Door controller mode used by coop controller
+    * @details: Enum class for door controller mode
+    *          Rtc - Door controller based on RTC time
+    *          ExternalLightSensor - Door controller based on external light sensor
+    *          NumberOfDoorController - Number of door controllers
+*/
+enum class DoorControllerMode {
+    Rtc = 0,
+    ExternalLightSensor,
+    NumberOfDoorController
+};
+
 struct LightStateGpioCallback {
     std::function<void(const bool &)> toogle_light_state;
     std::function<void(const float &)> set_pwm_light_percentage;

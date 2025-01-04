@@ -14,7 +14,8 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
                             ProjectConst::kInstallationTimeZone,
                             ProjectConst::kInstallationReq),
         bulb_controllers_(),
-        door_controllers_(),
+        door_controller_mode_(DoorControllerMode::Rtc),
+        rtc_door_controllers_(),
         coop_config_(coop_config),
         rtc_callback_(rtc_callback),
         light_states_(),
@@ -81,7 +82,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
         return sunset_callback(current_time) + ProjectConst::kLightControlSecondsToTurnOffLights;
     };
     building_id = coop_config_.door_config_[0].id_;
-    door_controllers_.insert(etl::make_pair(building_id,
+    rtc_door_controllers_.insert(etl::make_pair(building_id,
                                 RtcDoorController {
                                     DoorEventMap { etl::pair {
                                         getBuildingNumber(building_id),
@@ -95,6 +96,8 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
                                     }},
                                     rtc_callback_
                                 }));
+    // Add rtc controller to door controller interface map
+    door_controllers_.insert(etl::make_pair(building_id, &rtc_door_controllers_.at(building_id)));
 }
 
 bool ControlLogic::ChickenCoopController::periodicUpdateController() {
@@ -164,8 +167,8 @@ void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t
         auto door_action = DoorControl::DoorControlAction::Disable;
         auto door_state_conf = coop_config_.door_config_.at(getBuildingNumber(buildingId));
         if (door_state_conf.is_active_) {
-            if (doorController.updateDoorControllerEvents()) {
-                door_action = doorController.getDoorState();
+            if (doorController->updateDoorControllerEvents()) {
+                door_action = doorController->getDoorState();
             }
             // if door state has changed, update last change time and last door action
             if (door_action != last_door_action_) {
