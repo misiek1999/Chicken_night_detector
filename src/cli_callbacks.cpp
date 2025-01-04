@@ -25,6 +25,8 @@ void changeLogLevelCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getErrorStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getDoorControlModeCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void clearAllErrorStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
+void getDoorControlAutoControllerCli(EmbeddedCli *embeddedCli, char *args, void *context);
+
 
 CLI::CliCommandContainer CLI::cli_callbacks = {{{
         "set_rtc",                      // command name (spaces are not allowed)
@@ -109,6 +111,13 @@ CLI::CliCommandContainer CLI::cli_callbacks = {{{
         false,                          // flag whether to tokenize arguments (see below)
         nullptr,                        // optional pointer to any application context
         clearAllErrorStatusCli          // binding function
+    },
+    {
+        "get_door_controller",        // command name (spaces are not allowed)
+        "selected algorith to control door automaticly",        // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getDoorControlModeCli           // binding function
     }
 }};
 
@@ -472,4 +481,15 @@ void clearAllErrorStatusCli(EmbeddedCli * embeddedCli, char * args, void * conte
     auto* error_manager_ptr = SystemControl::ErrorManager::getInstance();
     error_manager_ptr->resetAllError();
     Serial.println("All errors are cleared");
+}
+
+void getDoorControlAutoControllerCli(EmbeddedCli * embeddedCli, char * args, void * context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
+
+    const auto* chicken_coop_controller_ptr = ControlLogic::getChickenCoopControllerInstance();
+    const auto door_control_mode = chicken_coop_controller_ptr->getDoorControllerMode();
+    Serial.print("Selected door auto controller: ");
+    Serial.println(static_cast<int>(door_control_mode));
 }
