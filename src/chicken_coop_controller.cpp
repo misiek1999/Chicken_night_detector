@@ -71,14 +71,14 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
                                     }}
                                 }));
     // Add door controller event to main building
-    auto doorEventFirstUpdate = [&] (const std::time_t &current_time) mutable {
+    auto getDoorOpenEventTime = [&] (const std::time_t &current_time) mutable {
         auto tm  = *std::localtime(&current_time);
         tm.tm_hour = 6;
         tm.tm_min = 0;
         auto new_open_time = std::mktime(&tm);
         return new_open_time;
     };
-    auto doorEventSecondUpdate = [&] (const std::time_t &current_time) mutable {
+    auto getDoorCloseEventTime = [&] (const std::time_t &current_time) mutable {
         return sunset_callback(current_time) + ProjectConst::kLightControlSecondsToTurnOffLights;
     };
     building_id = coop_config_.door_config_[0].id_;
@@ -89,8 +89,8 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
                                         DoorEventAndCallback {
                                             TimeEvent(),
                                             DoorEventUpdateCallbacks {
-                                                doorEventFirstUpdate,
-                                                doorEventSecondUpdate
+                                                getDoorOpenEventTime,
+                                                getDoorCloseEventTime
                                             }
                                         }
                                     }},
