@@ -117,7 +117,7 @@ CLI::CliCommandContainer CLI::cli_callbacks = {{{
         "selected algorith to control door automaticly",        // Optional help for a command (NULL for no help)
         false,                          // flag whether to tokenize arguments (see below)
         nullptr,                        // optional pointer to any application context
-        getDoorControlModeCli           // binding function
+        getDoorControlAutoControllerCli           // binding function
     }
 }};
 
