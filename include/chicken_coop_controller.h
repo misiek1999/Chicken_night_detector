@@ -15,6 +15,7 @@
 #include "door_controller.h"
 #include "gpio_driver.h"
 #include "rtc_driver.h"
+#include "light_sensor_controller.h"
 /*
     * @brief: Control logic namespace
     * @details: This namespace contains all classes and functions for control logic
@@ -24,6 +25,7 @@ namespace ControlLogic {
 constexpr uint8_t kMaxLightController = 2;
 using LightBulbControllerMap = etl::unordered_map<BuildingId, LightBulbController, kMaxLightController>;
 using RtcDoorControllerMap = etl::unordered_map<BuildingId, RtcDoorController, kMaxLightController>;
+using LightSensorDoorControllerMap = etl::unordered_map<BuildingId, LightSensorDoorController, kMaxLightController>;
 using DoorControllerMap = etl::unordered_map<BuildingId, IDoorController*, kMaxLightController>;
 using DoorActionMap = etl::unordered_map<size_t, DoorControl::DoorControlAction, kMaxEventsCount>;
 /*
@@ -123,6 +125,7 @@ class ChickenCoopController {
     LightBulbControllerMap bulb_controllers_;
     DoorControllerMode door_controller_mode_;
     RtcDoorControllerMap rtc_door_controllers_;
+    LightSensorDoorControllerMap light_sensor_door_controllers_;
     DoorControllerMap door_controllers_;
     CoopConfig coop_config_;
     TimeCallback rtc_callback_;

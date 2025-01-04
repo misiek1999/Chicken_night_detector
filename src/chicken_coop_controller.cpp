@@ -5,6 +5,7 @@
 #include "rtc_driver.h"
 #include "light_event_duration.h"
 #include "log.h"
+#include "light_sensor_controller instance.h"
 
 EventUpdateCallback sunset_callback;
 
@@ -98,6 +99,10 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
                                 }));
     // Add rtc controller to door controller interface map
     door_controllers_.insert(etl::make_pair(building_id, &rtc_door_controllers_.at(building_id)));
+
+    // Add external light door controller
+    light_sensor_door_controllers_.insert(etl::make_pair(building_id,
+                                                         *getLightSensorDoorControllerInstance()));
 }
 
 bool ControlLogic::ChickenCoopController::periodicUpdateController() {
@@ -179,6 +184,14 @@ void ControlLogic::ChickenCoopController::setDoorControllerMode(const DoorContro
             break;
         case DoorControllerMode::ExternalLightSensor:
             // change door controller to external light sensor mode
+            for (auto &[buildingId, doorController] : door_controllers_) {
+                // check if light sensor door controller is exist
+                if (light_sensor_door_controllers_.find(buildingId) == light_sensor_door_controllers_.end()) {
+                    LOG_WARNING("Light sensor door controller for building %d is not exist", buildingId);
+                    continue;
+                }
+                doorController = &light_sensor_door_controllers_.at(buildingId);
+            }
             break;
         default:
             LOG_WARNING("Invalid door controller mode %d", static_cast<int>(mode));
