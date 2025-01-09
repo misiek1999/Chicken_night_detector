@@ -23,7 +23,7 @@
 */
 namespace ControlLogic {
 constexpr uint8_t kMaxLightController = 2;
-using LightBulbControllerMap = etl::unordered_map<BuildingId, LightBulbController, kMaxLightController>;
+using LightBulbControllerMap = etl::unordered_map<BuildingId, LightEventController, kMaxLightController>;
 using RtcDoorControllerMap = etl::unordered_map<BuildingId, RtcDoorController, kMaxLightController>;
 using LightSensorDoorControllerMap = etl::unordered_map<BuildingId, LightSensorDoorController, kMaxLightController>;
 using DoorControllerMap = etl::unordered_map<BuildingId, IDoorController*, kMaxLightController>;
