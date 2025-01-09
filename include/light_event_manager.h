@@ -118,15 +118,15 @@ using RestDimmingTimePercentMap = etl::unordered_map<size_t, float, kMaxEventsCo
 /*
     * This class should be used to control signle instance of light bulb.
 */
-class LightEventController {
+class LightEventManager {
  public:
-    LightEventController() = default;
+    LightEventManager() = default;
 
     /*
-        @brief: Constructor to create light bulb controller.
+        @brief: Constructor to create lightEventManager.
         @param: events_containers - map of light dimming events and coresponding callbacks
     */
-    explicit LightEventController(const LightDimmingEventMap &events_containers);
+    explicit LightEventManager(const LightDimmingEventMap &events_containers);
 
     /*
         @brief: get event state for selected event
@@ -256,6 +256,6 @@ class LightEventController {
     size_t getActiveDimmingEventIndex(const std::time_t &current_time) const;
 
     std::time_t last_update_time_;
-};  //  class LightEventController
+};  //  class LightEventManager
 
 }  //  namespace ControlLogic

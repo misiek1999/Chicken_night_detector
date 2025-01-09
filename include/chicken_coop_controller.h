@@ -11,7 +11,7 @@
 #include "chicken_coop_config.h"
 #include "calculate_sunset_and_sunrise_time.h"
 #include "light_state.h"
-#include "event_controller.h"
+#include "light_event_manager.h"
 #include "door_controller.h"
 #include "gpio_driver.h"
 #include "rtc_driver.h"
@@ -23,7 +23,7 @@
 */
 namespace ControlLogic {
 constexpr uint8_t kMaxLightController = 2;
-using LightBulbControllerMap = etl::unordered_map<BuildingId, LightEventController, kMaxLightController>;
+using LightBulbControllerMap = etl::unordered_map<BuildingId, LightEventManager, kMaxLightController>;
 using RtcDoorControllerMap = etl::unordered_map<BuildingId, RtcDoorController, kMaxLightController>;
 using LightSensorDoorControllerMap = etl::unordered_map<BuildingId, LightSensorDoorController, kMaxLightController>;
 using DoorControllerMap = etl::unordered_map<BuildingId, IDoorController*, kMaxLightController>;
