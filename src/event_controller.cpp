@@ -1,4 +1,4 @@
-#include "bulb_controller.h"
+#include "event_controller.h"
 #include "calculate_sunset_and_sunrise_time.h"
 #include "log.h"
 

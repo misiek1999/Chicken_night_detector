@@ -11,7 +11,7 @@
 #include "chicken_coop_config.h"
 #include "calculate_sunset_and_sunrise_time.h"
 #include "light_state.h"
-#include "bulb_controller.h"
+#include "event_controller.h"
 #include "door_controller.h"
 #include "gpio_driver.h"
 #include "rtc_driver.h"
