@@ -77,7 +77,7 @@ float ControlLogic::LightDimmingEvent::getRestLightDimmingTimePercent(const std:
     auto rest_dimming_time = getRestLightDimmingTime(current_time);
     auto current_dimming_time_ = getCurrentDimmingTime(current_time);
     const auto percent = static_cast<float>(rest_dimming_time) / static_cast<float>(current_dimming_time_);
-    LOG_VERBOSE("Rest proc dimming time: %d/%", percent);
+    LOG_VERBOSE("Rest proc dimming time: %d%%", percent);
     return percent;
 }
 
