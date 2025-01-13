@@ -21,7 +21,7 @@
 #include "chicken_coop_controller_instance.h"
 
 // Object of CLI interface controller
-CLI::CLIProcess cli_process;
+CLI::CLIProcess* cli_process;
 
 // Main chicken coop controller
 ControlLogic::ChickenCoopController *chicken_coop_controller;
@@ -68,6 +68,9 @@ void setup() {
     gpio_driver = GPIOInterface::GpioDriver::getInstance();
     // Initialize RTC
     rtc_driver = &RtcDriver::getInstance();
+    // Initialize CLI
+    static auto cli_process_obj = CLI::CLIProcess();
+    cli_process = &cli_process_obj;
     // Set rtc source to external module
     rtc_driver->setRtcSource(RtcSource::External);
     // Create chicken coop controller
@@ -150,7 +153,7 @@ void loop() {
     }
 
     // process CLI
-    cli_process.periodicCProcessCLI();
+    cli_process->periodicCProcessCLI();
 
     // calculate delay for main loop
     next_main_loop_process_time_us += ProjectConst::kMainLoopDelayUs;
