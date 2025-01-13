@@ -200,13 +200,16 @@ void ControlLogic::ChickenCoopController::setDoorControllerMode(const DoorContro
 }
 
 void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t & rtc_time) {
+    LOG_VERBOSE("Door controller enter");
     // Check all door controllers
     for (auto &[buildingId, doorController] : door_controllers_) {
         auto door_action = DoorControl::DoorControlAction::Disable;
         auto door_state_conf = coop_config_.door_config_.at(getBuildingNumber(buildingId));
         if (door_state_conf.is_active_) {
+            LOG_VERBOSE("Door controller %d is active", buildingId);
             if (doorController->updateDoorControllerEvents()) {
                 door_action = doorController->getDoorState();
+                LOG_INFO("Door controller %d action: %d", buildingId, door_action);
             }
             // if door state has changed, update last change time and last door action
             if (door_action != last_door_action_) {
@@ -226,6 +229,7 @@ void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t
             door_actions_[getBuildingNumber(buildingId)] = door_action;
         }
     }
+    LOG_VERBOSE("Door controller updated exit");
 }
 
 void ControlLogic::ChickenCoopController::updateLightController(const std::time_t & rtc_time) {
