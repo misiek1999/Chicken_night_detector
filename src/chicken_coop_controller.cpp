@@ -121,29 +121,23 @@ void ControlLogic::ChickenCoopController::toggleAutomaticDoorController(const bo
 void ControlLogic::ChickenCoopController::setDoorControllerMode(const DoorControllerMode &mode) {
     LOG_INFO("Set door controller mode to %d", static_cast<int>(mode));
     door_controller_mode_ = mode;
-    // change door controller mode
+
+    auto updateDoorController = [&](auto &controller_map, const char *controller_type) {
+        for (auto &[buildingId, doorController] : door_controllers_) {
+            if (controller_map.find(buildingId) == controller_map.end()) {
+                LOG_WARNING("%s door controller for building %d does not exist", controller_type, buildingId);
+                continue;
+            }
+            doorController = &controller_map.at(buildingId);
+        }
+    };
+
     switch (mode) {
         case DoorControllerMode::Rtc:
-            // change door controller to rtc mode
-            for (auto &[buildingId, doorController] : door_controllers_) {
-                // check if rtc door controller is exist
-                if (rtc_door_controllers_.find(buildingId) == rtc_door_controllers_.end()) {
-                    LOG_WARNING("Rtc door controller for building %d is not exist", buildingId);
-                    continue;
-                }
-                doorController = &rtc_door_controllers_.at(buildingId);
-            }
+            updateDoorController(rtc_door_controllers_, "Rtc");
             break;
         case DoorControllerMode::ExternalLightSensor:
-            // change door controller to external light sensor mode
-            for (auto &[buildingId, doorController] : door_controllers_) {
-                // check if light sensor door controller is exist
-                if (light_sensor_door_controllers_.find(buildingId) == light_sensor_door_controllers_.end()) {
-                    LOG_WARNING("Light sensor door controller for building %d is not exist", buildingId);
-                    continue;
-                }
-                doorController = &light_sensor_door_controllers_.at(buildingId);
-            }
+            updateDoorController(light_sensor_door_controllers_, "Light sensor");
             break;
         default:
             LOG_WARNING("Invalid door controller mode %d", static_cast<int>(mode));
