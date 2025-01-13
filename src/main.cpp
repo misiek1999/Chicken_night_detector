@@ -158,8 +158,8 @@ void loop() {
     main_loop_current_time_us = micros();
     if (next_main_loop_process_time_us - main_loop_current_time_us > ProjectConst::kMainLoopDelayUs) {
         //  overrurn detected
-        LOG_ERROR("Overrun main loop detected! Loop time: %d Current time: %d, next process time: %d",
-                    next_main_loop_process_time_us - main_loop_current_time_us,
+        LOG_ERROR("Overrun main loop detected! Loop time: %uus Current time: %uus, next process time: %uus",
+                    main_loop_current_time_us - main_loop_entry_time_ms,
                     main_loop_current_time_us,
                     next_main_loop_process_time_us);
         // set new time for next main loop process
