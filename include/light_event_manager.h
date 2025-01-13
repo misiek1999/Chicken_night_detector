@@ -255,7 +255,7 @@ class LightEventManager {
 
     size_t getActiveDimmingEventIndex(const std::time_t &current_time) const;
 
-    std::time_t last_update_time_;
+    std::time_t last_update_time_ = {};
 };  //  class LightEventManager
 
 }  //  namespace ControlLogic
