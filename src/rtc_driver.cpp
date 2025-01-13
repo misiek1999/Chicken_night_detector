@@ -78,6 +78,7 @@ std::time_t RtcDriver::getTimeFromRtc() {
     }
     if (!checkRtcTimeIsValid(time)) {
         reportRtcError();
+        time = {};
         LOG_WARNING("Rtc time is not valid");
     } else {
         clearRtcError();
