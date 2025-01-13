@@ -1,20 +1,22 @@
 #include "door_controller.h"
 #include "log.h"
 
-ControlLogic::RtcDoorController::RtcDoorController(const DoorEventMap& door_event_map, const TimeCallback &rtc_callback):
+ControlLogic::RtcDoorController::RtcDoorController(const DoorEventMap& door_event_map, TimeCallback* rtc_callback):
     door_events_map_(door_event_map),
     rtc_callback_(rtc_callback) {
 }
 
 
 bool ControlLogic::RtcDoorController::updateDoorControllerEvents() {
-    const auto current_time = rtc_callback_();
+    const auto current_time = std::invoke(*rtc_callback_);
+    LOG_VERBOSE("Door event size: %d", door_events_map_.size());
     for (auto &[door_id, door_event_and_callback] : door_events_map_) {
         const auto& door_callback = door_event_and_callback.second;
         if (checkCallbacksAreValid(door_callback)) {
             auto new_event_start = door_callback.first(current_time);
             auto new_event_stop = door_callback.second(current_time);
             door_event_and_callback.first.setEventTime(new_event_start, new_event_stop);
+            LOG_VERBOSE("Door event updated: %d, start: %u, stop: %u", door_id, new_event_start, new_event_stop);
         } else {
             LOG_ERROR("Invalid callback for door event: %d", door_id);
         }
@@ -23,7 +25,7 @@ bool ControlLogic::RtcDoorController::updateDoorControllerEvents() {
 }
 
 DoorControl::DoorControlAction ControlLogic::RtcDoorController::getDoorState() const {
-    const auto current_time = rtc_callback_();
+    const auto current_time = std::invoke(*rtc_callback_);
     auto action = DoorControl::DoorControlAction::Close;
     for (const auto &[door_id, door_event_and_callback] : door_events_map_) {
         if (door_event_and_callback.first.checkEventIsActive(current_time)) {

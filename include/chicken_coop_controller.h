@@ -9,9 +9,8 @@
 #include "project_pin_definition.h"
 #include "project_const.h"
 #include "chicken_coop_config.h"
-#include "calculate_sunset_and_sunrise_time.h"
 #include "light_state.h"
-#include "light_event_manager.h"
+#include "rtc_bulb_controller.h"
 #include "door_controller.h"
 #include "gpio_driver.h"
 #include "rtc_driver.h"
@@ -23,7 +22,7 @@
 */
 namespace ControlLogic {
 constexpr uint8_t kMaxLightController = 2;
-using LightBulbControllerMap = etl::unordered_map<BuildingId, LightEventManager, kMaxLightController>;
+using RtcLightBulbControllerMap = etl::unordered_map<BuildingId, RtcBulbController, kMaxLightController>;
 using RtcDoorControllerMap = etl::unordered_map<BuildingId, RtcDoorController, kMaxLightController>;
 using LightSensorDoorControllerMap = etl::unordered_map<BuildingId, LightSensorDoorController, kMaxLightController>;
 using DoorControllerMap = etl::unordered_map<BuildingId, IDoorController*, kMaxLightController>;
@@ -122,7 +121,7 @@ class ChickenCoopController {
 
  private:
     DaytimeCalculator daytime_calculator_;
-    LightBulbControllerMap bulb_controllers_;
+    RtcLightBulbControllerMap rtc_bulb_controllers_;
     DoorControllerMode door_controller_mode_;
     RtcDoorControllerMap rtc_door_controllers_;
     LightSensorDoorControllerMap light_sensor_door_controllers_;

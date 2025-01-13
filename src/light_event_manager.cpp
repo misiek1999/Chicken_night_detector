@@ -1,4 +1,6 @@
 #include "light_event_manager.h"
+
+#include <utility>
 #include "calculate_sunset_and_sunrise_time.h"
 #include "log.h"
 
@@ -103,9 +105,9 @@ ProjectTypes::time_minute_t ControlLogic::LightDimmingEvent::getCurrentDimmingTi
 //                  LightEventManager class implementation
 // -----------------------------------------------------------------------------
 
-ControlLogic::LightEventManager::LightEventManager(const LightDimmingEventMap &events_containers):
-        event_containers_(events_containers),
-        last_update_time_(0) {
+ControlLogic::LightEventManager::LightEventManager(LightDimmingEventMap events_containers) :
+    event_containers_(std::move(events_containers))
+{
     for (auto & event : event_containers_) {
         LOG_DEBUG("Event: %u", event.first);
     }
@@ -223,13 +225,17 @@ void ControlLogic::LightEventManager::updateEvents(const std::time_t & current_t
         return;
     }
     // get new event time from callback
-    for (auto& event : event_containers_) {
-        auto callback = event.second.callback;
-        if (callback == nullptr) {
-            LOG_ERROR("Callback is not set for event: %u", event.first);
+    for (auto [event, event_and_callback] : event_containers_) {
+        if (!event_and_callback.callback) {
+            LOG_ERROR("Callback is not set for event: %u", event);
         } else {
-            auto new_event_time = std::invoke(callback, current_time);
-            event.second.event.setEventTime(new_event_time);
+            auto new_event_time = event_and_callback.callback(current_time);
+            LOG_INFO("New event time: %d", new_event_time);
+
+            if (event_and_callback.callback) {
+                LOG_INFO("New event time: %d", new_event_time);
+            }
+            event_and_callback.event.setEventTime(new_event_time);
         }
     }
     last_update_time_ = current_time;

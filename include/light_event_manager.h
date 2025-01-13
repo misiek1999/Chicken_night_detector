@@ -126,7 +126,7 @@ class LightEventManager {
         @brief: Constructor to create lightEventManager.
         @param: events_containers - map of light dimming events and coresponding callbacks
     */
-    explicit LightEventManager(const LightDimmingEventMap &events_containers);
+    explicit LightEventManager(LightDimmingEventMap events_containers);
 
     /*
         @brief: get event state for selected event

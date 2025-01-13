@@ -46,7 +46,7 @@ class RtcDoorController : public IDoorController {
         @brief: Constructor of class
         @param: door_event_map - map of door events
     */
-    explicit RtcDoorController(const DoorEventMap& door_event_map, const TimeCallback &rtc_callback);
+    explicit RtcDoorController(const DoorEventMap& door_event_map, TimeCallback* rtc_callback);
 
     /*
         @brief: Update door controller, should be called periodically
@@ -76,7 +76,7 @@ class RtcDoorController : public IDoorController {
 
  private:
     DoorEventMap door_events_map_ = {};
-    TimeCallback rtc_callback_;
+    TimeCallback* rtc_callback_ = {};
 };
 
 }   // namespace ControlLogic
