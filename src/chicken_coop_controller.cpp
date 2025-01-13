@@ -9,7 +9,7 @@
 
 EventUpdateCallback sunset_callback;
 
-ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_config, TimeCallback rtc_callback):
+ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_config, TimeCallback get_rtc_time_callback):
         daytime_calculator_(ProjectConst::kInstallationLatitude,
                             ProjectConst::kInstallationLongitude,
                             ProjectConst::kInstallationTimeZone,
@@ -18,7 +18,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
         door_controller_mode_(DoorControllerMode::Rtc),
         rtc_door_controllers_(),
         coop_config_(coop_config),
-        rtc_callback_(rtc_callback),
+        rtc_callback_(get_rtc_time_callback),
         light_states_(),
         door_actions_(),
         last_change_time_(0),

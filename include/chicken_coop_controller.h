@@ -40,7 +40,7 @@ class ChickenCoopController {
     /*
         @brief: contructor of class
     */
-    ChickenCoopController(CoopConfig coop_config, TimeCallback get_rtc_time);
+    ChickenCoopController(CoopConfig coop_config, TimeCallback get_rtc_time_callback);
 
     /*
         * @bierf: Update light controller
