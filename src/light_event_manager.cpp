@@ -249,7 +249,7 @@ void ControlLogic::LightEventManager::updateAllActivationAndDeactivationTime(con
 }
 
 ControlLogic::RestDimmingTimeMap ControlLogic::LightEventManager::getAllRestOfDimmingTime(const std::time_t & current_time) const {
-    RestDimmingTimeMap rest_dimming_time_map;
+    RestDimmingTimeMap rest_dimming_time_map = {};
     for (auto event : event_containers_) {
         rest_dimming_time_map[event.first] = event.second.event.getRestLightDimmingTime(current_time);
     }
@@ -257,7 +257,7 @@ ControlLogic::RestDimmingTimeMap ControlLogic::LightEventManager::getAllRestOfDi
 }
 
 ControlLogic::RestDimmingTimePercentMap ControlLogic::LightEventManager::getAllRestOfDimmingTimePercent(const std::time_t & current_time) const {
-    RestDimmingTimePercentMap rest_dimming_time_percent_map;
+    RestDimmingTimePercentMap rest_dimming_time_percent_map = {};
     for (auto event_and_callback : event_containers_) {
         rest_dimming_time_percent_map[event_and_callback.first] =
                 event_and_callback.second.event.getRestLightDimmingTimePercent(current_time);
