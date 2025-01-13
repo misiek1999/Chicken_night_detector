@@ -46,7 +46,6 @@ auto last_error_indicator_state = false;
 // Time of last light process
 ProjectTypes::time_ms_t light_process_last_time_ms = 0;
 ProjectTypes::time_ms_t gpio_update_last_time_ms = 0;
-ProjectTypes::time_ms_t main_loop_entry_time_ms = 0;
 ProjectTypes::time_ms_t last_change_error_indicator = 0;
 ProjectTypes::time_us_t next_main_loop_process_time_us = 0;
 ProjectTypes::time_us_t main_loop_current_time_us = 0;
@@ -83,7 +82,7 @@ void setup() {
 // Main program loop
 void loop() {
     // get current time
-    main_loop_entry_time_ms = millis();
+    const auto main_loop_entry_time_ms = millis();
     const auto loop_entry_time_us = micros();
 
     // read control signals from external switch and buttons
