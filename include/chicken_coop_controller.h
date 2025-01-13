@@ -120,20 +120,20 @@ class ChickenCoopController {
     void setDoorControllerMode(const DoorControllerMode &mode);
 
  private:
-    DaytimeCalculator daytime_calculator_;
-    RtcLightBulbControllerMap rtc_bulb_controllers_;
-    DoorControllerMode door_controller_mode_;
-    RtcDoorControllerMap rtc_door_controllers_;
-    LightSensorDoorControllerMap light_sensor_door_controllers_;
-    DoorControllerMap door_controllers_;
+    DaytimeCalculator daytime_calculator_ = {};
+    RtcLightBulbControllerMap rtc_bulb_controllers_ = {};
+    DoorControllerMode door_controller_mode_ = {DoorControllerMode::Rtc};
+    RtcDoorControllerMap rtc_door_controllers_ = {};
+    LightSensorDoorControllerMap light_sensor_door_controllers_ = {};
+    DoorControllerMap door_controllers_ = {};
     CoopConfig coop_config_;
     TimeCallback rtc_callback_;
-    ControlLogic::LightStateMap light_states_;
-    DoorActionMap door_actions_;
+    ControlLogic::LightStateMap light_states_ = {};
+    DoorActionMap door_actions_ = {};
 
     static constexpr double kMaxDoorMovementTime = 10.0;    // 10 seconds
-    std::time_t last_change_time_;
-    DoorControl::DoorControlAction last_door_action_;
+    std::time_t last_change_time_ = {};
+    DoorControl::DoorControlAction last_door_action_ = {DoorControl::DoorControlAction::Disable};
 
     /*
         * @brief: Update door controller

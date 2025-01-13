@@ -13,15 +13,8 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
                             ProjectConst::kInstallationLongitude,
                             ProjectConst::kInstallationTimeZone,
                             ProjectConst::kInstallationReq),
-        rtc_bulb_controllers_(),
-        door_controller_mode_(DoorControllerMode::Rtc),
-        rtc_door_controllers_(),
         coop_config_(coop_config),
-        rtc_callback_(get_rtc_time_callback),
-        light_states_(),
-        door_actions_(),
-        last_change_time_(0),
-        last_door_action_(DoorControl::DoorControlAction::Disable)
+        rtc_callback_(get_rtc_time_callback)
 {
     // Add rtc controller to light controller interface map
     for (const auto &[callback, id , state] : coop_config_.light_config_) {
