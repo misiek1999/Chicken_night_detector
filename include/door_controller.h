@@ -52,13 +52,13 @@ class RtcDoorController : public IDoorController {
         @brief: Update door controller, should be called periodically
         @return: true if success, false if failed
     */
-    bool updateDoorControllerEvents();
+    bool updateDoorControllerEvents() override;
 
     /*
         @brief: Get door state
         @return: door action state
     */
-    DoorControl::DoorControlAction getDoorState() const;
+    DoorControl::DoorControlAction getDoorState() const override;
 
     /*
         @brief: Add door event
@@ -75,7 +75,7 @@ class RtcDoorController : public IDoorController {
     bool removeDoorEvent(const size_t &door_event_id);
 
  private:
-    DoorEventMap door_events_map_;
+    DoorEventMap door_events_map_ = {};
     TimeCallback rtc_callback_;
 };
 
