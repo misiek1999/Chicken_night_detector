@@ -84,6 +84,7 @@ void setup() {
 void loop() {
     // get current time
     main_loop_entry_time_ms = millis();
+    const auto loop_entry_time_us = micros();
 
     // read control signals from external switch and buttons
     if (main_loop_entry_time_ms - gpio_update_last_time_ms >= ProjectConst::kMainLoopDelayBetweenUpdateGPIO) {
@@ -159,7 +160,7 @@ void loop() {
     if (next_main_loop_process_time_us - main_loop_current_time_us > ProjectConst::kMainLoopDelayUs) {
         //  overrurn detected
         LOG_ERROR("Overrun main loop detected! Loop time: %uus Current time: %uus, next process time: %uus",
-                    main_loop_current_time_us - main_loop_entry_time_ms,
+                    main_loop_current_time_us - loop_entry_time_us,
                     main_loop_current_time_us,
                     next_main_loop_process_time_us);
         // set new time for next main loop process
