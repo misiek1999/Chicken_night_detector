@@ -4,7 +4,6 @@ constexpr const auto kDelayToChangeDoorStateMs = 1800000;    // 30 minutes
 
 ControlLogic::LightSensorDoorController::LightSensorDoorController(lightStateCallback light_sensor_callback):
     light_sensor_callback_(light_sensor_callback) {
-        gpio_driver_ = GPIOInterface::GpioDriver::getInstance();
 }
 
 bool ControlLogic::LightSensorDoorController::updateDoorControllerEvents() {

@@ -27,7 +27,6 @@ namespace ControlLogic {
 
      private:
         lightStateCallback light_sensor_callback_;
-        GPIOInterface::GpioDriver *gpio_driver_;
         ProjectTypes::time_ms_t last_light_change_time_ {0};
         EnternalLightState last_light_state_ {EnternalLightState::Low};
         DoorControl::DoorControlAction door_state_ {DoorControl::DoorControlAction::Disable};
