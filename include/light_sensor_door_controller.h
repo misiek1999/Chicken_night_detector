@@ -8,11 +8,6 @@
 
 namespace ControlLogic {
 
-    enum class EnternalLightState {
-        Low = 0,
-        High
-    };
-
     class LightSensorDoorController : public IDoorController {
      public:
         explicit LightSensorDoorController(lightStateCallback light_sensor_callback);
