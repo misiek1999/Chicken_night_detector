@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gpio_driver.h"
-#include "light_sensor_controller.h"
+#include "light_sensor_door_controller.h"
 
 namespace ControlLogic {
     LightSensorDoorController* getLightSensorDoorControllerInstance() {

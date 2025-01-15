@@ -14,7 +14,7 @@
 #include "door_controller.h"
 #include "gpio_driver.h"
 #include "rtc_driver.h"
-#include "light_sensor_controller.h"
+#include "light_sensor_door_controller.h"
 /*
     * @brief: Control logic namespace
     * @details: This namespace contains all classes and functions for control logic

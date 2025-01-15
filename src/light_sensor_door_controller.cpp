@@ -1,4 +1,4 @@
-#include "light_sensor_controller.h"
+#include "light_sensor_door_controller.h"
 
 constexpr const auto kDelayToChangeDoorStateMs = 1800000;    // 30 minutes
 
