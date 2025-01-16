@@ -25,6 +25,11 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
         light_sensor_bulb_controllers_.insert(etl::make_pair(id, *getLightSensorBulbControllerInstance()));
     }
 
+    // Add all RTC bulb controllers to main bulb controller map
+    for (auto &[id, rtc_bulb_controller] : rtc_bulb_controllers_) {
+        bulb_controllers_[id] = &rtc_bulb_controller;
+    }
+
     // Add door controller event to main building
     auto getDoorOpenEventTime = [&] (const std::time_t &current_time) mutable {
         auto tm  = *std::localtime(&current_time);
@@ -184,11 +189,11 @@ void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t
 
 void ControlLogic::ChickenCoopController::updateLightController(const std::time_t & rtc_time) {
     // iterate over all bulb light controllers
-    for (auto &[buildingId, lightBulbController] : rtc_bulb_controllers_) {
+    for (auto &[buildingId, bulbController] : bulb_controllers_) {
         // update light controller
-        std::ignore = lightBulbController.periodicUpdateController();
+        std::ignore = bulbController->periodicUpdateController();
         // get current light state
-        auto bulb_light_state = lightBulbController.getLightState();
+        auto bulb_light_state = bulbController->getLightState();
         auto light_state_conf = coop_config_.light_config_.at(getBuildingNumber(buildingId));
         // When light controller is not active, force turn off the light
         if (!light_state_conf.is_active_) {
@@ -196,7 +201,7 @@ void ControlLogic::ChickenCoopController::updateLightController(const std::time_
         }
         light_states_[getBuildingNumber(buildingId)] = bulb_light_state;
         // set control signal to output control elements
-        const auto dimming_prec = lightBulbController.getTotalOfDimmingTimePercent();
+        const auto dimming_prec = bulbController->getTotalOfDimmingTimePercent();
         switch (bulb_light_state) {
             case LightState::On:
                 light_state_conf.callback_.toogle_light_state(true);
