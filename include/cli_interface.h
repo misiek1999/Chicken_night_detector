@@ -12,8 +12,8 @@ namespace CLI
 {
 
 // const values used in cli interface
-constexpr uint16_t kBufferSize = 512;
-constexpr uint16_t kMaxBindingCount = 14;
+constexpr uint16_t kBufferSize = 640;
+constexpr uint16_t kMaxBindingCount = 20;
 constexpr uint16_t kHistorySize = 32;
 constexpr uint16_t kCmdBuffersize = 64;
 constexpr uint16_t kRxBufferSize = 32;
