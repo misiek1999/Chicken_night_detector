@@ -33,6 +33,12 @@ enum class DoorControllerMode {
     NumberOfDoorController
 };
 
+enum class BulbControllerMode {
+    Rtc = 0,
+    ExternalLightSensor,
+    NumberOfBulbController
+};
+
 struct LightStateGpioCallback {
     std::function<void(const bool &)> toogle_light_state;
     std::function<void(const float &)> set_pwm_light_percentage;

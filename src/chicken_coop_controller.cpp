@@ -154,6 +154,43 @@ void ControlLogic::ChickenCoopController::setDoorControllerMode(const DoorContro
     }
 }
 
+void ControlLogic::ChickenCoopController::setBulbControllerMode(const BulbControllerMode &mode) {
+    if (mode >= BulbControllerMode::NumberOfBulbController) {
+        LOG_WARNING("Invalid bulb controller mode %d", static_cast<int>(mode));
+        return;
+    }
+
+    if (bulb_controller_mode_ == mode) {
+        LOG_INFO("Bulb controller mode is already set to %d", static_cast<int>(mode));
+        return;
+    }
+
+    LOG_INFO("Set bulb controller mode to %d", static_cast<int>(mode));
+    bulb_controller_mode_ = mode;
+
+    auto updateBulbController = [&](auto &controller_map, const char *controller_type) {
+        for (auto &[buildingId, bulbController] : bulb_controllers_) {
+            if (controller_map.find(buildingId) == controller_map.end()) {
+                LOG_WARNING("%s bulb controller for building %d does not exist", controller_type, buildingId);
+                continue;
+            }
+            bulbController = &controller_map.at(buildingId);
+        }
+    };
+
+    switch (mode) {
+        case BulbControllerMode::Rtc:
+            updateBulbController(rtc_bulb_controllers_, "Rtc");
+            break;
+        case BulbControllerMode::ExternalLightSensor:
+            updateBulbController(light_sensor_bulb_controllers_, "Light sensor");
+            break;
+        default:
+            LOG_WARNING("Invalid bulb controller mode %d", static_cast<int>(mode));
+            break;
+    }
+}
+
 void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t & rtc_time) {
     LOG_VERBOSE("Door controller enter");
     // Check all door controllers

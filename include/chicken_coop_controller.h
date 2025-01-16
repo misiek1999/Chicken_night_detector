@@ -122,9 +122,16 @@ class ChickenCoopController {
     */
     void setDoorControllerMode(const DoorControllerMode &mode);
 
+    /*
+        * @brief: Set bulb controller mode
+        * @param mode: BulbControllerMode
+    */
+    void setBulbControllerMode(const BulbControllerMode &mode);
+
  private:
     DaytimeCalculator daytime_calculator_ = {};
     // Light controllers
+    BulbControllerMode bulb_controller_mode_ = {BulbControllerMode::Rtc};
     RtcLightBulbControllerMap rtc_bulb_controllers_ = {};
     LightSensorBulbControllerMap light_sensor_bulb_controllers_ = {};
     BulbControllerMap bulb_controllers_ = {};
