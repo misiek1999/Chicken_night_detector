@@ -128,6 +128,16 @@ void ControlLogic::ChickenCoopController::toggleAutomaticDoorController(const bo
 }
 
 void ControlLogic::ChickenCoopController::setDoorControllerMode(const DoorControllerMode &mode) {
+    if (mode >= DoorControllerMode::NumberOfDoorController) {
+        LOG_WARNING("Invalid door controller mode %d", static_cast<int>(mode));
+        return;
+    }
+
+    if (door_controller_mode_ == mode) {
+        LOG_INFO("Door controller mode is already set to %d", static_cast<int>(mode));
+        return;
+    }
+
     LOG_INFO("Set door controller mode to %d", static_cast<int>(mode));
     door_controller_mode_ = mode;
 
