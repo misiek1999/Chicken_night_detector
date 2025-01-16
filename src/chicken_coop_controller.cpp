@@ -21,7 +21,7 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
         rtc_bulb_controllers_.insert(etl::make_pair(id, RtcBulbController(&rtc_callback_, &daytime_calculator_)));
     }
     // Add light sensor bulb controller to light controller interface map
-    for (const auto &[callback, id , state] : coop_config_.door_config_) {
+    for (const auto &[callback, id , state] : coop_config_.light_config_) {
         light_sensor_bulb_controllers_.insert(etl::make_pair(id, *getLightSensorBulbControllerInstance()));
     }
 
