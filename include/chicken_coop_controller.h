@@ -15,6 +15,7 @@
 #include "gpio_driver.h"
 #include "rtc_driver.h"
 #include "light_sensor_door_controller.h"
+#include "light_sensor_bulb_controller.h"
 /*
     * @brief: Control logic namespace
     * @details: This namespace contains all classes and functions for control logic
@@ -25,7 +26,9 @@ constexpr uint8_t kMaxLightController = 2;
 using RtcLightBulbControllerMap = etl::unordered_map<BuildingId, RtcBulbController, kMaxLightController>;
 using RtcDoorControllerMap = etl::unordered_map<BuildingId, RtcDoorController, kMaxLightController>;
 using LightSensorDoorControllerMap = etl::unordered_map<BuildingId, LightSensorDoorController, kMaxLightController>;
+using LightSensorBulbControllerMap = etl::unordered_map<BuildingId, LightSensorBulbController, kMaxLightController>;
 using DoorControllerMap = etl::unordered_map<BuildingId, IDoorController*, kMaxLightController>;
+using BulbControllerMap = etl::unordered_map<BuildingId, IBulbController*, kMaxLightController>;
 using DoorActionMap = etl::unordered_map<size_t, DoorControl::DoorControlAction, kMaxEventsCount>;
 /*
     * @brief: Main controller class for chicken coop
@@ -121,13 +124,20 @@ class ChickenCoopController {
 
  private:
     DaytimeCalculator daytime_calculator_ = {};
+    // Light controllers
     RtcLightBulbControllerMap rtc_bulb_controllers_ = {};
+    LightSensorBulbControllerMap light_sensor_bulb_controllers_ = {};
+    BulbControllerMap bulb_controllers_ = {};
+    // Door controllers
     DoorControllerMode door_controller_mode_ = {DoorControllerMode::Rtc};
     RtcDoorControllerMap rtc_door_controllers_ = {};
     LightSensorDoorControllerMap light_sensor_door_controllers_ = {};
     DoorControllerMap door_controllers_ = {};
+    // Coop configuration
     CoopConfig coop_config_;
+    // Rtc time callback
     TimeCallback rtc_callback_;
+    // Internal coop states
     ControlLogic::LightStateMap light_states_ = {};
     DoorActionMap door_actions_ = {};
 
