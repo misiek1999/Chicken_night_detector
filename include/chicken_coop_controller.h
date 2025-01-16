@@ -117,6 +117,14 @@ class ChickenCoopController {
     }
 
     /*
+        * @brief: Get bulb controller mode
+        * @return: BulbControllerMode
+    */
+    BulbControllerMode getBulbControllerMode() const {
+        return bulb_controller_mode_;
+    }
+
+    /*
         * @brief: Set door controller mode
         * @param mode: DoorControllerMode
     */
