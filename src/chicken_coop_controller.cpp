@@ -134,11 +134,11 @@ void ControlLogic::ChickenCoopController::setDoorControllerMode(const DoorContro
     }
 
     if (door_controller_mode_ == mode) {
-        LOG_INFO("Door controller mode is already set to %d", static_cast<int>(mode));
+        LOG_INFO("Door controller mode is already set to %s", ControlLogic::getDoorControllerModeName(mode));
         return;
     }
 
-    LOG_INFO("Set door controller mode to %d", static_cast<int>(mode));
+    LOG_INFO("Set door controller mode to %s", ControlLogic::getDoorControllerModeName(mode));
     door_controller_mode_ = mode;
 
     auto updateDoorController = [&](auto &controller_map, const char *controller_type) {
@@ -171,11 +171,11 @@ void ControlLogic::ChickenCoopController::setBulbControllerMode(const BulbContro
     }
 
     if (bulb_controller_mode_ == mode) {
-        LOG_INFO("Bulb controller mode is already set to %d", static_cast<int>(mode));
+        LOG_INFO("Bulb controller mode is already set to %s", ControlLogic::getBulbControllerModeName(mode));
         return;
     }
 
-    LOG_INFO("Set bulb controller mode to %d", static_cast<int>(mode));
+    LOG_INFO("Set bulb controller mode to %s", ControlLogic::getBulbControllerModeName(mode));
     bulb_controller_mode_ = mode;
 
     auto updateBulbController = [&](auto &controller_map, const char *controller_type) {

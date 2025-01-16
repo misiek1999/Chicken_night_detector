@@ -72,4 +72,41 @@ constexpr size_t getBuildingNumber(const BuildingId &building_id) {
     return static_cast<size_t>(building_id);
 }
 
+#define ENUM_TO_CASE(enum_name) \
+    case enum_name: return #enum_name;
+
+inline const char* getBuildingIdName(const BuildingId &building_id) {
+    switch (building_id) {
+        ENUM_TO_CASE(BuildingId::Main);
+        ENUM_TO_CASE(BuildingId::External);
+        ENUM_TO_CASE(BuildingId::NumberOfBuildings);
+        default:
+            break;
+    }
+    return "Unknown";
+}
+
+inline const char* getDoorControllerModeName(const DoorControllerMode &mode) {
+    switch (mode) {
+        ENUM_TO_CASE(DoorControllerMode::Rtc);
+        ENUM_TO_CASE(DoorControllerMode::ExternalLightSensor);
+        ENUM_TO_CASE(DoorControllerMode::NumberOfDoorController);
+        default:
+            break;
+    }
+    return "Unknown";
+}
+
+inline const char* getBulbControllerModeName(const BulbControllerMode &mode) {
+    switch (mode) {
+        ENUM_TO_CASE(BulbControllerMode::Rtc);
+        ENUM_TO_CASE(BulbControllerMode::ExternalLightSensor);
+        ENUM_TO_CASE(BulbControllerMode::NumberOfBulbController);
+        default:
+            break;
+    }
+    return "Unknown";
+}
+
+#undef ENUM_TO_CASE
 }  // namespace ControlLogic
