@@ -43,6 +43,8 @@ bool external_light_enabled = true;
 auto door_control_mode = DoorControl::DoorControlMode::Off;
 auto last_error_indicator_state = false;
 
+bool was_rtc_error = false;
+
 // Time of last light process
 ProjectTypes::time_ms_t light_process_last_time_ms = 0;
 ProjectTypes::time_ms_t gpio_update_last_time_ms = 0;
@@ -109,7 +111,7 @@ void loop() {
             door_control_mode = input_door_status;
             // toggle main door controller based on selected mode
             chicken_coop_controller->toggleAutomaticDoorController(door_control_mode == DoorControl::DoorControlMode::Auto);
-            LOG_INFO("Door status changed to %d", door_control_mode);
+            LOG_INFO("Door status changed to %s", DoorControl::getDoorControlModeName(door_control_mode));
         }
         // take action when selected mode is manual
         if (door_control_mode == DoorControl::DoorControlMode::Manual) {
@@ -126,6 +128,21 @@ void loop() {
 
     // perform diagnostic
     diagnostic_manager->performDiagnostic();
+
+    // in case of rtc error, switch to external light sensor controllers
+    const auto current_rtc_error_status = error_manager->checkIsRtcError();
+    if (current_rtc_error_status != was_rtc_error) {
+        if (current_rtc_error_status) {
+            LOG_INFO("RTC error detected, switch to external light sensor controllers");
+            chicken_coop_controller->setBulbControllerMode(ControlLogic::BulbControllerMode::ExternalLightSensor);
+            chicken_coop_controller->setDoorControllerMode(ControlLogic::DoorControllerMode::ExternalLightSensor);
+        } else {
+            LOG_INFO("RTC error resolved, switch to RTC controllers");
+            chicken_coop_controller->setBulbControllerMode(ControlLogic::BulbControllerMode::Rtc);
+            chicken_coop_controller->setDoorControllerMode(ControlLogic::DoorControllerMode::Rtc);
+        }
+        was_rtc_error = current_rtc_error_status;
+    }
 
     // process light control every 1s
     if (main_loop_entry_time_ms - light_process_last_time_ms >= ProjectConst::kMainLoopDelayBetweenLightControlProcess) {
