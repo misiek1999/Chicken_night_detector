@@ -372,20 +372,8 @@ void getDoorStatusCli(EmbeddedCli * embeddedCli, char * args, void * context) {
         Serial.print("Building ID: ");
         Serial.print(static_cast<int>(door_status_it.first));
         Serial.print(" -> ");
-        switch (door_status_it.second) {
-        case DoorControl::DoorControlAction::Open:
-            Serial.println("Door is open");
-            break;
-        case DoorControl::DoorControlAction::Close:
-            Serial.println("Door is close");
-            break;
-        case DoorControl::DoorControlAction::Disable:
-            Serial.println("Door is disabled");
-            break;
-        default:
-            Serial.println("Door is in error state");
-            break;
-        }
+        Serial.print("Door status: ");
+        Serial.println(DoorControl::getDoorControlActionName(door_status_it.second));
         Serial.println("");
     }
 }
@@ -479,7 +467,7 @@ void getDoorControlModeCli(EmbeddedCli * embeddedCli, char * args, void * contex
     auto* gpio_driver_ptr = GPIOInterface::GpioDriver::getInstance();
     const auto door_control_mode = gpio_driver_ptr->getMainBuildingDoorControlMode();
     Serial.print("Door control mode: ");
-    Serial.println(static_cast<int>(door_control_mode));
+    Serial.println(DoorControl::getDoorControlModeName(door_control_mode));
 }
 
 void clearAllErrorStatusCli(EmbeddedCli * embeddedCli, char * args, void * context) {
