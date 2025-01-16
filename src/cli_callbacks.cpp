@@ -26,6 +26,7 @@ void getErrorStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getDoorControlModeCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void clearAllErrorStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getDoorControlAutoControllerCli(EmbeddedCli *embeddedCli, char *args, void *context);
+void getBulbControlAutoControllerCli(EmbeddedCli *embeddedCli, char *args, void *context);
 
 
 CLI::CliCommandContainer CLI::cli_callbacks = {{{
@@ -118,6 +119,13 @@ CLI::CliCommandContainer CLI::cli_callbacks = {{{
         false,                          // flag whether to tokenize arguments (see below)
         nullptr,                        // optional pointer to any application context
         getDoorControlAutoControllerCli           // binding function
+    },
+    {
+        "get_bulb_controller",        // command name (spaces are not allowed)
+        "selected algorith to control bulb automaticly",        // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getBulbControlAutoControllerCli           // binding function
     }
 }};
 
@@ -492,4 +500,15 @@ void getDoorControlAutoControllerCli(EmbeddedCli * embeddedCli, char * args, voi
     const auto door_control_mode = chicken_coop_controller_ptr->getDoorControllerMode();
     Serial.print("Selected door auto controller: ");
     Serial.println(static_cast<int>(door_control_mode));
+}
+
+void getBulbControlAutoControllerCli(EmbeddedCli *embeddedCli, char *args, void *context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
+
+    const auto* chicken_coop_controller_ptr = ControlLogic::getChickenCoopControllerInstance();
+    const auto bulb_control_mode = chicken_coop_controller_ptr->getBulbControllerMode();
+    Serial.print("Selected bulb auto controller: ");
+    Serial.println(static_cast<int>(bulb_control_mode));
 }
