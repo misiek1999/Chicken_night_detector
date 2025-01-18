@@ -169,9 +169,9 @@ bool ControlLogic::LightEventManager::removeEvent(const size_t event_index) {
     if (itr != event_containers_.end()) {
         event_containers_.erase(itr);
         result = true;
-        LOG_INFO("Event removed: %u", itr);
+        LOG_INFO("Event removed: %u", event_index);
     } else {
-        LOG_WARNING("Event not found: %u", itr);
+        LOG_WARNING("Event not found: %u", event_index);
     }
     return result;
 }
