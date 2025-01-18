@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Functional>
+#include <functional>
 
 using lightStateCallback = std::function<bool()>;
 
