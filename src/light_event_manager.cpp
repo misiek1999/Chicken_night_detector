@@ -212,10 +212,6 @@ float ControlLogic::LightEventManager::getRestOfDimmingTimePercent(const std::ti
     return rest_dimming_time_percent;
 }
 
-std::time_t ControlLogic::LightEventManager::getTotalOfDimmingTime(const std::time_t & current_time) const {
-    return getActiveDimmingEvent(current_time)->second;
-}
-
 float ControlLogic::LightEventManager::getTotalOfDimmingTimePercent(const std::time_t & current_time) const {
     return getRestOfDimmingTimePercent(current_time, getActiveDimmingEventIndex(current_time));
 }
@@ -275,14 +271,18 @@ bool ControlLogic::LightEventManager::checkEventIndexIsValid(const size_t & even
     return event_containers_.find(event_index) != event_containers_.end();
 }
 
-ControlLogic::RestDimmingTimeMap::iterator ControlLogic::LightEventManager::getActiveDimmingEvent(const std::time_t & current_time) const {
+etl::pair<size_t, ProjectTypes::time_minute_t>  ControlLogic::LightEventManager::getActiveDimmingEvent(const std::time_t & current_time) const {
     auto all_dimming_times = getAllRestOfDimmingTime(current_time);
     auto elem = etl::max_element(all_dimming_times.begin(), all_dimming_times.end(), [](const auto &a, const auto &b) {
         return a.second < b.second;
     });
-    return elem;
+    return etl::make_pair(elem->first, elem->second);
 }
 
 size_t ControlLogic::LightEventManager::getActiveDimmingEventIndex(const std::time_t & current_time) const {
-    return getActiveDimmingEvent(current_time)->first;
+    return getActiveDimmingEvent(current_time).first;
+}
+
+std::time_t ControlLogic::LightEventManager::getTotalOfDimmingTime(const std::time_t & current_time) const {
+    return getActiveDimmingEvent(current_time).second;
 }

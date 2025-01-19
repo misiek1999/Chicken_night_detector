@@ -251,7 +251,7 @@ class LightEventManager {
 
     bool checkEventIndexIsValid(const size_t &event_index) const;
 
-    RestDimmingTimeMap::iterator getActiveDimmingEvent(const std::time_t &current_time) const;
+    etl::pair<size_t, ProjectTypes::time_minute_t>  getActiveDimmingEvent(const std::time_t &current_time) const;
 
     size_t getActiveDimmingEventIndex(const std::time_t &current_time) const;
 
