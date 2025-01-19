@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Arduino.h>
 #include "project_types.h"
 
 namespace ModuleAdapter

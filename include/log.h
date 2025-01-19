@@ -11,7 +11,7 @@ enum class LogSource {
 };
 
 inline void initLog() {
-    Log.begin(LOG_LEVEL_INFO, &Serial);
+    Log.begin(LOG_LEVEL_VERBOSE, &Serial);
     Log.noticeln("Log initialized");
 }
 

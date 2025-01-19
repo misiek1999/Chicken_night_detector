@@ -1,11 +1,5 @@
 #pragma once
 
-#include <Arduino.h>
-#include <ctime>
-#include <functional>
-#include <etl/vector.h>
-#include <etl/array.h>
-#include <etl/unordered_map.h>
 #include "project_pin_definition.h"
 #include "project_const.h"
 #include "chicken_coop_config.h"
@@ -16,6 +10,12 @@
 #include "rtc_driver.h"
 #include "light_sensor_door_controller.h"
 #include "light_sensor_bulb_controller.h"
+#include <etl/vector.h>
+#include <etl/array.h>
+#include <etl/unordered_map.h>
+#include <ctime>
+#include <functional>
+
 /*
     * @brief: Control logic namespace
     * @details: This namespace contains all classes and functions for control logic

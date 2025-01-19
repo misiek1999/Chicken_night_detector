@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Arduino.h>
 #include "door_control_states.h"
+#include <etl/array.h>
+#include <functional>
 
 namespace ControlLogic {
 

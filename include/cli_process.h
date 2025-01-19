@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Arduino.h>
 #include <cli_interface.h>
 
 namespace CLI

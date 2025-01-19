@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Arduino.h>
-
 #define CASE_ENUM_TO_STRING(enum_name) \
     case enum_name: return #enum_name;
 

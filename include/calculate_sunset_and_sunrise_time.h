@@ -1,9 +1,8 @@
 #pragma once
 
-#include <Arduino.h>
-#include <ctime>
-#include <project_types.h>
+#include "project_types.h"
 #include <sunset.h>
+#include <ctime>
 
 class DaytimeCalculator {
  public:

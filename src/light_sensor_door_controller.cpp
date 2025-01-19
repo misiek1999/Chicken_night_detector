@@ -1,4 +1,5 @@
 #include "light_sensor_door_controller.h"
+#include "Arduino.h"
 
 constexpr const auto kDelayToChangeDoorStateMs = 1800000;    // 30 minutes
 

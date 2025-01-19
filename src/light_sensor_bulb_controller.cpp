@@ -1,5 +1,5 @@
 #include "light_sensor_bulb_controller.h"
-#include "Arduino.h"
+#include <Arduino.h>
 
 ControlLogic::LightSensorBulbController::LightSensorBulbController(lightStateCallback light_sensor_callback):
         light_sensor_callback_(light_sensor_callback) {

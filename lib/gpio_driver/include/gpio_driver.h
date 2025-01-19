@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Arduino.h>
 #include <door_control_states.h>
+#include <cstdint>
 
 namespace GPIOInterface {
 

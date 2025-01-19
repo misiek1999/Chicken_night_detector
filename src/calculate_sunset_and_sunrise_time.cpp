@@ -1,5 +1,6 @@
 #include "calculate_sunset_and_sunrise_time.h"
 #include "project_const.h"
+#include <cstring>
 
 DaytimeCalculator::DaytimeCalculator():
     sunset_time(DaytimeCalculator::init_minute_value),

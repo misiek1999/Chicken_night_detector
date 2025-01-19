@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Arduino.h>
 #include <external_light_sensor_callback.h>
 #include "project_types.h"
 #include "gpio_driver.h"

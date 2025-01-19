@@ -1,5 +1,4 @@
 #pragma once
-#include <Arduino.h>
 
 // actuators outputs
 constexpr auto kPinMainLigthOutput = 16;

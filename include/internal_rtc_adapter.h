@@ -1,8 +1,7 @@
 #pragma once
 
-#include <Arduino.h>
-#include <ctime>
 #include "rtc_adapter.h"
+#include <ctime>
 namespace ModuleAdapter {
     /*
         @details function to initialize module

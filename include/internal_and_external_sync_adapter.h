@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Arduino.h>
-#
 #include "internal_rtc_adapter.h"
 #include "external_rtc_adapter.h"
 #include <ctime>

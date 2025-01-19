@@ -1,9 +1,8 @@
 #pragma once
 
-#include <functional>
-#include <Arduino.h>
 #include <embedded_cli.h>
 #include <etl/vector.h>
+#include <functional>
 
 // enable embedded CLI
 #define EMBEDDED_CLI_IMPL

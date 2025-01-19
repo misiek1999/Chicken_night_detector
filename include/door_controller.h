@@ -1,12 +1,11 @@
 #pragma once
 
-#include <Arduino.h>
-#include <ctime>
-#include <etl/utility.h>
-#include <etl/unordered_map.h>
 #include "door_control_states.h"
 #include "time_event.h"
 #include "rtc_driver.h"
+#include <etl/unordered_map.h>
+#include <etl/utility.h>
+#include <ctime>
 
 
 namespace ControlLogic {

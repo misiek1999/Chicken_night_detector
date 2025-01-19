@@ -1,4 +1,5 @@
 #include "cli_interface.h"
+#include <Arduino.h>
 
 CLI::CLIInterface::CLIInterface(etl::array<CliCommandBinding, kMaxBindingCount> &cli_callbacks,
                                 serial_read_char_fun_t getCharFromSerial,

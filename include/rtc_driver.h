@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Arduino.h>
-#include <ctime>
 #include "project_pin_definition.h"
 #include "project_types.h"
 #include "error_manager.h"
@@ -9,6 +7,7 @@
 #include "external_rtc_adapter.h"
 #include "internal_rtc_adapter.h"
 #include "internal_and_external_sync_adapter.h"
+#include <ctime>
 
 // callback funtion to get current time from rtc
 using TimeCallback = std::function<std::time_t(void)>;
