@@ -19,8 +19,8 @@ RtcBulbController::RtcBulbController(TimeCallback* rtc_update_time_callback,
     const auto month = static_cast<uint8_t>(date.tm_mon);
     const auto [time_to_blink_before_event, time_to_blink_after_event, time_to_turn_on_before_event, time_to_turn_off_after_event] = ControlLogic::getEventDurationTime(month);
 
-    sunset_callback_ = [this](const std::time_t &current_time) -> std::time_t {
-        const auto data = daytime_calculator_->getSunsetTime(current_time);
+    sunset_callback_ = [daytime_calculator](const std::time_t &current_time) -> std::time_t {
+        const auto data = daytime_calculator->getSunsetTime(current_time);
         return data;
     };
 
