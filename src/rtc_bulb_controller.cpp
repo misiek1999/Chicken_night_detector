@@ -11,8 +11,8 @@ RtcBulbController::RtcBulbController(TimeCallback* rtc_update_time_callback,
         rtc_update_time_callback_(rtc_update_time_callback),
         daytime_calculator_(daytime_calculator)
 {
-    assert(rtc_update_time_callback_ != nullptr && *rtc_update_time_callback_&& "RTC time callback is nullptr!");
-    last_update_time_ = (*rtc_update_time_callback_)();
+    assert(rtc_update_time_callback_ != nullptr && *rtc_update_time_callback_ && "RTC time callback is nullptr!");
+    last_update_time_ = std::invoke(*rtc_update_time_callback_);
 
     auto event_time = daytime_calculator_->getSunsetTime(last_update_time_);
     const auto date = *std::localtime(&last_update_time_);
