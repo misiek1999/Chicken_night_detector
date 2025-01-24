@@ -249,6 +249,7 @@ void ControlLogic::ChickenCoopController::updateLightController(const std::time_
         light_states_[getBuildingNumber(buildingId)] = bulb_light_state;
         // set control signal to output control elements
         const auto dimming_prec = bulbController->getTotalOfDimmingTimePercent();
+        LOG_DEBUG("Light controller %d state: %d, dimming_time %f", (int)buildingId, (int)bulb_light_state, dimming_prec);
         switch (bulb_light_state) {
             case LightState::On:
                 light_state_conf.callback_.toogle_light_state(true);
