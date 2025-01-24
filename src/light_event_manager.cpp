@@ -226,10 +226,8 @@ void ControlLogic::LightEventManager::updateEvents(const std::time_t & current_t
             LOG_ERROR("Callback is not set for event: %u", event);
         } else {
             auto new_event_time = event_and_callback.callback(current_time);
-            LOG_INFO("New event time: %d", new_event_time);
-
             if (event_and_callback.callback) {
-                LOG_INFO("New event time: %d", new_event_time);
+                LOG_DEBUG("New event time: %d", new_event_time);
             }
             event_and_callback.event.setEventTime(new_event_time);
         }
