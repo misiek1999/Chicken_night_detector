@@ -211,7 +211,7 @@ void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t
             LOG_VERBOSE("Door controller %d is active", buildingId);
             if (doorController->updateDoorControllerEvents()) {
                 door_action = doorController->getDoorState();
-                LOG_INFO("Door controller %d action: %s", buildingId, DoorControl::getDoorControlActionName(door_action));
+                LOG_DEBUG("Door controller %d action: %s", buildingId, DoorControl::getDoorControlActionName(door_action));
             }
             // if door state has changed, update last change time and last door action
             if (door_action != last_door_action_) {
