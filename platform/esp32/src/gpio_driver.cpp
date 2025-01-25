@@ -8,7 +8,7 @@ constexpr uint32_t kChangeStateDelayUs = 5;
 constexpr uint16_t kPwmFrequency = 500;
 constexpr uint16_t kPwmMaxValue = 255;
 constexpr uint16_t kPwmMinValue = 0;
-constexpr float kLightPercentOff = 0.5;
+constexpr float kLightPercentOff = 0.2;
 constexpr float kLightPercentOn = 1.0;
 
 GPIOInterface::GpioDriver::GpioDriver():
@@ -56,7 +56,7 @@ GPIOInterface::GpioDriver::GpioDriver():
 }
 
 void GPIOInterface::GpioDriver::toggleLightMainBuilding(const bool state) {
-    setNormalLightState(state, kPinMainLigthOutput);
+    setNormalLightState(!state, kPinMainLigthOutput);
     digitalWrite(kPinOnboardLed, static_cast<uint32_t>(!state));
     toggleLightMainBuildingIndicator(state);
 }
@@ -68,7 +68,7 @@ void GPIOInterface::GpioDriver::setPWMLightPercentageMainBuilding(const float pe
 }
 
 void GPIOInterface::GpioDriver::toggleLightExternalBuilding(const bool state) {
-    setNormalLightState(state, kPinExternalLigthOutput);
+    setNormalLightState(!state, kPinExternalLigthOutput);
     toggleLightExternalBuildingIndicator(state);
 }
 
@@ -87,7 +87,7 @@ void GPIOInterface::GpioDriver:: setNormalLightState(const bool state, const uin
 
 void GPIOInterface::GpioDriver::setPWMLight(const float percent_light, const uint16_t pin) {
     // scale percent range
-    const float scaled_percent_light = 1 -(percent_light * (kLightPercentOn - kLightPercentOff) + kLightPercentOff);
+    const float scaled_percent_light = kLightPercentOn - (percent_light * (kLightPercentOn - kLightPercentOff) + kLightPercentOff);
     // convert percent light to the range of 0 to 1023
     const auto pwm = static_cast<uint16_t>(scaled_percent_light * kPwmMaxValue);
     analogWrite(pin, pwm);
