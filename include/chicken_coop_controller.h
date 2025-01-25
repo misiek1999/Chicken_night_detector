@@ -156,7 +156,7 @@ class ChickenCoopController {
     ControlLogic::LightStateMap light_states_ = {};
     DoorActionMap door_actions_ = {};
 
-    static constexpr double kMaxDoorMovementTime = 10.0;    // 10 seconds
+    static constexpr double kMaxDoorMovementTime = 40.0;    // 40 seconds
     std::time_t last_change_time_ = {};
     DoorControl::DoorControlAction last_door_action_ = {DoorControl::DoorControlAction::Disable};
 
