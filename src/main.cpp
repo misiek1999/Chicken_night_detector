@@ -137,7 +137,7 @@ void loop() {
             chicken_coop_controller->setBulbControllerMode(ControlLogic::BulbControllerMode::ExternalLightSensor);
             chicken_coop_controller->setDoorControllerMode(ControlLogic::DoorControllerMode::ExternalLightSensor);
         } else {
-            LOG_INFO("RTC error resolved, switch to RTC controllers");
+            LOG_INFO("Switch to RTC controllers");
             chicken_coop_controller->setBulbControllerMode(ControlLogic::BulbControllerMode::Rtc);
             chicken_coop_controller->setDoorControllerMode(ControlLogic::DoorControllerMode::Rtc);
         }
