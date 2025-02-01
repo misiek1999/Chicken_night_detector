@@ -1,7 +1,7 @@
 #include "light_sensor_door_controller.h"
 #include "Arduino.h"
 
-constexpr const auto kDelayToChangeDoorStateMs = 1800000;    // 30 minutes
+constexpr const auto kDelayToChangeDoorStateMs = 300000;    // 5 minutes
 
 ControlLogic::LightSensorDoorController::LightSensorDoorController(lightStateCallback light_sensor_callback):
     light_sensor_callback_(light_sensor_callback) {

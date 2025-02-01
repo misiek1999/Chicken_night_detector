@@ -28,7 +28,7 @@ namespace ControlLogic {
         lightStateCallback light_sensor_callback_;
         ProjectTypes::time_ms_t last_light_change_time_ {0};
         EnternalLightState last_light_state_ {EnternalLightState::Low};
-        DoorControl::DoorControlAction door_state_ {DoorControl::DoorControlAction::Disable};
+        DoorControl::DoorControlAction door_state_ {DoorControl::DoorControlAction::Open};
     };
 
 
