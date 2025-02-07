@@ -162,7 +162,6 @@ void GPIOInterface::GpioDriver::toggleDoorMoveIndicator(const bool state) {
 void GPIOInterface::GpioDriver::toggleErrorIndicator(const bool state) {
     digitalWrite(kPinErrorIndicator, !state);
 }
-
 bool GPIOInterface::GpioDriver::getExternalLightSensor() {
-    return digitalRead(kPinExternalLightSensor);
+    return !digitalRead(kPinExternalLightSensor);
 }
