@@ -15,7 +15,8 @@ bool ControlLogic::LightSensorDoorController::updateDoorControllerEvents() {
         last_light_state_ = current_light_state;
     }
     if (current_time - last_light_change_time_ > kDelayToChangeDoorStateMs) {
-        door_state_ = current_light_state == EnternalLightState::High ? DoorControl::DoorControlAction::Open : DoorControl::DoorControlAction::Close;
+        // This logic is inverted, if the light is high, the door should be closed
+        door_state_ = current_light_state == EnternalLightState::High ? DoorControl::DoorControlAction::Close : DoorControl::DoorControlAction::Open;
     }
     return true;
 }
