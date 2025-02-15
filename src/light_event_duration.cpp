@@ -12,8 +12,8 @@ enum class Season
 // dimming before event, dimming after event, active before event, active after event
 constexpr etl::array<ControlLogic::BulbEventDurationTime, 3> bulb_event_duration_times = {{
     {0, 60, 60, 10}, // 0: winter
-    {0, 20, 35, 5},  // 1: spring and autumn
-    {0, 0, 20, 10},  // 2: summer
+    {0, 20, 30, 10},  // 1: spring and autumn
+    {0, 0, 5, 25},  // 2: summer
 }};
 
 ControlLogic::BulbEventDurationTime ControlLogic::getEventDurationTime(const uint8_t &month)
