@@ -44,9 +44,13 @@ class TimeEvent {
     */
     std::time_t getStopEventTime() const;
 
- protected:
+    void setStartEventTime(const std::time_t &start_event_time) { start_event_time_ = start_event_time; }
+    void setStopEventTime(const std::time_t &stop_event_time) { stop_event_time_ = stop_event_time; }
+
+ private:
     std::time_t start_event_time_;
     std::time_t stop_event_time_;
+protected:
     static constexpr std::time_t kTimeInitValue = {};
 };
 
@@ -58,7 +62,7 @@ class TimestampEvent : public TimeEvent{
                           const ProjectTypes::time_minute_t &time_to_turn_off_after_event);
 
     // use method from base class
-    using TimeEvent::checkEventIsActive;
+    // using TimeEvent::checkEventIsActive;
 
     // remove setEventTime from base class
     void setEventTime(const std::time_t &start_event_time, const std::time_t &stop_event_time) = delete;

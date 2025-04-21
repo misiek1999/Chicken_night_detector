@@ -33,6 +33,7 @@ void ControlLogic::LightDimmingEvent::setEventTime(const std::time_t & new_event
     turn_on_event_.setEventTime(new_event_time);
     start_dimming_event_.setEventTime(new_event_time);
     LOG_VERBOSE("Event time updated: %d", new_event_time);
+    updateEventActivationAndDimmingTime();
 }
 
 void ControlLogic::LightDimmingEvent::setNewActivationAndDimmingTime(const ProjectTypes::time_minute_t & time_to_turn_on_before_event,
@@ -221,15 +222,13 @@ void ControlLogic::LightEventManager::updateEvents(const std::time_t & current_t
         return;
     }
     // get new event time from callback
-    for (auto [event, event_and_callback] : event_containers_) {
+    for (auto& [event, event_and_callback] : event_containers_) {
         if (!event_and_callback.callback) {
             LOG_ERROR("Callback is not set for event: %u", event);
         } else {
             auto new_event_time = event_and_callback.callback(current_time);
-            if (event_and_callback.callback) {
-                LOG_DEBUG("New event time: %d", new_event_time);
-            }
             event_and_callback.event.setEventTime(new_event_time);
+            LOG_DEBUG("New event time: %d", new_event_time);
         }
     }
     last_update_time_ = current_time;

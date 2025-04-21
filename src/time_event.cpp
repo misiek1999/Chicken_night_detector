@@ -1,5 +1,6 @@
 #include "time_event.h"
-
+#include "log.h"
+#include <string>
 static constexpr uint32_t kSecondPerMinute = 60U;
 
 // Global functions
@@ -24,6 +25,10 @@ TimeEvent::TimeEvent(const std::time_t & start_event_time,
 }
 
 bool TimeEvent::checkEventIsActive(const std::time_t & current_time) const {
+    LOG_DEBUG("Start event time: %s, stop event time: %s, current: %s",
+                std::to_string(start_event_time_).c_str(),
+                std::to_string(stop_event_time_).c_str(),
+                std::to_string(current_time).c_str());
     return current_time > start_event_time_ && current_time < stop_event_time_;
 }
 
@@ -86,7 +91,8 @@ ProjectTypes::time_minute_t TimestampEvent::getTimeToTurnOffAfterEvent() const {
 }
 
 ProjectTypes::time_minute_t TimestampEvent::getTimeToEvent(const std::time_t & current_time) const {
-    return static_cast<ProjectTypes::time_minute_t>(std::difftime(start_event_time_, current_time));
+    const auto start_event_time = getStartEventTime();
+    return static_cast<ProjectTypes::time_minute_t>(std::difftime(start_event_time, current_time));
 }
 
 bool TimestampEvent::checkEventWasHappened(const std::time_t & current_time) const {
@@ -94,15 +100,20 @@ bool TimestampEvent::checkEventWasHappened(const std::time_t & current_time) con
 }
 
 ProjectTypes::time_minute_t TimestampEvent::getTimePastEvent(const std::time_t & current_time) const {
-    return static_cast<ProjectTypes::time_minute_t>(std::difftime(current_time, stop_event_time_));
+    const auto stop_event_time = getStopEventTime();
+    return static_cast<ProjectTypes::time_minute_t>(std::difftime(current_time, stop_event_time));
 }
 
 void TimestampEvent::updateEventTurnOffTime() {
-    stop_event_time_ = event_time_ + convertMinutesToSeconds(time_to_turn_off_after_event_);
+    const auto stop_event_time = event_time_ + convertMinutesToSeconds(time_to_turn_off_after_event_);
+    setStopEventTime(stop_event_time);
+    LOG_DEBUG("Event time, turn off time: %s", std::to_string(event_time_).c_str(), std::to_string(stop_event_time).c_str());
 }
 
 void TimestampEvent::updateEventTurnOnTime() {
-    start_event_time_ = event_time_ - convertMinutesToSeconds(time_to_turn_on_before_event_);
+    const auto start_event_time = event_time_ - convertMinutesToSeconds(time_to_turn_on_before_event_);
+    setStartEventTime(start_event_time);
+    LOG_DEBUG("Event time: %s, turn on time: %s", std::to_string(event_time_).c_str(), std::to_string(start_event_time).c_str());
 }
 
 void TimestampEvent::updateEventTime() {
