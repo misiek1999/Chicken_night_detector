@@ -235,6 +235,7 @@ void ControlLogic::ChickenCoopController::updateDoorController(const std::time_t
 }
 
 void ControlLogic::ChickenCoopController::updateLightController(const std::time_t & rtc_time) {
+    LOG_VERBOSE("Light controller enter");
     // iterate over all bulb light controllers
     for (auto &[buildingId, bulbController] : bulb_controllers_) {
         // update light controller
@@ -249,7 +250,7 @@ void ControlLogic::ChickenCoopController::updateLightController(const std::time_
         light_states_[getBuildingNumber(buildingId)] = bulb_light_state;
         // set control signal to output control elements
         const auto dimming_prec = bulbController->getTotalOfDimmingTimePercent();
-        LOG_DEBUG("Light controller %d state: %d, dimming_time %f", (int)buildingId, (int)bulb_light_state, dimming_prec);
+        LOG_DEBUG("Light controller %d state: %d, dimming_time: %F", (int)buildingId, (int)bulb_light_state, dimming_prec);
         switch (bulb_light_state) {
             case LightState::On:
                 light_state_conf.callback_.toogle_light_state(true);
@@ -264,4 +265,5 @@ void ControlLogic::ChickenCoopController::updateLightController(const std::time_
                 break;
             }
     }
+    LOG_VERBOSE("Light controller updated exit");
 }
