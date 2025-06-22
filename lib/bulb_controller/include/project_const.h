@@ -23,6 +23,7 @@ namespace ProjectConst
     constexpr uint32_t kLightControlSecondsToTurnOffLights = 60 * 60; // Default value 1h
     constexpr uint32_t kLightControlSecondsToDimmingLight = 10 * 60;   // Default value 10min
     constexpr uint32_t kLightControlNightMaximumSecondDuration = 24 * 60 * 60;   //Maximum duration of ON or Dimming mode in light control logic
+    constexpr uint32_t kSecondsToCloseDoor = 60 * 30; // Default value 30min for door close time
     // sunset and sunrise const
     constexpr ProjectTypes::latitude_t kInstallationLatitude = 50.08027485662493F;
     constexpr ProjectTypes::longitude_t kInstallationLongitude = 21.341718388675318F;

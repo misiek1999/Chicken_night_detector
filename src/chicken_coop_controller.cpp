@@ -33,13 +33,17 @@ ControlLogic::ChickenCoopController::ChickenCoopController(CoopConfig coop_confi
     // Add door controller event to main building
     auto getDoorOpenEventTime = [&] (const std::time_t &current_time) mutable {
         auto tm  = *std::localtime(&current_time);
-        tm.tm_hour = 6;
+        if (tm.tm_mon > 2 && tm.tm_mon < 10) { // April to October
+            tm.tm_hour = 5;
+        } else {
+            tm.tm_hour = 6; // Default to 6 AM for other months
+        }
         tm.tm_min = 0;
         auto new_open_time = std::mktime(&tm);
         return new_open_time;
     };
     auto getDoorCloseEventTime = [&] (const std::time_t &current_time) mutable {
-        return daytime_calculator_.getSunsetTime(current_time) + ProjectConst::kLightControlSecondsToTurnOffLights;
+        return daytime_calculator_.getSunsetTime(current_time) + ProjectConst::kSecondsToCloseDoor;
     };
     const auto building_id = coop_config_.door_config_[0].id_;
     rtc_door_controllers_.insert(etl::make_pair(building_id,
