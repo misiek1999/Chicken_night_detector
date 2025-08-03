@@ -8,6 +8,7 @@
 #include "chicken_coop_controller_instance.h"
 #include "rtc_driver.h"
 #include "log.h"
+#include "calculate_sunset_and_sunrise_time.h"
 
 // declaration of helper function
 bool checkInputRtcArgumentValueIsInRange(uint32_t value, size_t index);
@@ -27,7 +28,8 @@ void getDoorControlModeCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void clearAllErrorStatusCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getDoorControlAutoControllerCli(EmbeddedCli *embeddedCli, char *args, void *context);
 void getBulbControlAutoControllerCli(EmbeddedCli *embeddedCli, char *args, void *context);
-
+void getSunriseTime(EmbeddedCli *embeddedCli, char *args, void *context);
+void getSunsetTime(EmbeddedCli *embeddedCli, char *args, void *context);
 
 CLI::CliCommandContainer CLI::cli_callbacks = {{{
         "set_rtc",                      // command name (spaces are not allowed)
@@ -126,6 +128,20 @@ CLI::CliCommandContainer CLI::cli_callbacks = {{{
         false,                          // flag whether to tokenize arguments (see below)
         nullptr,                        // optional pointer to any application context
         getBulbControlAutoControllerCli           // binding function
+    },
+    {
+        "get_sunrise_time",        // command name (spaces are not allowed)
+        "get sunrise time",        // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getSunriseTime                // binding function
+    },
+    {
+        "get_sunset_time",        // command name (spaces are not allowed)
+        "get sunset time",        // Optional help for a command (NULL for no help)
+        false,                          // flag whether to tokenize arguments (see below)
+        nullptr,                        // optional pointer to any application context
+        getSunsetTime                // binding function
     }
 }};
 
@@ -500,3 +516,71 @@ void getBulbControlAutoControllerCli(EmbeddedCli *embeddedCli, char *args, void 
     Serial.print("Selected bulb auto controller: ");
     Serial.println(ControlLogic::getBulbControllerModeName(bulb_control_mode));
 }
+void getSunriseTime(EmbeddedCli *embeddedCli, char *args, void *context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
+
+    auto* rtc_driver_ptr = &RtcDriver::getInstance();
+
+    // read current time
+    std::time_t currentTime = rtc_driver_ptr->getTimeFromRtc();
+    // get current time
+    std::time_t current_time = rtc_driver_ptr->getTimeFromRtc();
+    // convert time_t to tm
+    auto currentTimeTm = *std::localtime(&currentTime);
+
+    DaytimeCalculator calculator(ProjectConst::kInstallationLatitude,
+                                 ProjectConst::kInstallationLongitude,
+                                 ProjectConst::kInstallationTimeZone,
+                                 ProjectConst::kInstallationReq);
+    const auto sunrise_time = calculator.getSunriseTime(currentTime);
+    // convert sunrise time to tm
+    auto sunriseTimeTm = *std::localtime(&sunrise_time);
+
+    // print current and sunrise time
+    char buf[128];
+    // Get the time from the RTC
+    snprintf(buf, sizeof(buf), "Current time: %04d-%02d-%02d %02d:%02d:%02d Sunrise time: %04d-%02d-%02d %02d:%02d:%02d",
+        currentTimeTm.tm_year + ProjectConst::kTmStructInitYear, currentTimeTm.tm_mon + ProjectConst::kMonthSyncOffset,
+        currentTimeTm.tm_mday, currentTimeTm.tm_hour, currentTimeTm.tm_min, currentTimeTm.tm_sec,
+        sunriseTimeTm.tm_year + ProjectConst::kTmStructInitYear, sunriseTimeTm.tm_mon + ProjectConst::kMonthSyncOffset,
+        sunriseTimeTm.tm_mday, sunriseTimeTm.tm_hour, sunriseTimeTm.tm_min, sunriseTimeTm.tm_sec);
+    // Print the formatted string to serial so we can see the time.
+    Serial.println(buf);
+}
+
+void getSunsetTime(EmbeddedCli *embeddedCli, char *args, void *context) {
+    (void)embeddedCli;
+    (void)context;
+    (void)args;
+
+    auto* rtc_driver_ptr = &RtcDriver::getInstance();
+
+    // read current time
+    std::time_t currentTime = rtc_driver_ptr->getTimeFromRtc();
+    // get current time
+    std::time_t current_time = rtc_driver_ptr->getTimeFromRtc();
+    // convert time_t to tm
+    auto currentTimeTm = *std::localtime(&currentTime);
+
+    DaytimeCalculator calculator(ProjectConst::kInstallationLatitude,
+                                 ProjectConst::kInstallationLongitude,
+                                 ProjectConst::kInstallationTimeZone,
+                                 ProjectConst::kInstallationReq);
+    const auto sunset_time = calculator.getSunsetTime(currentTime);
+    // convert sunset time to tm
+    auto sunsetTimeTm = *std::localtime(&sunset_time);
+
+    // print current and sunset time
+    char buf[128];
+    // Get the time from the RTC
+    snprintf(buf, sizeof(buf), "Current time: %04d-%02d-%02d %02d:%02d:%02d Sunset time: %04d-%02d-%02d %02d:%02d:%02d",
+        currentTimeTm.tm_year + ProjectConst::kTmStructInitYear, currentTimeTm.tm_mon + ProjectConst::kMonthSyncOffset,
+        currentTimeTm.tm_mday, currentTimeTm.tm_hour, currentTimeTm.tm_min, currentTimeTm.tm_sec,
+        sunsetTimeTm.tm_year + ProjectConst::kTmStructInitYear, sunsetTimeTm.tm_mon + ProjectConst::kMonthSyncOffset,
+        sunsetTimeTm.tm_mday, sunsetTimeTm.tm_hour, sunsetTimeTm.tm_min, sunsetTimeTm.tm_sec);
+    // Print the formatted string to serial so we can see the time.
+    Serial.println(buf);
+}
+
