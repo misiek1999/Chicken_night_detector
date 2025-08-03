@@ -86,7 +86,7 @@ float ControlLogic::LightDimmingEvent::getRestLightDimmingTimePercent(const std:
 
 void ControlLogic::LightDimmingEvent::updateEventActivationAndDimmingTime() {
     turn_on_event_.setNewTimeToTurnOffAfterEvent(time_to_turn_off_after_event_);
-    turn_on_event_.setNewTimeToTurnOnBeforeEvent(0);
+    turn_on_event_.setNewTimeToTurnOnBeforeEvent(time_to_turn_on_before_event_);
     start_dimming_event_.setNewTimeToTurnOffAfterEvent(time_to_end_dimming_after_turn_off_ + time_to_turn_off_after_event_);
     start_dimming_event_.setNewTimeToTurnOnBeforeEvent(time_to_start_dimming_before_turn_on_ + time_to_turn_on_before_event_);
     LOG_DEBUG("Event before %d, after %d : Dimming before %d, after %d",
